@@ -25,8 +25,6 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 
 void World::Update(sf::Time dt)
 {
-	//Scroll the world
-	m_camera.move(0, m_scrollspeed * dt.asSeconds());
 	
 	m_player_aircraft->SetVelocity(0.f, 0.f);
 
@@ -44,7 +42,6 @@ void World::Update(sf::Time dt)
 
 	m_scenegraph.RemoveWrecks();
 
-	SpawnEnemies();
 
 	m_scenegraph.Update(dt, m_command_queue);
 	AdaptPlayerPosition();
@@ -110,7 +107,7 @@ void World::BuildScene()
 	//Initialize the different layers
 	for (std::size_t i = 0; i < static_cast<int>(SceneLayers::kLayerCount); ++i)
 	{
-		ReceiverCategories category = (i == static_cast<int>(SceneLayers::kLowerAir)) ? ReceiverCategories::kScene : ReceiverCategories::kNone;
+		ReceiverCategories category = (i == static_cast<int>(SceneLayers::kParticles)) ? ReceiverCategories::kScene : ReceiverCategories::kNone;
 		SceneNode::Ptr layer(new SceneNode(category));
 		m_scene_layers[i] = layer.get();
 		m_scenegraph.AttachChild(std::move(layer));
@@ -137,20 +134,18 @@ void World::BuildScene()
 	m_player_aircraft = leader.get();
 	m_player_aircraft->setPosition(m_spawn_position);
 	m_player_aircraft->SetVelocity(40.f, m_scrollspeed);
-	m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(leader));
+	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
 	//Add the particle nodes to the scene
 	std::unique_ptr<ParticleNode> smokeNode(new ParticleNode(ParticleType::kSmoke, m_textures));
-	m_scene_layers[static_cast<int>(SceneLayers::kLowerAir)]->AttachChild(std::move(smokeNode));
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(smokeNode));
 
 	std::unique_ptr<ParticleNode> propellantNode(new ParticleNode(ParticleType::kPropellant, m_textures));
-	m_scene_layers[static_cast<int>(SceneLayers::kLowerAir)]->AttachChild(std::move(propellantNode));
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(propellantNode));
 
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
 	m_scenegraph.AttachChild(std::move(soundNode));
-
-	AddEnemies();
 
 	/*std::unique_ptr<Aircraft> left_escort(new Aircraft(AircraftType::kRaptor, m_textures, m_fonts));
 	left_escort->setPosition(-80.f, 50.f);
@@ -184,23 +179,8 @@ void World::AdaptPlayerVelocity()
 	{
 		m_player_aircraft->SetVelocity(velocity / std::sqrt(2.f));
 	}
-	//Add scrolling velocity
-	m_player_aircraft->Accelerate(0.f, m_scrollspeed);
 }
 
-void World::SpawnEnemies()
-{
-	//Spawn an enemy when it is relevant i.e when it is in the Battlefieldboudns
-	while (!m_enemy_spawn_points.empty() && m_enemy_spawn_points.back().m_y > GetBattleFieldBounds().top)
-	{
-		SpawnPoint spawn = m_enemy_spawn_points.back();
-		std::unique_ptr<Aircraft> enemy(new Aircraft(spawn.m_type, m_textures, m_fonts));
-		enemy->setPosition(spawn.m_x, spawn.m_y);
-		enemy->setRotation(180.f);
-		m_scene_layers[static_cast<int>(SceneLayers::kUpperAir)]->AttachChild(std::move(enemy));
-		m_enemy_spawn_points.pop_back();
-	}
-}
 
 void World::AddEnemies()
 {
@@ -233,19 +213,13 @@ sf::FloatRect World::GetViewBounds() const
 
 sf::FloatRect World::GetBattleFieldBounds() const
 {
-	//Return camera bounds + a small area at the top where enemies spawn
-	sf::FloatRect bounds = GetViewBounds();
-	bounds.top -= 100.f;
-	bounds.height += 100.f;
-
-	return bounds;
-
+	return GetViewBounds();
 }
 
 void World::DestroyEntitiesOutsideView()
 {
 	Command command;
-	command.category = static_cast<int>(ReceiverCategories::kEnemyAircraft) | static_cast<int>(ReceiverCategories::kProjectile);
+	command.category = static_cast<int>(ReceiverCategories::kProjectile);
 	command.action = DerivedAction<Entity>([this](Entity& e, sf::Time dt)
 		{
 			//Does the object intersect with the battlefield
