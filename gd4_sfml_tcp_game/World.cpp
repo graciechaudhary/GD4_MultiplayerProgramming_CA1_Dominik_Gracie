@@ -282,7 +282,7 @@ void World::BuildTreesRandom(sf::FloatRect lake_bounds) {
 		}
 		};
 
-	// Place 10 trees of each type
+	
 	place_trees(purple_tree_texture, 15);
 	place_trees(green_tree_texture, 15);
 	place_trees(dead_tree_texture, 15);
