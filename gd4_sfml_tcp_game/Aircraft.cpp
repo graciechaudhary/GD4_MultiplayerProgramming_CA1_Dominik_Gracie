@@ -49,7 +49,10 @@ Aircraft::Aircraft(AircraftType type, const TextureHolder& textures, const FontH
 	, m_show_explosion(true)
 	, m_spawned_pickup(false)
 	, m_played_explosion_sound(false)
-
+	, m_is_walking_up(false)
+	, m_is_walking_down(false)
+	, m_is_walking_left(false)
+	, m_is_walking_right(false)
 {
 	m_explosion.SetFrameSize(sf::Vector2i(256, 256));
 	m_explosion.SetNumFrames(16);
@@ -359,4 +362,75 @@ void Aircraft::PlayLocalSound(CommandQueue& commands, SoundEffect effect)
 		});
 
 	commands.Push(command);
+}
+
+void Aircraft::ClearWalkingFlags(sf::Time dt)
+{
+	if (m_clear_flags_time > sf::milliseconds(250))
+	{
+		m_is_walking_down = false;
+		m_is_walking_left = false;
+		m_is_walking_right = false;
+		m_is_walking_up = false;
+		m_clear_flags_time = sf::Time::Zero;
+	}
+	else
+	{
+		m_clear_flags_time += dt;
+	}
+
+}
+
+int Aircraft::GetWalkingFlagsCount() const
+{
+	return m_is_walking_up + m_is_walking_down + m_is_walking_left + m_is_walking_right;
+}
+
+void Aircraft::HandleSliding()
+{
+	sf::Vector2f velocity = GetVelocity();
+	float x_reduce = 0.f;
+	float y_reduce = 0.f;
+	float reduction_rate = 1.4f;
+
+	if (velocity.x != 0.f && !m_is_walking_left && !m_is_walking_right)
+	{
+		x_reduce = velocity.x > 0.f ? -reduction_rate : reduction_rate;
+	}
+	if (velocity.y != 0.f && !m_is_walking_down && !m_is_walking_up)
+	{
+		y_reduce = velocity.y > 0.f ? -reduction_rate : reduction_rate;
+	}
+
+	Accelerate(x_reduce, y_reduce);
+
+
+	if (GetVelocity().x <= 4.f && GetVelocity().x >= -4.f)
+	{
+		SetVelocity(0.f, GetVelocity().y);
+	}
+
+	if (GetVelocity().y <= 4.f && GetVelocity().y >= -4.f)
+	{
+		SetVelocity(GetVelocity().x, 0.f);
+	}
+
+}
+
+void Aircraft::HandleBorderInteraction(sf::FloatRect view_bounds)
+{
+	const float border_distance = 40.f;
+
+	sf::Vector2f position = getPosition();
+	position.x = std::max(position.x, view_bounds.left + border_distance);
+	position.x = std::min(position.x, view_bounds.left + view_bounds.width - border_distance);
+	position.y = std::max(position.y, view_bounds.top + border_distance);
+	position.y = std::min(position.y, view_bounds.top + view_bounds.height - border_distance);
+
+	if (position != getPosition())
+	{
+		SetVelocity(0.f, 0.f);
+	}
+
+	setPosition(position);
 }

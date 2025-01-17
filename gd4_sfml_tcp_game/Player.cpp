@@ -1,17 +1,109 @@
 #include "Player.hpp"
 #include "ReceiverCategories.hpp"
 #include "Aircraft.hpp"
+#include <iostream>
 
-struct AircraftMover
+
+enum class Direction
 {
-    AircraftMover(float vx, float vy) :velocity(vx, vy)
+	kLeft,
+	kRight,
+	kUp,
+	kDown
+};
+
+struct CharacterMover
+{
+    CharacterMover(Direction dir) : direction(dir)
     {}
     void operator()(Aircraft& aircraft, sf::Time) const
     {
+        switch (direction)
+        {
+        case Direction::kLeft:
+            aircraft.m_is_walking_left = true;
+            break;
+        case Direction::kRight:
+            aircraft.m_is_walking_right = true;
+            break;
+        case Direction::kUp:
+            aircraft.m_is_walking_up = true;
+            break;
+        case Direction::kDown:
+            aircraft.m_is_walking_down = true;
+            break;
+        default:
+            break;
+        }
+
+        int sum = aircraft.GetWalkingFlagsCount();
+
+        sf::Vector2f current_velocity = aircraft.GetVelocity();
+		sf::Vector2f velocity = sf::Vector2f(0.f,0.f);
+		float max_speed = 200.f;
+		float acceleration = 10.f;
+
+
+        if (sum == 2)
+        {
+            max_speed /= std::sqrt(2.f);
+            acceleration /= std::sqrt(2.f);
+        }
+        else if (current_velocity.x != 0.f && current_velocity.y != 0.f)
+        {
+            max_speed /= std::sqrt(2.f);
+        }
+
+        switch (direction)
+        {
+        case Direction::kLeft: 
+			if (current_velocity.x < -max_speed)
+			{
+				aircraft.SetVelocity(-max_speed, current_velocity.y);
+			}
+			else
+			{
+				velocity.x -= acceleration;
+			}
+            break;
+        case Direction::kRight:
+            if (current_velocity.x > max_speed)
+            {
+                aircraft.SetVelocity(max_speed, current_velocity.y);
+            }
+            else
+            {
+				velocity.x += acceleration;
+            }
+            break;
+        case Direction::kUp:
+			if (current_velocity.y < -max_speed)
+			{
+				aircraft.SetVelocity(current_velocity.x, -max_speed);
+			}
+			else
+			{
+				velocity.y -= acceleration;
+			}
+            break;
+        case Direction::kDown:
+            if (current_velocity.y > max_speed)
+            {
+                aircraft.SetVelocity(current_velocity.x, max_speed);
+            }
+            else
+            {
+				velocity.y += acceleration;
+            }
+            break;
+        default:
+            break;
+        }
+
         aircraft.Accelerate(velocity);
     }
 
-    sf::Vector2f velocity;
+	Direction direction;
 };
 
 Player::Player(): m_current_mission_status(MissionStatus::kMissionRunning)
@@ -23,6 +115,7 @@ Player::Player(): m_current_mission_status(MissionStatus::kMissionRunning)
     m_key_binding[sf::Keyboard::S] = Action::kMoveDown;
     m_key_binding[sf::Keyboard::M] = Action::kMissileFire;
     m_key_binding[sf::Keyboard::Space] = Action::kBulletFire;
+    
 
     //Set initial action bindings
     InitialiseActions();
@@ -99,11 +192,10 @@ MissionStatus Player::GetMissionStatus() const
 
 void Player::InitialiseActions()
 {
-    const float kPlayerSpeed = 200.f;
-    m_action_binding[Action::kMoveLeft].action = DerivedAction<Aircraft>(AircraftMover(-kPlayerSpeed, 0.f));
-    m_action_binding[Action::kMoveRight].action = DerivedAction<Aircraft>(AircraftMover(kPlayerSpeed, 0.f));
-    m_action_binding[Action::kMoveUp].action = DerivedAction<Aircraft>(AircraftMover(0.f, -kPlayerSpeed));
-    m_action_binding[Action::kMoveDown].action = DerivedAction<Aircraft>(AircraftMover(0.f, kPlayerSpeed));
+    m_action_binding[Action::kMoveLeft].action = DerivedAction<Aircraft>(CharacterMover(Direction::kLeft));
+    m_action_binding[Action::kMoveRight].action = DerivedAction<Aircraft>(CharacterMover(Direction::kRight));
+    m_action_binding[Action::kMoveUp].action = DerivedAction<Aircraft>(CharacterMover(Direction::kUp));
+    m_action_binding[Action::kMoveDown].action = DerivedAction<Aircraft>(CharacterMover(Direction::kDown));
     m_action_binding[Action::kBulletFire].action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time dt)
         {
             a.Fire();
@@ -115,7 +207,6 @@ void Player::InitialiseActions()
             a.LaunchMissile();
         }
     );
-
 }
 
 bool Player::IsRealTimeAction(Action action)

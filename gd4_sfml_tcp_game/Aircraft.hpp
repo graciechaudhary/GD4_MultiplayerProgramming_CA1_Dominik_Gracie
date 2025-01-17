@@ -31,6 +31,19 @@ public:
 	bool IsMarkedForRemoval() const override;
 	void PlayLocalSound(CommandQueue& commands, SoundEffect effect);
 
+	void ClearWalkingFlags(sf::Time dt);
+
+	int GetWalkingFlagsCount() const;
+
+	void HandleSliding();
+
+	void HandleBorderInteraction(sf::FloatRect view_bounds);
+
+	bool m_is_walking_left;
+	bool m_is_walking_right;
+	bool m_is_walking_up;
+	bool m_is_walking_down;
+
 private:
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
@@ -67,5 +80,6 @@ private:
 	bool m_spawned_pickup;
 	bool m_played_explosion_sound;
 
+	sf::Time m_clear_flags_time;
 };
 
