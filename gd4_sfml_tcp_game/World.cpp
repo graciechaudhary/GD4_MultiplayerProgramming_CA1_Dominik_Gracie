@@ -50,19 +50,19 @@ void World::Update(sf::Time dt)
 
 void World::Draw()
 {
-	if (PostEffect::IsSupported())
-	{
-		m_scene_texture.clear();
+	//if (PostEffect::IsSupported())
+	//{
+		/*m_scene_texture.clear();
 		m_scene_texture.setView(m_camera);
 		m_scene_texture.draw(m_scenegraph);
 		m_scene_texture.display();
-		m_bloom_effect.Apply(m_scene_texture, m_target);
-	}
-	else
-	{
+		m_bloom_effect.Apply(m_scene_texture, m_target);*/
+	//}
+	//else
+	//{
 		m_target.setView(m_camera);
 		m_target.draw(m_scenegraph);
-	}
+	//}
 }
 
 CommandQueue& World::GetCommandQueue()
@@ -103,8 +103,8 @@ void World::LoadTextures()
 	//new additions for the game
 	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
 	m_textures.Load(TextureID::kCharacterAttack, "MediaFiles/Textures/Character/CharacterAttackSheet.png");
-	m_textures.Load(TextureID::kSnowTile, "MediaFiles/Textures/Environment/SandTile_64x64.png");
-	m_textures.Load(TextureID::kLakeTile, "MediaFiles/Textures/Environment/SandTile2_64x64.png");
+	m_textures.Load(TextureID::kSnowTile, "MediaFiles/Textures/Environment/SnowTile_64x64.png");
+	m_textures.Load(TextureID::kLakeTile, "MediaFiles/Textures/Environment/LakeTile2_32x32.png");
 	m_textures.Load(TextureID::kPurpleTree, "MediaFiles/Textures/Tree/PurpleTree_64x64.png");
 	m_textures.Load(TextureID::kGreenTree, "MediaFiles/Textures/Tree/GreenTree_64x64.png");
 	m_textures.Load(TextureID::kDeadTree, "MediaFiles/Textures/Tree/DeadTree_64x64.png");
@@ -174,18 +174,19 @@ void World::BuildSnowLandscape() {
 	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(background_sprite));
 
 	//Building ice lake
+	const float border_thickness = 64.f;
 	sf::Texture& icy_lake_texture = m_textures.Get(TextureID::kLakeTile);
 	icy_lake_texture.setRepeated(true);
 	sf::IntRect lake_texture_rect(0, 0, static_cast<int>(m_world_bounds.width), static_cast<int>(m_world_bounds.height));
 	std::unique_ptr<SpriteNode> lake_sprite(new SpriteNode(icy_lake_texture, lake_texture_rect));
-	lake_sprite->setScale(0.8125, 0.75);
-	lake_sprite->setPosition(m_world_bounds.left + 96, m_world_bounds.top + 96);
+	lake_sprite->setScale(0.875, 0.834);
+	lake_sprite->setPosition(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness);
 	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(lake_sprite));
 
-	sf::FloatRect lake_bounds(m_world_bounds.left + 96, m_world_bounds.top + 96,	m_world_bounds.width * 0.8125, m_world_bounds.height * 0.75);
+	//sf::FloatRect lake_bounds(m_world_bounds.left + 96, m_world_bounds.top + 96,	m_world_bounds.width * 0.8125, m_world_bounds.height * 0.75);
 		
 	//BuildTreesRandom(lake_bounds);
-	BuildTreesFixed(lake_bounds);
+	//BuildTreesFixed(lake_bounds);
 }
 
 void World::BuildTreesRandom(sf::FloatRect lake_bounds) {
