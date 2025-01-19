@@ -7,6 +7,7 @@
 #include "ProjectileType.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 #include "Animation.hpp"
+#include "FacingDirections.hpp"
 
 class Aircraft : public Entity
 {
@@ -38,6 +39,8 @@ public:
 	void HandleSliding();
 
 	void HandleBorderInteraction(sf::FloatRect view_bounds);
+
+	FacingDirections GetFacingDirection() const;
 
 	bool m_is_walking_left;
 	bool m_is_walking_right;

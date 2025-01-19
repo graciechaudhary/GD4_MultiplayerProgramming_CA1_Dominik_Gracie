@@ -196,21 +196,80 @@ void Aircraft::LaunchMissile()
 void Aircraft::CreateBullet(SceneNode& node, const TextureHolder& textures) const
 {
 	ProjectileType type = IsAllied() ? ProjectileType::kAlliedBullet : ProjectileType::kEnemyBullet;
-	switch (m_spread_level)
+	//switch (m_spread_level)
+	//{
+	//case 1:
+	//	CreateProjectile(node, type, 0.0f, 0.5f, textures);
+	//	break;
+	//case 2:
+	//	CreateProjectile(node, type, -0.5f, 0.5f, textures);
+	//	CreateProjectile(node, type, 0.5f, 0.5f, textures);
+	//	break;
+	//case 3:
+	//	CreateProjectile(node, type, 0.0f, 0.5f, textures);
+	//	CreateProjectile(node, type, -0.5f, 0.5f, textures);
+	//	CreateProjectile(node, type, 0.5f, 0.5f, textures);
+	//	break;
+	//}
+	float x_offset = 0.f;
+	float y_offset = 0.5f;
+	sf::Vector2f velocity(0.f,0.f);
+
+	std::unique_ptr<Projectile> projectile(new Projectile(type, textures));
+
+	float snowball_speed = projectile->GetMaxSpeed();
+
+	switch (GetFacingDirection())
 	{
-	case 1:
-		CreateProjectile(node, type, 0.0f, 0.5f, textures);
+	case FacingDirections::kUp:
+		velocity.y = -snowball_speed;
+		y_offset = 0.5f;
 		break;
-	case 2:
-		CreateProjectile(node, type, -0.5f, 0.5f, textures);
-		CreateProjectile(node, type, 0.5f, 0.5f, textures);
+	case FacingDirections::kDown:
+		velocity.y = snowball_speed;
+		y_offset = 0.5f;
 		break;
-	case 3:
-		CreateProjectile(node, type, 0.0f, 0.5f, textures);
-		CreateProjectile(node, type, -0.5f, 0.5f, textures);
-		CreateProjectile(node, type, 0.5f, 0.5f, textures);
+	case FacingDirections::kLeft:
+		velocity.x = -snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kRight:
+		velocity.x = snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kUpLeft:
+		velocity.x = -snowball_speed / std::sqrt(2);
+		velocity.y = -snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = -0.5f;
+		break;
+	case FacingDirections::kUpRight:
+		velocity.x = snowball_speed / std::sqrt(2);
+		velocity.y = -snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = 0.5f;
+		break;
+	case FacingDirections::kDownLeft:
+		velocity.x = -snowball_speed / std::sqrt(2);
+		velocity.y = snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = -0.5f;
+		break;
+	case FacingDirections::kDownRight:
+		velocity.x = snowball_speed / std::sqrt(2);
+		velocity.y = snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = 0.5f;
+		break;
+	default:
 		break;
 	}
+
+	sf::Vector2f offset(x_offset * m_sprite.getGlobalBounds().width, y_offset * m_sprite.getGlobalBounds().height);
+
+	projectile->setPosition(GetWorldPosition() + offset);
+	projectile->SetVelocity(velocity);
+	node.AttachChild(std::move(projectile));
 	
 }
 
@@ -267,7 +326,7 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 	Entity::UpdateCurrent(dt, commands);
 	UpdateTexts();
-	UpdateMovementPattern(dt);
+	//UpdateMovementPattern(dt);
 
 	UpdateRollAnimation();
 
@@ -277,10 +336,10 @@ void Aircraft::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 void Aircraft::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 {
-	if (!IsAllied())
-	{
-		Fire();
-	}
+	//if (!IsAllied())
+	//{
+	//	Fire();
+	//}
 
 	if (m_is_firing && m_fire_countdown <= sf::Time::Zero)
 	{
@@ -433,4 +492,72 @@ void Aircraft::HandleBorderInteraction(sf::FloatRect view_bounds)
 	}
 
 	setPosition(position);
+}
+
+FacingDirections Aircraft::GetFacingDirection() const
+{
+	int walking_flags = GetWalkingFlagsCount();
+
+	if (walking_flags == 1)
+	{
+		if (m_is_walking_up)
+		{
+			return FacingDirections::kUp;
+		}
+		else if (m_is_walking_down)
+		{
+			return FacingDirections::kDown;
+		}
+		else if (m_is_walking_left)
+		{
+			return FacingDirections::kLeft;
+		}
+		else if (m_is_walking_right)
+		{
+			return FacingDirections::kRight;
+		}
+	}
+	else if (walking_flags == 2)
+	{
+		if (m_is_walking_up && m_is_walking_left)
+		{
+			return FacingDirections::kUpLeft;
+		}
+		else if (m_is_walking_up && m_is_walking_right)
+		{
+			return FacingDirections::kUpRight;
+		}
+		else if (m_is_walking_down && m_is_walking_left)
+		{
+			return FacingDirections::kDownLeft;
+		}
+		else if (m_is_walking_down && m_is_walking_right)
+		{
+			return FacingDirections::kDownRight;
+		}
+	}
+	else if (walking_flags == 3)
+	{
+		if (!m_is_walking_up)
+		{
+			return FacingDirections::kDown;
+		}
+		else if (!m_is_walking_down)
+		{
+			return FacingDirections::kUp;
+		}
+		else if (!m_is_walking_left)
+		{
+			return FacingDirections::kRight;
+		}
+		else if (!m_is_walking_right)
+		{
+			return FacingDirections::kLeft;
+		}
+	}
+	else
+	{
+		return FacingDirections::kDown;
+
+	}
 }

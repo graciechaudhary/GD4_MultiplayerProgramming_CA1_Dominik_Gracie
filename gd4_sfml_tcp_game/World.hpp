@@ -69,6 +69,7 @@ private:
 	sf::Vector2f m_spawn_position;
 	float m_scrollspeed;
 	Aircraft* m_player_aircraft;
+	Aircraft* m_player2_aircraft;
 
 	CommandQueue m_command_queue;
 

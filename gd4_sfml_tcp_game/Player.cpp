@@ -115,15 +115,31 @@ Player::Player(): m_current_mission_status(MissionStatus::kMissionRunning)
     m_key_binding[sf::Keyboard::S] = Action::kMoveDown;
     m_key_binding[sf::Keyboard::M] = Action::kMissileFire;
     m_key_binding[sf::Keyboard::Space] = Action::kBulletFire;
+	m_key_binding[sf::Keyboard::Left] = Action::kMoveLeft2;
+	m_key_binding[sf::Keyboard::Right] = Action::kMoveRight2;
+	m_key_binding[sf::Keyboard::Up] = Action::kMoveUp2;
+	m_key_binding[sf::Keyboard::Down] = Action::kMoveDown2;
+	m_key_binding[sf::Keyboard::RShift] = Action::kThrow2;
     
-
     //Set initial action bindings
     InitialiseActions();
 
+
+	bool first_player = true;
     //Assign all categories to a player's aircraft
     for (auto& pair : m_action_binding)
     {
-        pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+        if (pair.first == Action::kMoveLeft2) first_player = false;
+
+        if (first_player)
+        {
+            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+		}
+        else
+        {
+            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kEnemyAircraft);
+        }
+
     }
 }
 
@@ -207,6 +223,16 @@ void Player::InitialiseActions()
             a.LaunchMissile();
         }
     );
+
+	m_action_binding[Action::kMoveLeft2].action = DerivedAction<Aircraft>(CharacterMover(Direction::kLeft));
+	m_action_binding[Action::kMoveRight2].action = DerivedAction<Aircraft>(CharacterMover(Direction::kRight));
+	m_action_binding[Action::kMoveUp2].action = DerivedAction<Aircraft>(CharacterMover(Direction::kUp));
+	m_action_binding[Action::kMoveDown2].action = DerivedAction<Aircraft>(CharacterMover(Direction::kDown));
+	m_action_binding[Action::kThrow2].action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time dt)
+		{
+			a.Fire();
+		}
+	);
 }
 
 bool Player::IsRealTimeAction(Action action)
@@ -218,6 +244,11 @@ bool Player::IsRealTimeAction(Action action)
     case Action::kMoveDown:
     case Action::kMoveUp:
     case Action::kBulletFire:
+	case Action::kMoveLeft2:
+	case Action::kMoveRight2:
+	case Action::kMoveDown2:
+	case Action::kMoveUp2:
+    case Action::kThrow2:
         return true;
     default:
         return false;

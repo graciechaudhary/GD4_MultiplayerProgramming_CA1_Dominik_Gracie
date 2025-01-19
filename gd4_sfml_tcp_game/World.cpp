@@ -26,9 +26,10 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 void World::Update(sf::Time dt)
 {
 	m_player_aircraft->ClearWalkingFlags(dt);
+	m_player2_aircraft->ClearWalkingFlags(dt);
 
 	DestroyEntitiesOutsideView();
-	GuideMissiles();
+	//GuideMissiles();
 
 	//Forward commands to the scenegraph
 	while (!m_command_queue.IsEmpty())
@@ -136,6 +137,12 @@ void World::BuildScene()
 	m_player_aircraft->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
+	std::unique_ptr<Aircraft> second(new Aircraft(AircraftType::kAvenger, m_textures, m_fonts));
+	m_player2_aircraft = second.get();
+	m_player2_aircraft->setPosition(40.f,40.f);
+	m_player2_aircraft->SetVelocity(0, 0);
+	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(second));
+
 	//Add the particle nodes to the scene
 	std::unique_ptr<ParticleNode> smokeNode(new ParticleNode(ParticleType::kSmoke, m_textures));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(smokeNode));
@@ -162,6 +169,7 @@ void World::AdaptPlayerPosition()
 	sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
 
 	m_player_aircraft->HandleBorderInteraction(view_bounds);
+	m_player2_aircraft->HandleBorderInteraction(view_bounds);
 
 }
 
@@ -169,6 +177,7 @@ void World::AdaptPlayerVelocity()
 {
 
 	m_player_aircraft->HandleSliding();
+	m_player2_aircraft->HandleSliding();
 
 
 
