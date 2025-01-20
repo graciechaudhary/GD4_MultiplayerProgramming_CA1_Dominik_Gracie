@@ -30,15 +30,36 @@ void EmitterNode::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	}
 }
 
+//void EmitterNode::EmitParticles(sf::Time dt)
+//{
+//	const float emissionRate = 5.f;
+//	const sf::Time interval = sf::seconds(1.f) / emissionRate;
+//
+//	m_accumulated_time += dt;
+//	while (m_accumulated_time > interval)
+//	{
+//		m_accumulated_time -= interval;
+//		m_particle_system->AddParticle(GetWorldPosition());
+//	}
+//}
+
+
+//setting new emission pattern - Gracie Chaudhary
 void EmitterNode::EmitParticles(sf::Time dt)
 {
-	const float emissionRate = 30.f;
+	const float emissionRate = 50.f; 
 	const sf::Time interval = sf::seconds(1.f) / emissionRate;
-
 	m_accumulated_time += dt;
-	while (m_accumulated_time > interval)
-	{
+
+	while (m_accumulated_time > interval) {
 		m_accumulated_time -= interval;
-		m_particle_system->AddParticle(GetWorldPosition());
+
+		// setting up code for emission in a circular/radial pattern
+		float angle = static_cast<float>(std::rand()) / RAND_MAX * 2 * 3.14159f; //converting my random angle in a range between [0,2pi] radians
+		float radius = 30.f; // setting distance for the floating particles
+		sf::Vector2f offset(radius * std::cos(angle), radius * std::sin(angle)); // seeting x and y coordinates - x = radius*cos(angle), y = radius*sin(angle)
+
+		// Add particle at offset position
+		m_particle_system->AddParticle(GetWorldPosition() + offset);
 	}
 }

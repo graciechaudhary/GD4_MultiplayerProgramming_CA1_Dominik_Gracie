@@ -103,9 +103,11 @@ void World::LoadTextures()
 	m_textures.Load(TextureID::kEntities, "Media/Textures/Entities.png");
 	m_textures.Load(TextureID::kJungle, "Media/Textures/Jungle.png");
 	m_textures.Load(TextureID::kExplosion, "Media/Textures/Explosion.png");
-	m_textures.Load(TextureID::kParticle, "Media/Textures/Particle.png");
 
-	//new additions for the game
+	//edited texture for the snow particle effect - GracieChaudhary
+	m_textures.Load(TextureID::kParticle, "MediaFiles/Textures/Particles/SnowBits.png");
+
+	//reloading textures for game assets - GracieChaudhary
 	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
 	m_textures.Load(TextureID::kCharacterAttack, "MediaFiles/Textures/Character/CharacterAttackSheet.png");
 	m_textures.Load(TextureID::kSnowball, "MediaFiles/Textures/Weapon/Snowball.png");
@@ -121,7 +123,7 @@ void World::BuildScene()
 {
 	InitializeLayers();
 
-	//builds snow landsacpe, adds tree sprite
+	//builds snow landsacpe, adds tree sprite - Gracie Chaudhary
 	BuildSnowLandscape();	
 
 	//Add the finish line
@@ -144,6 +146,9 @@ void World::BuildScene()
 	std::unique_ptr<ParticleNode> propellantNode(new ParticleNode(ParticleType::kPropellant, m_textures));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(propellantNode));
 
+	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures));
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
+
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
 	m_scenegraph.AttachChild(std::move(soundNode));
@@ -157,6 +162,7 @@ void World::BuildScene()
 	m_player_aircraft->AttachChild(std::move(right_escort));*/
 }
 
+//cleaning up the code - GracieChaudhary
 void World::InitializeLayers() {
 	//Initialize the different layers
 	for (std::size_t i = 0; i < static_cast<int>(SceneLayers::kLayerCount); ++i)
@@ -168,6 +174,7 @@ void World::InitializeLayers() {
 	}
 }
 
+//building our snow landscape - snow, icy lake, trees - GracieChaudhary
 void World::BuildSnowLandscape() {
 
 	//Prepare the background - defining the area for the repeated texture, creating sprite using the repeating texture, setting position of the sprite to match the world bounds, and attaching the sprite to the background scene layer
@@ -194,6 +201,7 @@ void World::BuildSnowLandscape() {
 	//BuildTreesFixed(lake_bounds);
 }
 
+//Building trees randomly - GracieChaudhary
 void World::BuildTreesRandom(sf::FloatRect lake_bounds) {
 
 	//Placing tree sprites
@@ -205,34 +213,7 @@ void World::BuildTreesRandom(sf::FloatRect lake_bounds) {
 	std::unique_ptr<SpriteNode> greenTreeSprite(new SpriteNode(greenTreeTexture));
 	std::unique_ptr<SpriteNode> deadTreeSprite(new SpriteNode(deadTreeTexture));*/
 
-	//std::vector<sf::Vector2f> purple_tree_positions = {
-	//{200.f, 300.f}, {400.f, 600.f}, {700.f, 200.f}
-	//};
-	//std::vector<sf::Vector2f> green_tree_positions = {
-	//	{150.f, 450.f}, {500.f, 800.f}, {900.f, 150.f}
-	//};
-	//std::vector<sf::Vector2f> dead_tree_positions = {
-	//	{250.f, 550.f}, {600.f, 700.f}, {800.f, 300.f}
-	//};
-	//// Create and position purple trees
-	//for (const auto& position : purple_tree_positions) {		
-	//		std::unique_ptr<SpriteNode> treeSprite(new SpriteNode(purple_tree_texture));
-	//		treeSprite->setPosition(position);
-	//		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(treeSprite));		
-	//}
-	//// Create and position green trees
-	//for (const auto& position : green_tree_positions) {		
-	//		std::unique_ptr<SpriteNode> treeSprite(new SpriteNode(green_tree_texture));
-	//		treeSprite->setPosition(position);
-	//		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(treeSprite));		
-	//}
-	//// Create and position dead trees
-	//for (const auto& position : dead_tree_positions) {		
-	//		std::unique_ptr<SpriteNode> treeSprite(new SpriteNode(dead_tree_texture));
-	//		treeSprite->setPosition(position);
-	//		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(treeSprite));		
-	//}
-
+	
 	// Dimensions and border rules
 	const int tree_size = 64;
 	const sf::Vector2f screen_size(1024, 768);
@@ -295,6 +276,7 @@ void World::BuildTreesRandom(sf::FloatRect lake_bounds) {
 
 }
 
+//Building trees in a fixed manner - GracieChaudhary
 void World::BuildTreesFixed(sf::FloatRect lake_bounds) {
 
 	//Placing tree sprites
