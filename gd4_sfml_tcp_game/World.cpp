@@ -13,7 +13,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_sounds(sounds)
 	,m_scenegraph(ReceiverCategories::kNone)
 	,m_scene_layers()
-	,m_world_bounds(0.f,0.f, m_camera.getSize().x, 768.f)
+	,m_world_bounds(0.f,0.f, m_camera.getSize().x, m_camera.getSize().y)
 	,m_spawn_position(m_camera.getSize().x/2.f, m_world_bounds.height - m_camera.getSize().y/2.f)
 	,m_scrollspeed(-50.f)
 	,m_player_aircraft(nullptr)
@@ -52,17 +52,22 @@ void World::Draw()
 {
 	//if (PostEffect::IsSupported())
 	//{
-		/*m_scene_texture.clear();
-		m_scene_texture.setView(m_camera);
-		m_scene_texture.draw(m_scenegraph);
-		m_scene_texture.display();
-		m_bloom_effect.Apply(m_scene_texture, m_target);*/
+	//	m_scene_texture.clear();
+	//	m_scene_texture.setView(m_camera);
+	//	m_scene_texture.draw(m_scenegraph);
+	//	m_scene_texture.display();
+	//	m_bloom_effect.Apply(m_scene_texture, m_target);
+	//	//m_shadow_effect.Apply(m_scene_texture, m_target);
+
 	//}
 	//else
 	//{
-		m_target.setView(m_camera);
-		m_target.draw(m_scenegraph);
+	//	m_target.setView(m_camera);
+	//	m_target.draw(m_scenegraph);
 	//}
+
+	m_target.setView(m_camera);
+	m_target.draw(m_scenegraph);
 }
 
 CommandQueue& World::GetCommandQueue()
@@ -82,12 +87,12 @@ bool World::HasPlayerReachedEnd() const
 
 void World::LoadTextures()
 {
-	m_textures.Load(TextureID::kEagle, "Media/Textures/Eagle.png");
+	/*m_textures.Load(TextureID::kEagle, "Media/Textures/Eagle.png");
 	m_textures.Load(TextureID::kRaptor, "Media/Textures/Raptor.png");
 	m_textures.Load(TextureID::kAvenger, "Media/Textures/Avenger.png");
 	m_textures.Load(TextureID::kLandscape, "Media/Textures/Desert.png");
 	m_textures.Load(TextureID::kBullet, "Media/Textures/Bullet.png");
-	m_textures.Load(TextureID::kMissile, "Media/Textures/Missile.png");
+	m_textures.Load(TextureID::kMissile, "Media/Textures/Missile.png");*/
 
 	m_textures.Load(TextureID::kHealthRefill, "Media/Textures/HealthRefill.png");
 	m_textures.Load(TextureID::kMissileRefill, "Media/Textures/MissileRefill.png");
@@ -103,13 +108,13 @@ void World::LoadTextures()
 	//new additions for the game
 	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
 	m_textures.Load(TextureID::kCharacterAttack, "MediaFiles/Textures/Character/CharacterAttackSheet.png");
+	m_textures.Load(TextureID::kSnowball, "MediaFiles/Textures/Weapon/Snowball.png");
 	m_textures.Load(TextureID::kSnowTile, "MediaFiles/Textures/Environment/SnowTile_64x64.png");
-	m_textures.Load(TextureID::kLakeTile, "MediaFiles/Textures/Environment/LakeTile2_32x32.png");
+	m_textures.Load(TextureID::kLakeTile, "MediaFiles/Textures/Environment/LakeTile_64x64.png");
 	m_textures.Load(TextureID::kPurpleTree, "MediaFiles/Textures/Tree/PurpleTree_64x64.png");
 	m_textures.Load(TextureID::kGreenTree, "MediaFiles/Textures/Tree/GreenTree_64x64.png");
 	m_textures.Load(TextureID::kDeadTree, "MediaFiles/Textures/Tree/DeadTree_64x64.png");
-	//m_textures.Load(TextureID::kLakeLandscape, "");
-
+	
 }
 
 void World::BuildScene()

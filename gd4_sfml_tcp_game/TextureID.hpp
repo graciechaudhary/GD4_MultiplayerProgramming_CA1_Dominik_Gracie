@@ -25,11 +25,11 @@ enum class TextureID
 	//new additions for the game
 	kCharacterMovement,
 	kCharacterAttack,
+	kSnowball,
 	kSnowTile,
 	kLakeTile,
 	kPurpleTree,
 	kGreenTree,
-	kDeadTree,
-	kLakeLandscape
+	kDeadTree
 
 };

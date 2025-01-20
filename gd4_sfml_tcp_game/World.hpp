@@ -9,6 +9,7 @@
 #include "SpriteNode.hpp"
 #include "CommandQueue.hpp"
 #include "BloomEffect.hpp"
+#include "ShadowEffect.hpp"
 #include "SoundPlayer.hpp"
 
 #include <array>
@@ -81,5 +82,8 @@ private:
 	std::vector<Aircraft*> m_active_enemies;
 
 	BloomEffect m_bloom_effect;
+
+	//ShadowEffect m_shadow_effect;
+	
 };
 
