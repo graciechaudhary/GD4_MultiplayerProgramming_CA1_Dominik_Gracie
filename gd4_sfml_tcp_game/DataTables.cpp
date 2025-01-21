@@ -13,7 +13,7 @@ std::vector<AircraftData> InitializeAircraftData()
     data[static_cast<int>(AircraftType::kEagle)].m_speed = 200.f;
     data[static_cast<int>(AircraftType::kEagle)].m_fire_interval = sf::seconds(1);
     data[static_cast<int>(AircraftType::kEagle)].m_texture = TextureID::kCharacterMovement;
-    data[static_cast<int>(AircraftType::kEagle)].m_texture_rect = sf::IntRect(0, 0, 38, 42);
+    data[static_cast<int>(AircraftType::kEagle)].m_texture_rect = sf::IntRect(0, 0, 38, 42); //adapted to the new spritesheet
     data[static_cast<int>(AircraftType::kEagle)].m_has_roll_animation = true;
 
     data[static_cast<int>(AircraftType::kRaptor)].m_hitpoints = 20;
@@ -98,12 +98,6 @@ std::vector<PickupData> InitializePickupData()
 std::vector<ParticleData> InitializeParticleData()
 {
     std::vector<ParticleData> data(static_cast<int>(ParticleType::kParticleCount));
-
-    //data[static_cast<int>(ParticleType::kPropellant)].m_color = sf::Color(0,0,0);//151,216,255
-    //data[static_cast<int>(ParticleType::kPropellant)].m_lifetime = sf::seconds(0.5f);
-
-    /*data[static_cast<int>(ParticleType::kSmoke)].m_color = sf::Color(50, 50, 50);
-    data[static_cast<int>(ParticleType::kSmoke)].m_lifetime = sf::seconds(2.5f);*/
 
     data[static_cast<int>(ParticleType::kSnow)].m_color = sf::Color(255,255,255);
     data[static_cast<int>(ParticleType::kSnow)].m_lifetime = sf::seconds(1.f);

@@ -7,5 +7,16 @@ enum class SoundEffect
 	kExplosion2,
 	kLaunchMissile,
 	kCollectPickup,
-	kButton
+	kButton,
+
+	//game sound effects
+	kSnowballThrow,
+	kSnowballHitPlayer,
+	//kSnowballHitGround, - still under consideration as it might cause audio clutter
+
+	//ui sound effects
+	kMenuButton,
+	kPauseButton,
+	kLifeDrop,
+	kLifeGain
 };

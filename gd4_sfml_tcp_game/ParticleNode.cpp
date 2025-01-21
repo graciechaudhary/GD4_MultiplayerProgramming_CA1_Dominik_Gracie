@@ -15,7 +15,7 @@ ParticleNode::ParticleNode(ParticleType type, const TextureHolder& textures)
     , m_texture(textures.Get(TextureID::kParticle))
     , m_type(type)
     , m_vertex_array(sf::Quads) 
-    /*fixed particle system glitch: as we were using four vertices in the ComputeVertices method but a triangular vertex array the fourth particle 
+    /*fixed particle system glitch: as we were using four vertices in the ComputeVertices method but a triangular vertex array the fourth vertex 
     would attach to the first vertex of the next particle which was fixed with using quads - GracieChaudhary*/
     , m_needs_vertex_update(true)
 {
