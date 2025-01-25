@@ -14,10 +14,15 @@ Application::Application() : m_window(sf::VideoMode(1024, 768), "States", sf::St
 	m_window.setKeyRepeatEnabled(false);
 	m_fonts.Load(Font::kMain, "Media/Fonts/Sansation.ttf");
 	m_textures.Load(TextureID::kTitleScreen, "Media/Textures/TitleScreen.png");
+	
 	m_textures.Load(TextureID::kButtonNormal, "Media/Textures/ButtonNormal.png");
 	m_textures.Load(TextureID::kButtonSelected, "Media/Textures/ButtonSelected.png");
 	m_textures.Load(TextureID::kButtonActivated, "Media/Textures/ButtonPressed.png");
 	m_textures.Load(TextureID::kButtons, "Media/Textures/Buttons.png");
+
+	//new
+	m_textures.Load(TextureID::kMenuButton, "MediaFiles/Textures/UI/MenuButton.png");
+	m_textures.Load(TextureID::kMenuScreen, "MediaFiles/Textures/Menu/5.png");
 
 	RegisterStates();
 	m_stack.PushState(StateID::kTitle);

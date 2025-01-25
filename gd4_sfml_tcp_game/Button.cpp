@@ -12,6 +12,7 @@ gui::Button::Button(State::Context context)
     ChangeTexture(ButtonType::kNormal);
     sf::FloatRect bounds = m_sprite.getLocalBounds();
     m_text.setPosition(bounds.width / 2, bounds.height / 2);
+    m_sprite.setColor((sf::Color(255, 255, 255)));
 }
 
 void gui::Button::SetCallback(Callback callback)

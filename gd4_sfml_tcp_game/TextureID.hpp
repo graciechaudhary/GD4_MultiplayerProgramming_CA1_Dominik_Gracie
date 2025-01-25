@@ -30,6 +30,8 @@ enum class TextureID
 	kLakeTile,
 	kPurpleTree,
 	kGreenTree,
-	kDeadTree
+	kDeadTree,
+	kMenuScreen,
+	kMenuButton
 
 };
