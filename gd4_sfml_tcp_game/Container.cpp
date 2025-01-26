@@ -35,7 +35,7 @@ void gui::Container::HandleEvent(const sf::Event& event)
         {
             SelectNext();
         }
-        else if (event.key.code == sf::Keyboard::Return || event.key.code == sf::Keyboard::Space)
+        else if (event.key.code == sf::Keyboard::Return)
         {
             if (HasSelection())
             {

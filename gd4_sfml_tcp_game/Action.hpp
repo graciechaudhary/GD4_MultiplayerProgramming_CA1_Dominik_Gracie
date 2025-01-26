@@ -5,7 +5,6 @@ enum class Action
 	kMoveRight,
 	kMoveUp,
 	kMoveDown,
-	kMissileFire,
 	kBulletFire,
 	kMoveLeft2,
 	kMoveRight2,

@@ -9,17 +9,22 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
 	//Build key binding buttons and labels
-	AddButtonLabel(Action::kMoveUp, 150.f, "Move Up", context);
-	AddButtonLabel(Action::kMoveDown, 200.f, "Move Down", context);
-	AddButtonLabel(Action::kMoveRight, 250.f, "Move Right", context);
-	AddButtonLabel(Action::kMoveLeft, 300.f, "Move Left", context);
-	AddButtonLabel(Action::kBulletFire, 350.f, "Fire", context);
-	AddButtonLabel(Action::kMissileFire, 400.f, "Missile Fire", context);
+	AddButtonLabel(Action::kMoveUp, 50.f, "Move Up", context);
+	AddButtonLabel(Action::kMoveDown, 100.f, "Move Down", context);
+	AddButtonLabel(Action::kMoveRight, 150.f, "Move Right", context);
+	AddButtonLabel(Action::kMoveLeft, 200.f, "Move Left", context);
+	AddButtonLabel(Action::kBulletFire, 250.f, "Fire", context);
+	AddButtonLabel(Action::kMoveUp2, 300.f, "Move Up 2", context);
+	AddButtonLabel(Action::kMoveDown2, 350.f, "Move Down 2", context);
+	AddButtonLabel(Action::kMoveRight2, 400.f, "Move Right 2", context);
+	AddButtonLabel(Action::kMoveLeft2, 450.f, "Move Left 2", context);
+	AddButtonLabel(Action::kThrow2, 500.f, "Throw 2", context);
+
 
 	UpdateLabels();
 
 	auto back_button = std::make_shared<gui::Button>(context);
-	back_button->setPosition(80.f, 475.f);
+	back_button->setPosition(80.f, 550.f);
 	back_button->SetText("Back");
 	back_button->SetCallback(std::bind(&SettingsState::RequestStackPop, this));
 	m_gui_container.Pack(back_button);
@@ -70,7 +75,7 @@ bool SettingsState::HandleEvent(const sf::Event& event)
 
 void SettingsState::UpdateLabels()
 {
-	Player& player = *GetContext().player;
+	GameInputController& player = *GetContext().player;
 	for (std::size_t i = 0; i < static_cast<int>(Action::kActionCount); ++i)
 	{
 		sf::Keyboard::Key key = player.GetAssignedKey(static_cast<Action>(i));

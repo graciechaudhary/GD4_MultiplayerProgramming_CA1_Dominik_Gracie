@@ -3,6 +3,7 @@
 #include "Projectile.hpp"
 #include "ParticleNode.hpp"
 #include "SoundNode.hpp"
+#include <iostream> 
 
 World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
 	:m_target(output_target)
@@ -16,11 +17,19 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_spawn_position(m_camera.getSize().x/2.f, m_world_bounds.height - m_camera.getSize().y/2.f)
 	,m_scrollspeed(-50.f)
 	,m_player_aircraft(nullptr)
+	, m_time_since_last_drop(sf::Time::Zero)
+	, m_pickup_drop_interval(sf::seconds(5.f))
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
 	BuildScene();
 	m_camera.setCenter(m_spawn_position);
+
+	m_create_pickup_command.category = static_cast<int>(ReceiverCategories::kScene);
+	m_create_pickup_command.action = [this](SceneNode& node, sf::Time)
+		{
+			CreatePickup(node, m_textures);
+		};
 }
 
 void World::Update(sf::Time dt)
@@ -29,6 +38,7 @@ void World::Update(sf::Time dt)
 	m_player2_aircraft->ClearWalkingFlags(dt);
 
 	DestroyEntitiesOutsideView();
+	CheckPickupDrop(dt);
 	//GuideMissiles();
 
 	//Forward commands to the scenegraph
@@ -90,7 +100,7 @@ void World::LoadTextures()
 	m_textures.Load(TextureID::kMissile, "Media/Textures/Missile.png");
 
 	m_textures.Load(TextureID::kHealthRefill, "Media/Textures/HealthRefill.png");
-	m_textures.Load(TextureID::kMissileRefill, "Media/Textures/MissileRefill.png");
+	m_textures.Load(TextureID::kSnowballRefill, "Media/Textures/MissileRefill.png");
 	m_textures.Load(TextureID::kFireSpread, "Media/Textures/FireSpread.png");
 	m_textures.Load(TextureID::kFireRate, "Media/Textures/FireRate.png");
 	m_textures.Load(TextureID::kFinishLine, "Media/Textures/FinishLine.png");
@@ -131,13 +141,13 @@ void World::BuildScene()
 	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(finish_sprite));
 
 	//Add the player's aircraft
-	std::unique_ptr<Aircraft> leader(new Aircraft(AircraftType::kEagle, m_textures, m_fonts));
+	std::unique_ptr<Character> leader(new Character(AircraftType::kEagle, m_textures, m_fonts));
 	m_player_aircraft = leader.get();
 	m_player_aircraft->setPosition(m_spawn_position);
 	m_player_aircraft->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
-	std::unique_ptr<Aircraft> second(new Aircraft(AircraftType::kAvenger, m_textures, m_fonts));
+	std::unique_ptr<Character> second(new Character(AircraftType::kAvenger, m_textures, m_fonts));
 	m_player2_aircraft = second.get();
 	m_player2_aircraft->setPosition(40.f,40.f);
 	m_player2_aircraft->SetVelocity(0, 0);
@@ -188,29 +198,13 @@ void World::AdaptPlayerVelocity()
 	//}
 }
 
-
-void World::AddEnemies()
+void World::CreatePickup(SceneNode& node, const TextureHolder& textures) const
 {
-	AddEnemy(AircraftType::kRaptor, 0.f, 500.f);
-	AddEnemy(AircraftType::kRaptor, 0.f, 1000.f);
-	AddEnemy(AircraftType::kRaptor, 100.f, 1100.f);
-	AddEnemy(AircraftType::kRaptor, -100.f, 1100.f);
-	AddEnemy(AircraftType::kAvenger, -70.f, 1400.f);
-	AddEnemy(AircraftType::kAvenger, 70.f, 1400.f);
-	AddEnemy(AircraftType::kAvenger, 70.f, 1600.f);
-
-	//Sort the enemies according to y-value so that enemies are checked first
-	std::sort(m_enemy_spawn_points.begin(), m_enemy_spawn_points.end(), [](SpawnPoint lhs, SpawnPoint rhs)
-	{
-		return lhs.m_y < rhs.m_y;
-	});
-
-}
-
-void World::AddEnemy(AircraftType type, float relx, float rely)
-{
-	SpawnPoint spawn(type, m_spawn_position.x + relx, m_spawn_position.y - rely);
-	m_enemy_spawn_points.emplace_back(spawn);
+	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
+	std::unique_ptr<Pickup> pickup(new Pickup(type, textures));
+	pickup->setPosition(m_world_bounds.width / 3, m_world_bounds.height / 3);
+	node.AttachChild(std::move(pickup));
+	std::cout << "Pickup created" << std::endl;
 }
 
 sf::FloatRect World::GetViewBounds() const
@@ -242,8 +236,8 @@ void World::GuideMissiles()
 {
 	//Target the closest enemy in the world
 	Command enemyCollector;
-	enemyCollector.category = static_cast<int>(ReceiverCategories::kEnemyAircraft);
-	enemyCollector.action = DerivedAction<Aircraft>([this](Aircraft& enemy, sf::Time)
+	enemyCollector.category = static_cast<int>(ReceiverCategories::kPlayerTwo);
+	enemyCollector.action = DerivedAction<Character>([this](Character& enemy, sf::Time)
 		{
 			if (!enemy.IsDestroyed())
 			{
@@ -252,7 +246,7 @@ void World::GuideMissiles()
 		});
 
 	Command missileGuider;
-	missileGuider.category = static_cast<int>(ReceiverCategories::kAlliedProjectile);
+	missileGuider.category = static_cast<int>(ReceiverCategories::kPlayerOneProjectile);
 	missileGuider.action = DerivedAction<Projectile>([this](Projectile& missile, sf::Time dt)
 		{
 			if (!missile.IsGuided())
@@ -261,9 +255,9 @@ void World::GuideMissiles()
 			}
 
 			float min_distance = std::numeric_limits<float>::max();
-			Aircraft* closest_enemy = nullptr;
+			Character* closest_enemy = nullptr;
 
-			for (Aircraft* enemy : m_active_enemies)
+			for (Character* enemy : m_active_enemies)
 			{
 				float enemy_distance = Distance(missile, *enemy);
 				if (enemy_distance < min_distance)
@@ -310,30 +304,48 @@ void World::HandleCollisions()
 	m_scenegraph.CheckSceneCollision(m_scenegraph, collision_pairs);
 	for (SceneNode::Pair pair : collision_pairs)
 	{
-		if (MatchesCategories(pair, ReceiverCategories::kPlayerAircraft, ReceiverCategories::kEnemyAircraft))
+		if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPlayerTwo))
 		{
-			auto& player = static_cast<Aircraft&>(*pair.first);
-			auto& enemy = static_cast<Aircraft&>(*pair.second);
+			auto& player_one = static_cast<Character&>(*pair.first);
+			auto& playuer_two = static_cast<Character&>(*pair.second);
 			//Collision response
-			player.Damage(enemy.GetHitPoints());
-			enemy.Destroy();
+			sf::Vector2f velocity_one = player_one.GetVelocity();
+			sf::Vector2f velocity_two = playuer_two.GetVelocity();
+
+			player_one.SetVelocity(0.f, 0.f);
+			playuer_two.SetVelocity(0.f, 0.f);
+
+			if (velocity_one == sf::Vector2f(0.f, 0.f))
+			{
+				velocity_one = -velocity_two;
+			}
+			if (velocity_two == sf::Vector2f(0.f, 0.f))
+			{
+				velocity_two = -velocity_one;
+			}
+
+			player_one.Accelerate(velocity_two);
+			playuer_two.Accelerate(velocity_one);
 		}
 
-		else if (MatchesCategories(pair, ReceiverCategories::kPlayerAircraft, ReceiverCategories::kPickup))
+		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPickup) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPickup))
 		{
-			auto& player = static_cast<Aircraft&>(*pair.first);
+			auto& player = static_cast<Character&>(*pair.first);
 			auto& pickup = static_cast<Pickup&>(*pair.second);
 			//Collision response
 			pickup.Apply(player);
 			pickup.Destroy();
 			player.PlayLocalSound(m_command_queue, SoundEffect::kCollectPickup);
 		}
-		else if (MatchesCategories(pair, ReceiverCategories::kPlayerAircraft, ReceiverCategories::kEnemyProjectile) || MatchesCategories(pair, ReceiverCategories::kEnemyAircraft, ReceiverCategories::kAlliedProjectile))
+		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPlayerTwoProjectile) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPlayerOneProjectile))
 		{
-			auto& aircraft = static_cast<Aircraft&>(*pair.first);
+			auto& character = static_cast<Character&>(*pair.first);
 			auto& projectile = static_cast<Projectile&>(*pair.second);
 			//Collision response
-			aircraft.Damage(projectile.GetDamage());
+			character.Damage(projectile.GetDamage());
+			character.SetVelocity(0.f, 0.f);
+			character.Accelerate(projectile.GetVelocity() / (2.5f,2.5f));
+
 			projectile.Destroy();
 		}
 	}
@@ -346,4 +358,18 @@ void World::UpdateSounds()
 
 	// Remove unused sounds
 	m_sounds.RemoveStoppedSounds();
+}
+
+void World::CheckPickupDrop(sf::Time dt)
+{
+	// Check if it's time to spawn a new pickup
+	if (m_time_since_last_drop > m_pickup_drop_interval)
+	{
+		m_time_since_last_drop = sf::Time::Zero;
+		m_command_queue.Push(m_create_pickup_command);
+	}
+	else
+	{
+		m_time_since_last_drop += dt;
+	}
 }

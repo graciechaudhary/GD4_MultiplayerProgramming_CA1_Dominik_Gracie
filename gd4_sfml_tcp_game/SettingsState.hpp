@@ -1,6 +1,6 @@
 #pragma once
 #include "State.hpp"
-#include "Player.hpp"
+#include "GameInputController.hpp"
 #include "Container.hpp"
 #include "Button.hpp"
 #include "Label.hpp"

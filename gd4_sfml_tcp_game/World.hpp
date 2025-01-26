@@ -4,7 +4,7 @@
 #include "ResourceHolder.hpp"
 #include "SceneNode.hpp"
 #include "SceneLayers.hpp"
-#include "Aircraft.hpp"
+#include "Character.hpp"
 #include "TextureID.hpp"
 #include "SpriteNode.hpp"
 #include "CommandQueue.hpp"
@@ -31,9 +31,7 @@ private:
 	void AdaptPlayerPosition();
 	void AdaptPlayerVelocity();
 
-	void SpawnEnemies();
-	void AddEnemies();
-	void AddEnemy(AircraftType type, float relx, float rely);
+	void CreatePickup(SceneNode& node, const TextureHolder& textures) const;
 	sf::FloatRect GetViewBounds() const;
 	sf::FloatRect GetBattleFieldBounds() const;
 
@@ -42,6 +40,8 @@ private:
 
 	void HandleCollisions();
 	void UpdateSounds();
+
+	void CheckPickupDrop(sf::Time dt);
 
 
 private:
@@ -68,13 +68,17 @@ private:
 	sf::FloatRect m_world_bounds;
 	sf::Vector2f m_spawn_position;
 	float m_scrollspeed;
-	Aircraft* m_player_aircraft;
-	Aircraft* m_player2_aircraft;
+	Character* m_player_aircraft;
+	Character* m_player2_aircraft;
 
 	CommandQueue m_command_queue;
 
+	Command m_create_pickup_command;
+	sf::Time m_pickup_drop_interval;
+	sf::Time m_time_since_last_drop;
+
 	std::vector<SpawnPoint> m_enemy_spawn_points;
-	std::vector<Aircraft*> m_active_enemies;
+	std::vector<Character*> m_active_enemies;
 
 	BloomEffect m_bloom_effect;
 };

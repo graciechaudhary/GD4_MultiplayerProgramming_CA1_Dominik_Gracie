@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "World.hpp"
-#include "Player.hpp"
+#include "GameInputController.hpp"
 
 class Game
 {
@@ -20,5 +20,5 @@ class Game
 		static const sf::Time kTimePerFrame;
 		sf::RenderWindow m_window;
 		World m_world;
-		Player m_player;
+		GameInputController m_player;
 };

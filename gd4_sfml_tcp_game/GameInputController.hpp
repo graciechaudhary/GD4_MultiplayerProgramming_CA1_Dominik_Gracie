@@ -8,10 +8,10 @@
 class Command;
 
 
-class Player
+class GameInputController
 {
 public:
-	Player();
+	GameInputController();
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
 	void HandleRealTimeInput(CommandQueue& command_queue);
 

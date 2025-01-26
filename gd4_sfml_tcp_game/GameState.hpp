@@ -12,6 +12,6 @@ public:
 
 private:
 	World m_world;
-	Player& m_player;
+	GameInputController& m_player;
 };
 

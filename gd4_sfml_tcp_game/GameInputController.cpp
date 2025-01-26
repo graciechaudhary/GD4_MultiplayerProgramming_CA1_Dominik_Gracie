@@ -1,6 +1,6 @@
-#include "Player.hpp"
+#include "GameInputController.hpp"
 #include "ReceiverCategories.hpp"
-#include "Aircraft.hpp"
+#include "Character.hpp"
 #include <iostream>
 
 
@@ -16,21 +16,21 @@ struct CharacterMover
 {
     CharacterMover(Direction dir) : direction(dir)
     {}
-    void operator()(Aircraft& aircraft, sf::Time) const
+    void operator()(Character& aircraft, sf::Time) const
     {
         switch (direction)
         {
         case Direction::kLeft:
-            aircraft.m_is_walking_left = true;
+            aircraft.WalkLeft();
             break;
         case Direction::kRight:
-            aircraft.m_is_walking_right = true;
+            aircraft.WalkRight();
             break;
         case Direction::kUp:
-            aircraft.m_is_walking_up = true;
+            aircraft.WalkUp();
             break;
         case Direction::kDown:
-            aircraft.m_is_walking_down = true;
+            aircraft.WalkDown();
             break;
         default:
             break;
@@ -40,7 +40,7 @@ struct CharacterMover
 
         sf::Vector2f current_velocity = aircraft.GetVelocity();
 		sf::Vector2f velocity = sf::Vector2f(0.f,0.f);
-		float max_speed = 200.f;
+		float max_speed = 200.f; // = character.GetMaxSpeed();
 		float acceleration = 10.f;
 
 
@@ -106,14 +106,13 @@ struct CharacterMover
 	Direction direction;
 };
 
-Player::Player(): m_current_mission_status(MissionStatus::kMissionRunning)
+GameInputController::GameInputController(): m_current_mission_status(MissionStatus::kMissionRunning)
 {
     //Set initial key bindings
     m_key_binding[sf::Keyboard::A] = Action::kMoveLeft;
     m_key_binding[sf::Keyboard::D] = Action::kMoveRight;
     m_key_binding[sf::Keyboard::W] = Action::kMoveUp;
     m_key_binding[sf::Keyboard::S] = Action::kMoveDown;
-    m_key_binding[sf::Keyboard::M] = Action::kMissileFire;
     m_key_binding[sf::Keyboard::Space] = Action::kBulletFire;
 	m_key_binding[sf::Keyboard::Left] = Action::kMoveLeft2;
 	m_key_binding[sf::Keyboard::Right] = Action::kMoveRight2;
@@ -133,17 +132,17 @@ Player::Player(): m_current_mission_status(MissionStatus::kMissionRunning)
 
         if (first_player)
         {
-            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayerAircraft);
+            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayerOne);
 		}
         else
         {
-            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kEnemyAircraft);
+            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayerTwo);
         }
 
     }
 }
 
-void Player::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
+void GameInputController::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
 {
     if (event.type == sf::Event::KeyPressed)
     {
@@ -155,7 +154,7 @@ void Player::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
     }
 }
 
-void Player::HandleRealTimeInput(CommandQueue& command_queue)
+void GameInputController::HandleRealTimeInput(CommandQueue& command_queue)
 {
     //Check if any of the key bindings are pressed
     for (auto pair : m_key_binding)
@@ -167,7 +166,7 @@ void Player::HandleRealTimeInput(CommandQueue& command_queue)
     }
 }
 
-void Player::AssignKey(Action action, sf::Keyboard::Key key)
+void GameInputController::AssignKey(Action action, sf::Keyboard::Key key)
 {
     //Remove keys that are currently bound to the action
     for (auto itr = m_key_binding.begin(); itr != m_key_binding.end();)
@@ -184,7 +183,7 @@ void Player::AssignKey(Action action, sf::Keyboard::Key key)
     m_key_binding[key] = action;
 }
 
-sf::Keyboard::Key Player::GetAssignedKey(Action action) const
+sf::Keyboard::Key GameInputController::GetAssignedKey(Action action) const
 {
     for (auto pair : m_key_binding)
     {
@@ -196,46 +195,40 @@ sf::Keyboard::Key Player::GetAssignedKey(Action action) const
     return sf::Keyboard::Unknown;
 }
 
-void Player::SetMissionStatus(MissionStatus status)
+void GameInputController::SetMissionStatus(MissionStatus status)
 {
     m_current_mission_status = status;
 }
 
-MissionStatus Player::GetMissionStatus() const
+MissionStatus GameInputController::GetMissionStatus() const
 {
     return m_current_mission_status;
 }
 
-void Player::InitialiseActions()
+void GameInputController::InitialiseActions()
 {
-    m_action_binding[Action::kMoveLeft].action = DerivedAction<Aircraft>(CharacterMover(Direction::kLeft));
-    m_action_binding[Action::kMoveRight].action = DerivedAction<Aircraft>(CharacterMover(Direction::kRight));
-    m_action_binding[Action::kMoveUp].action = DerivedAction<Aircraft>(CharacterMover(Direction::kUp));
-    m_action_binding[Action::kMoveDown].action = DerivedAction<Aircraft>(CharacterMover(Direction::kDown));
-    m_action_binding[Action::kBulletFire].action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time dt)
+    m_action_binding[Action::kMoveLeft].action = DerivedAction<Character>(CharacterMover(Direction::kLeft));
+    m_action_binding[Action::kMoveRight].action = DerivedAction<Character>(CharacterMover(Direction::kRight));
+    m_action_binding[Action::kMoveUp].action = DerivedAction<Character>(CharacterMover(Direction::kUp));
+    m_action_binding[Action::kMoveDown].action = DerivedAction<Character>(CharacterMover(Direction::kDown));
+    m_action_binding[Action::kBulletFire].action = DerivedAction<Character>([](Character& a, sf::Time dt)
         {
-            a.Fire();
+            a.Throw();
         }
     );
 
-    m_action_binding[Action::kMissileFire].action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time dt)
-        {
-            a.LaunchMissile();
-        }
-    );
-
-	m_action_binding[Action::kMoveLeft2].action = DerivedAction<Aircraft>(CharacterMover(Direction::kLeft));
-	m_action_binding[Action::kMoveRight2].action = DerivedAction<Aircraft>(CharacterMover(Direction::kRight));
-	m_action_binding[Action::kMoveUp2].action = DerivedAction<Aircraft>(CharacterMover(Direction::kUp));
-	m_action_binding[Action::kMoveDown2].action = DerivedAction<Aircraft>(CharacterMover(Direction::kDown));
-	m_action_binding[Action::kThrow2].action = DerivedAction<Aircraft>([](Aircraft& a, sf::Time dt)
+	m_action_binding[Action::kMoveLeft2].action = DerivedAction<Character>(CharacterMover(Direction::kLeft));
+	m_action_binding[Action::kMoveRight2].action = DerivedAction<Character>(CharacterMover(Direction::kRight));
+	m_action_binding[Action::kMoveUp2].action = DerivedAction<Character>(CharacterMover(Direction::kUp));
+	m_action_binding[Action::kMoveDown2].action = DerivedAction<Character>(CharacterMover(Direction::kDown));
+	m_action_binding[Action::kThrow2].action = DerivedAction<Character>([](Character& a, sf::Time dt)
 		{
-			a.Fire();
+			a.Throw();
 		}
 	);
 }
 
-bool Player::IsRealTimeAction(Action action)
+bool GameInputController::IsRealTimeAction(Action action)
 {
     switch (action)
     {
