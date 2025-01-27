@@ -13,12 +13,14 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_sounds(sounds)
 	,m_scenegraph(ReceiverCategories::kNone)
 	,m_scene_layers()
-	,m_world_bounds(0.f,0.f, m_camera.getSize().x, 3000.f)
-	,m_spawn_position(m_camera.getSize().x/2.f, m_world_bounds.height - m_camera.getSize().y/2.f)
+	,m_world_bounds(0.f,0.f, m_camera.getSize().x, m_camera.getSize().y)
+	,m_spawn_position(m_camera.getSize().x/2.f, m_camera.getSize().y/2.f)
 	,m_scrollspeed(-50.f)
 	,m_player_aircraft(nullptr)
 	, m_time_since_last_drop(sf::Time::Zero)
 	, m_pickup_drop_interval(sf::seconds(5.f))
+	, m_max_pickups(3)
+	, m_pickups_spawned(0)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -202,9 +204,8 @@ void World::CreatePickup(SceneNode& node, const TextureHolder& textures) const
 {
 	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
 	std::unique_ptr<Pickup> pickup(new Pickup(type, textures));
-	pickup->setPosition(m_world_bounds.width / 3, m_world_bounds.height / 3);
+	pickup->setPosition(Utility::RandomInt(GetViewBounds().width), Utility::RandomInt(GetViewBounds().height));
 	node.AttachChild(std::move(pickup));
-	std::cout << "Pickup created" << std::endl;
 }
 
 sf::FloatRect World::GetViewBounds() const
@@ -334,6 +335,7 @@ void World::HandleCollisions()
 			auto& pickup = static_cast<Pickup&>(*pair.second);
 			//Collision response
 			pickup.Apply(player);
+			m_pickups_spawned--;
 			pickup.Destroy();
 			player.PlayLocalSound(m_command_queue, SoundEffect::kCollectPickup);
 		}
@@ -366,9 +368,10 @@ void World::CheckPickupDrop(sf::Time dt)
 	if (m_time_since_last_drop > m_pickup_drop_interval)
 	{
 		m_time_since_last_drop = sf::Time::Zero;
+		m_pickups_spawned++;
 		m_command_queue.Push(m_create_pickup_command);
 	}
-	else
+	else if(m_pickups_spawned < m_max_pickups)
 	{
 		m_time_since_last_drop += dt;
 	}

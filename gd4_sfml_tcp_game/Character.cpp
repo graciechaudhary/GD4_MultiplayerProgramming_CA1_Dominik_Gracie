@@ -79,6 +79,11 @@ unsigned int Character::GetCategory() const
 
 }
 
+int Character::GetMaxHitpoints() const
+{
+	return Table[static_cast<int>(m_type)].m_hitpoints;
+}
+
 
 void Character::UpdateTexts()
 {
@@ -100,6 +105,7 @@ void Character::Throw()
 void Character::RechargeSnowballs()
 {
 	m_snowball_count = 3;
+	m_is_throwing = false;
 }
 
 void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) const

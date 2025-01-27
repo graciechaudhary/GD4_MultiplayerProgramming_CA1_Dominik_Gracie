@@ -69,7 +69,7 @@ std::vector<PickupData> InitializePickupData()
     data[static_cast<int>(PickupType::kHealthRefill)].m_texture_rect = sf::IntRect(0, 64, 40, 40);
     data[static_cast<int>(PickupType::kHealthRefill)].m_action = [](Character& a)
         {
-            a.Repair(1);
+            a.Repair(1, a.GetMaxHitpoints());
         };
 
 	data[static_cast<int>(PickupType::kSnowballRefill)].m_texture = TextureID::kEntities;

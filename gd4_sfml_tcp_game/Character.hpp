@@ -15,6 +15,8 @@ public:
 	Character(AircraftType type, const TextureHolder& textures, const FontHolder& fonts);
 	unsigned int GetCategory() const override;
 
+	int GetMaxHitpoints() const;
+
 	void UpdateTexts();
 	float GetMaxSpeed() const;
 

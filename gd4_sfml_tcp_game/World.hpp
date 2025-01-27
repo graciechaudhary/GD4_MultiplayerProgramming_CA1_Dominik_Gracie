@@ -76,6 +76,8 @@ private:
 	Command m_create_pickup_command;
 	sf::Time m_pickup_drop_interval;
 	sf::Time m_time_since_last_drop;
+	int m_pickups_spawned;
+	int m_max_pickups;
 
 	std::vector<SpawnPoint> m_enemy_spawn_points;
 	std::vector<Character*> m_active_enemies;
