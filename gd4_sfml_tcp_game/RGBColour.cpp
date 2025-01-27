@@ -9,17 +9,17 @@ RGBColour::RGBColour(int r, int g, int b)
 {
 }
 
-int RGBColour::GetR() const
+int RGBColour::GetRed() const
 {
     return r;
 }
 
-int RGBColour::GetG() const
+int RGBColour::GetGreen() const
 {
     return g;
 }
 
-int RGBColour::GetB() const
+int RGBColour::GetBlue() const
 {
     return b;
 }
@@ -36,6 +36,10 @@ void RGBColour::addRed(int val)
 	{
 		r = r - 256;
 	}
+	if (r < 0)
+	{
+		r = 256 + r;
+	}
 
 }
 
@@ -46,6 +50,10 @@ void RGBColour::addGreen(int val)
 	{
 		g = g - 256;
 	}
+	if (g < 0)
+	{
+		g = 256 + g;
+	}
 }
 
 void RGBColour::addBlue(int val)
@@ -54,5 +62,9 @@ void RGBColour::addBlue(int val)
 	if (b > 255)
 	{
 		b = b - 256;
+	}
+	if (b < 0)
+	{
+		b = 256 + b;
 	}
 }

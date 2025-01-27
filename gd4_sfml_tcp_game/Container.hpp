@@ -14,16 +14,16 @@ namespace gui
 		virtual bool IsSelectable() const override;
 		virtual void HandleEvent(const sf::Event& event) override;
 
+		sf::Keyboard::Key GetUpKey(bool is_player_one) const;
+		sf::Keyboard::Key GetDownKey(bool is_player_one) const;
+		sf::Keyboard::Key GetReturnKey(bool is_player_one) const;
+
 	private:
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 		bool HasSelection() const;
 		void Select(std::size_t index);
 		void SelectNext();
 		void SelectPrevious();
-
-		sf::Keyboard::Key GetUpKey(bool is_player_one) const;
-		sf::Keyboard::Key GetDownKey(bool is_player_one) const;
-		sf::Keyboard::Key GetReturnKey(bool is_player_one) const;
 
 	private:
 		std::vector<Component::Ptr> m_children;

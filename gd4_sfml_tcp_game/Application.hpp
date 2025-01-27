@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics/RenderWindow.hpp>
-#include "GameInputController.hpp"
+#include "PlayersController.hpp"
 #include "ResourceHolder.hpp"
 #include "ResourceIdentifiers.hpp"
 #include "StateStack.hpp"
@@ -21,7 +21,7 @@ private:
 
 private:
 	sf::RenderWindow m_window;
-	GameInputController m_player;
+	PlayersController m_players_controller;
 
 	TextureHolder m_textures;
 	FontHolder m_fonts;

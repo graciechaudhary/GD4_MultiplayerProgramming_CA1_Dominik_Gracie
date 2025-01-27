@@ -152,7 +152,7 @@
     <ClCompile Include="ParticleNode.cpp" />
     <ClCompile Include="PauseState.cpp" />
     <ClCompile Include="Pickup.cpp" />
-    <ClCompile Include="GameInputController.cpp" />
+    <ClCompile Include="PlayersController.cpp" />
     <ClCompile Include="PostEffect.cpp" />
     <ClCompile Include="PreGameState.cpp" />
     <ClCompile Include="Projectile.cpp" />
@@ -204,7 +204,7 @@
     <ClInclude Include="PauseState.hpp" />
     <ClInclude Include="Pickup.hpp" />
     <ClInclude Include="PickupType.hpp" />
-    <ClInclude Include="GameInputController.hpp" />
+    <ClInclude Include="PlayersController.hpp" />
     <ClInclude Include="PostEffect.hpp" />
     <ClInclude Include="PreGameState.hpp" />
     <ClInclude Include="Projectile.hpp" />

@@ -45,6 +45,7 @@ public:
 	void WalkUp();
 	void WalkDown();
 
+	void SetColour(sf::Color colour);
 
 
 private:

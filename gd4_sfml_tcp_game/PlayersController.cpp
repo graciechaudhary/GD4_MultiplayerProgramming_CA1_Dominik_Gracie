@@ -1,4 +1,4 @@
-#include "GameInputController.hpp"
+#include "PlayersController.hpp"
 #include "ReceiverCategories.hpp"
 #include "Character.hpp"
 #include <iostream>
@@ -106,7 +106,7 @@ struct CharacterMover
 	Direction direction;
 };
 
-GameInputController::GameInputController(): m_current_mission_status(MissionStatus::kMissionRunning)
+PlayersController::PlayersController() : m_current_mission_status(MissionStatus::kMissionRunning), m_should_update_colours(false)
 {
     //Set initial key bindings
     m_key_binding[sf::Keyboard::A] = Action::kMoveLeft;
@@ -142,7 +142,7 @@ GameInputController::GameInputController(): m_current_mission_status(MissionStat
     }
 }
 
-void GameInputController::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
+void PlayersController::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
 {
     if (event.type == sf::Event::KeyPressed)
     {
@@ -154,7 +154,7 @@ void GameInputController::HandleEvent(const sf::Event& event, CommandQueue& comm
     }
 }
 
-void GameInputController::HandleRealTimeInput(CommandQueue& command_queue)
+void PlayersController::HandleRealTimeInput(CommandQueue& command_queue)
 {
     //Check if any of the key bindings are pressed
     for (auto pair : m_key_binding)
@@ -166,7 +166,7 @@ void GameInputController::HandleRealTimeInput(CommandQueue& command_queue)
     }
 }
 
-void GameInputController::AssignKey(Action action, sf::Keyboard::Key key)
+void PlayersController::AssignKey(Action action, sf::Keyboard::Key key)
 {
     //Remove keys that are currently bound to the action
     for (auto itr = m_key_binding.begin(); itr != m_key_binding.end();)
@@ -183,7 +183,7 @@ void GameInputController::AssignKey(Action action, sf::Keyboard::Key key)
     m_key_binding[key] = action;
 }
 
-sf::Keyboard::Key GameInputController::GetAssignedKey(Action action) const
+sf::Keyboard::Key PlayersController::GetAssignedKey(Action action) const
 {
     for (auto pair : m_key_binding)
     {
@@ -195,17 +195,26 @@ sf::Keyboard::Key GameInputController::GetAssignedKey(Action action) const
     return sf::Keyboard::Unknown;
 }
 
-void GameInputController::SetMissionStatus(MissionStatus status)
+void PlayersController::SetMissionStatus(MissionStatus status)
 {
     m_current_mission_status = status;
 }
 
-MissionStatus GameInputController::GetMissionStatus() const
+MissionStatus PlayersController::GetMissionStatus() const
 {
     return m_current_mission_status;
 }
 
-void GameInputController::InitialiseActions()
+void PlayersController::SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two)
+{
+	m_colour_one = std::move(colour_one);
+	m_colour_two = std::move(colour_two);
+	m_should_update_colours = true;
+}
+
+
+
+void PlayersController::InitialiseActions()
 {
     m_action_binding[Action::kMoveLeft].action = DerivedAction<Character>(CharacterMover(Direction::kLeft));
     m_action_binding[Action::kMoveRight].action = DerivedAction<Character>(CharacterMover(Direction::kRight));
@@ -228,7 +237,7 @@ void GameInputController::InitialiseActions()
 	);
 }
 
-bool GameInputController::IsRealTimeAction(Action action)
+bool PlayersController::IsRealTimeAction(Action action)
 {
     switch (action)
     {
@@ -246,4 +255,32 @@ bool GameInputController::IsRealTimeAction(Action action)
     default:
         return false;
     }
+}
+
+void PlayersController::UpdateColours(CommandQueue& command_queue)
+{
+    if (!m_should_update_colours)
+    {
+        return;
+    }
+
+    Command set_colour_one;
+    set_colour_one.category = static_cast<int>(ReceiverCategories::kPlayerOne);
+    set_colour_one.action = [this](SceneNode& node, sf::Time)
+        {
+            Character& character = static_cast<Character&>(node);
+            character.SetColour(m_colour_one->GetColour());
+        };
+
+    Command set_colour_two;
+    set_colour_two.category = static_cast<int>(ReceiverCategories::kPlayerTwo);
+    set_colour_two.action = [this](SceneNode& node, sf::Time)
+        {
+            Character& character = static_cast<Character&>(node);
+            character.SetColour(m_colour_two->GetColour());
+        };
+
+    command_queue.Push(set_colour_one);
+    command_queue.Push(set_colour_two);
+	m_should_update_colours = false;
 }

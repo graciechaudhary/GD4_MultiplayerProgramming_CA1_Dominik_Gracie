@@ -16,7 +16,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_world_bounds(0.f,0.f, m_camera.getSize().x, m_camera.getSize().y)
 	,m_spawn_position(m_camera.getSize().x/2.f, m_camera.getSize().y/2.f)
 	,m_scrollspeed(-50.f)
-	,m_player_aircraft(nullptr)
+	,m_character_one(nullptr)
 	, m_time_since_last_drop(sf::Time::Zero)
 	, m_pickup_drop_interval(sf::seconds(5.f))
 	, m_max_pickups(3)
@@ -36,8 +36,8 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 
 void World::Update(sf::Time dt)
 {
-	m_player_aircraft->ClearWalkingFlags(dt);
-	m_player2_aircraft->ClearWalkingFlags(dt);
+	m_character_one->ClearWalkingFlags(dt);
+	m_character_two->ClearWalkingFlags(dt);
 
 	DestroyEntitiesOutsideView();
 	CheckPickupDrop(dt);
@@ -84,12 +84,12 @@ CommandQueue& World::GetCommandQueue()
 
 bool World::HasAlivePlayer() const
 {
-	return !m_player_aircraft->IsMarkedForRemoval();
+	return !m_character_one->IsMarkedForRemoval();
 }
 
 bool World::HasPlayerReachedEnd() const
 {
-	return !m_world_bounds.contains(m_player_aircraft->getPosition());
+	return !m_world_bounds.contains(m_character_one->getPosition());
 }
 
 void World::LoadTextures()
@@ -144,15 +144,15 @@ void World::BuildScene()
 
 	//Add the player's aircraft
 	std::unique_ptr<Character> leader(new Character(AircraftType::kEagle, m_textures, m_fonts));
-	m_player_aircraft = leader.get();
-	m_player_aircraft->setPosition(m_spawn_position);
-	m_player_aircraft->SetVelocity(0, 0);
+	m_character_one = leader.get();
+	m_character_one->setPosition(m_spawn_position);
+	m_character_one->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
 	std::unique_ptr<Character> second(new Character(AircraftType::kAvenger, m_textures, m_fonts));
-	m_player2_aircraft = second.get();
-	m_player2_aircraft->setPosition(40.f,40.f);
-	m_player2_aircraft->SetVelocity(0, 0);
+	m_character_two = second.get();
+	m_character_two->setPosition(40.f,40.f);
+	m_character_two->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(second));
 
 	//Add the particle nodes to the scene
@@ -180,16 +180,16 @@ void World::AdaptPlayerPosition()
 	//keep the player on the screen
 	sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
 
-	m_player_aircraft->HandleBorderInteraction(view_bounds);
-	m_player2_aircraft->HandleBorderInteraction(view_bounds);
+	m_character_one->HandleBorderInteraction(view_bounds);
+	m_character_two->HandleBorderInteraction(view_bounds);
 
 }
 
 void World::AdaptPlayerVelocity()
 {
 
-	m_player_aircraft->HandleSliding();
-	m_player2_aircraft->HandleSliding();
+	m_character_one->HandleSliding();
+	m_character_two->HandleSliding();
 
 
 
@@ -356,7 +356,7 @@ void World::HandleCollisions()
 void World::UpdateSounds()
 {
 	// Set listener's position to player position
-	m_sounds.SetListenerPosition(m_player_aircraft->GetWorldPosition());
+	m_sounds.SetListenerPosition(m_character_one->GetWorldPosition());
 
 	// Remove unused sounds
 	m_sounds.RemoveStoppedSounds();

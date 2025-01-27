@@ -68,8 +68,8 @@ private:
 	sf::FloatRect m_world_bounds;
 	sf::Vector2f m_spawn_position;
 	float m_scrollspeed;
-	Character* m_player_aircraft;
-	Character* m_player2_aircraft;
+	Character* m_character_one;
+	Character* m_character_two;
 
 	CommandQueue m_command_queue;
 

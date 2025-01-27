@@ -48,7 +48,7 @@
     <ClCompile Include="CommandQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameInputController.cpp">
+    <ClCompile Include="PlayersController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StateStack.cpp">
@@ -185,7 +185,7 @@
     <ClInclude Include="CommandQueue.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameInputController.hpp">
+    <ClInclude Include="PlayersController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Action.hpp">

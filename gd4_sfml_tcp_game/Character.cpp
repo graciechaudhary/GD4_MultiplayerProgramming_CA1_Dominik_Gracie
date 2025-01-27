@@ -8,6 +8,8 @@
 #include "Pickup.hpp"
 #include "SoundNode.hpp"
 
+#include <iostream>
+
 namespace
 {
 	const std::vector<AircraftData> Table = InitializeAircraftData();
@@ -445,6 +447,11 @@ void Character::WalkDown()
 {
 	m_is_walking_down = true;
 	UpdateCurrentDirection();
+}
+
+void Character::SetColour(sf::Color colour)
+{
+	m_sprite.setColor(colour);
 }
 
 void Character::WalkRight()

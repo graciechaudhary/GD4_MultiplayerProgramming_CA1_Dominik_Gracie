@@ -3,15 +3,17 @@
 #include "Action.hpp"
 #include "CommandQueue.hpp"
 #include "MissionStatus.hpp"
+#include "RGBColour.hpp"
 #include <map>
 
 class Command;
 
 
-class GameInputController
+class PlayersController
 {
 public:
-	GameInputController();
+	typedef std::unique_ptr<RGBColour> RGBColourPtr;
+	PlayersController();
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
 	void HandleRealTimeInput(CommandQueue& command_queue);
 
@@ -19,6 +21,9 @@ public:
 	sf::Keyboard::Key GetAssignedKey(Action action) const;
 	void SetMissionStatus(MissionStatus status);
 	MissionStatus GetMissionStatus() const;
+	void SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two);
+
+	void UpdateColours(CommandQueue& command_queue);
 
 private:
 	void InitialiseActions();
@@ -30,5 +35,9 @@ private:
 
 	MissionStatus m_current_mission_status;
 
+	std::unique_ptr<RGBColour> m_colour_one;
+	std::unique_ptr<RGBColour> m_colour_two;
+
+	bool m_should_update_colours;
 };
 

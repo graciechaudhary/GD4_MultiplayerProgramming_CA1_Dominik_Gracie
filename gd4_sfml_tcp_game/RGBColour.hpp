@@ -8,9 +8,9 @@ public:
 	RGBColour();
 	RGBColour(int r, int g, int b);
 
-	int GetR() const;
-	int GetG() const;
-	int GetB() const;
+	int GetRed() const;
+	int GetGreen() const;
+	int GetBlue() const;
 
 	sf::Color GetColour() const;
 

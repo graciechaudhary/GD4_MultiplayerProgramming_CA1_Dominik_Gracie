@@ -25,9 +25,6 @@ private:
 	std::unique_ptr<RGBColour> m_colour_one;
 	std::unique_ptr<RGBColour> m_colour_two;
 
-	bool m_is_one_colour_selecting;
-	bool m_is_two_colour_selecting;
-
 	bool m_is_player_one_ready;
 	bool m_is_player_two_ready;
 
