@@ -154,7 +154,9 @@
     <ClCompile Include="Pickup.cpp" />
     <ClCompile Include="GameInputController.cpp" />
     <ClCompile Include="PostEffect.cpp" />
+    <ClCompile Include="PreGameState.cpp" />
     <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="RGBColour.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="SettingsState.cpp" />
     <ClCompile Include="SoundNode.cpp" />
@@ -204,11 +206,13 @@
     <ClInclude Include="PickupType.hpp" />
     <ClInclude Include="GameInputController.hpp" />
     <ClInclude Include="PostEffect.hpp" />
+    <ClInclude Include="PreGameState.hpp" />
     <ClInclude Include="Projectile.hpp" />
     <ClInclude Include="ProjectileType.hpp" />
     <ClInclude Include="ReceiverCategories.hpp" />
     <ClInclude Include="ResourceHolder.hpp" />
     <ClInclude Include="ResourceIdentifiers.hpp" />
+    <ClInclude Include="RGBColour.hpp" />
     <ClInclude Include="SceneLayers.hpp" />
     <ClInclude Include="SceneNode.hpp" />
     <ClInclude Include="SettingsState.hpp" />

@@ -126,6 +126,12 @@
     <ClCompile Include="SoundNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PreGameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RGBColour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.hpp">
@@ -300,6 +306,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FacingDirections.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PreGameState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RGBColour.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
