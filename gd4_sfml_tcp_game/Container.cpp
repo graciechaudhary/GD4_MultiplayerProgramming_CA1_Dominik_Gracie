@@ -1,7 +1,8 @@
 #include "Container.hpp"
 
-gui::Container::Container()
+gui::Container::Container(bool is_player_one = false)
     :m_selected_child(-1)
+	, m_is_player_one(is_player_one)
 {
 }
 
@@ -11,7 +12,7 @@ void gui::Container::Pack(Component::Ptr component)
     if (!HasSelection() && component->IsSelectable())
     {
         Select(m_children.size() - 1);
-    }
+    } 
 }
 
 bool gui::Container::IsSelectable() const
@@ -21,21 +22,22 @@ bool gui::Container::IsSelectable() const
 
 void gui::Container::HandleEvent(const sf::Event& event)
 {
+
     if (HasSelection() && m_children[m_selected_child]->IsActive())
     {
         m_children[m_selected_child]->HandleEvent(event);
     }
     else if (event.type == sf::Event::KeyReleased)
     {
-        if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::Up)
+        if (event.key.code == GetUpKey(m_is_player_one))
         {
             SelectPrevious();
         }
-        else if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
+        else if (event.key.code == GetDownKey(m_is_player_one))
         {
             SelectNext();
         }
-        else if (event.key.code == sf::Keyboard::Return)
+        else if (event.key.code == GetReturnKey(m_is_player_one))
         {
             if (HasSelection())
             {
@@ -99,4 +101,17 @@ void gui::Container::SelectPrevious()
         prev = (prev + m_children.size() - 1) % m_children.size();
     } while (!m_children[prev]->IsSelectable());
     Select(prev);
+}
+
+
+sf::Keyboard::Key gui::Container::GetUpKey(bool is_player_one) const {
+    return is_player_one ? sf::Keyboard::W : sf::Keyboard::Up;
+}
+
+sf::Keyboard::Key gui::Container::GetDownKey(bool is_player_one) const {
+    return is_player_one ? sf::Keyboard::S : sf::Keyboard::Down;
+}
+
+sf::Keyboard::Key gui::Container::GetReturnKey(bool is_player_one) const {
+    return is_player_one ? sf::Keyboard::Space : sf::Keyboard::RShift;
 }

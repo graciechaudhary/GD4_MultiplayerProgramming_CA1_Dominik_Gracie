@@ -9,7 +9,7 @@ namespace gui
 		typedef std::shared_ptr<Container> Ptr;
 
 	public:
-		Container();
+		Container(bool is_player_one);
 		void Pack(Component::Ptr component);
 		virtual bool IsSelectable() const override;
 		virtual void HandleEvent(const sf::Event& event) override;
@@ -21,9 +21,14 @@ namespace gui
 		void SelectNext();
 		void SelectPrevious();
 
+		sf::Keyboard::Key GetUpKey(bool is_player_one) const;
+		sf::Keyboard::Key GetDownKey(bool is_player_one) const;
+		sf::Keyboard::Key GetReturnKey(bool is_player_one) const;
+
 	private:
 		std::vector<Component::Ptr> m_children;
 		int m_selected_child;
+		bool m_is_player_one;
 	};
 }
 

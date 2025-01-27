@@ -4,7 +4,7 @@
 
 SettingsState::SettingsState(StateStack& stack, Context context)
 	: State(stack, context)
-	, m_gui_container()
+	, m_gui_container(true)
 {
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
