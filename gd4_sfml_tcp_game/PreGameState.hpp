@@ -5,6 +5,7 @@
 #include "Button.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 #include "RGBColour.hpp"
+#include "Label.hpp"
 
 class PreGameState : public State
 {
@@ -27,7 +28,5 @@ private:
 
 	bool m_is_player_one_ready;
 	bool m_is_player_two_ready;
-
-
 };
 

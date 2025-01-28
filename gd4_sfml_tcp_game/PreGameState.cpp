@@ -16,35 +16,34 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 {
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
-
 	auto red_button_one = std::make_shared<gui::Button>(context);
 	red_button_one->setPosition(100, 250);
-	red_button_one->SetText("Red");
+	red_button_one->SetText("0");
 	red_button_one->SetToggle(true);
 
 	auto green_button_one = std::make_shared<gui::Button>(context);
 	green_button_one->setPosition(100, 300);
-	green_button_one->SetText("Green");
+	green_button_one->SetText("0");
 	green_button_one->SetToggle(true);
 
 	auto blue_button_one = std::make_shared<gui::Button>(context);
 	blue_button_one->setPosition(100, 350);
-	blue_button_one->SetText("Blue");
+	blue_button_one->SetText("0");
 	blue_button_one->SetToggle(true);
 
 	auto red_button_two = std::make_shared<gui::Button>(context);
 	red_button_two->setPosition(400, 250);
-	red_button_two->SetText("Red");
+	red_button_two->SetText("0");
 	red_button_two->SetToggle(true);
 
 	auto green_button_two = std::make_shared<gui::Button>(context);
 	green_button_two->setPosition(400, 300);
-	green_button_two->SetText("Green");
+	green_button_two->SetText("0");
 	green_button_two->SetToggle(true);
 
 	auto blue_button_two = std::make_shared<gui::Button>(context);
 	blue_button_two->setPosition(400, 350);
-	blue_button_two->SetText("Blue");
+	blue_button_two->SetText("0");
 	blue_button_two->SetToggle(true);
 
 	auto ready_button_one = std::make_shared<gui::Button>(context);
@@ -101,6 +100,23 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	for (auto& button : m_buttons_two) {
 		m_gui_container_two.Pack(button);
 	}
+
+	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
+	red_label->setPosition(325, 265);
+	red_label->SetColor(sf::Color::Red);
+	
+
+	auto green_label = std::make_shared<gui::Label>("Green", *context.fonts);
+	green_label->setPosition(325, 315);
+	green_label->SetColor(sf::Color::Green);
+
+	auto blue_label = std::make_shared<gui::Label>("Blue", *context.fonts);
+	blue_label->setPosition(325, 365);
+	blue_label->SetColor(sf::Color::Blue);
+
+	m_gui_container_one.Pack(red_label);
+	m_gui_container_one.Pack(green_label);
+	m_gui_container_one.Pack(blue_label);
 }
 
 void PreGameState::Draw()
