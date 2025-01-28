@@ -130,7 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Aircraft.cpp" />
+    <ClCompile Include="Character.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="BloomEffect.cpp" />
@@ -152,9 +152,11 @@
     <ClCompile Include="ParticleNode.cpp" />
     <ClCompile Include="PauseState.cpp" />
     <ClCompile Include="Pickup.cpp" />
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayersController.cpp" />
     <ClCompile Include="PostEffect.cpp" />
+    <ClCompile Include="PreGameState.cpp" />
     <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="RGBColour.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="SettingsState.cpp" />
     <ClCompile Include="SoundNode.cpp" />
@@ -170,7 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.hpp" />
-    <ClInclude Include="Aircraft.hpp" />
+    <ClInclude Include="Character.hpp" />
     <ClInclude Include="AircraftType.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Application.hpp" />
@@ -185,6 +187,7 @@
     <ClInclude Include="DataTables.hpp" />
     <ClInclude Include="EmitterNode.hpp" />
     <ClInclude Include="Entity.hpp" />
+    <ClInclude Include="FacingDirections.hpp" />
     <ClInclude Include="Font.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameOverState.hpp" />
@@ -201,13 +204,15 @@
     <ClInclude Include="PauseState.hpp" />
     <ClInclude Include="Pickup.hpp" />
     <ClInclude Include="PickupType.hpp" />
-    <ClInclude Include="Player.hpp" />
+    <ClInclude Include="PlayersController.hpp" />
     <ClInclude Include="PostEffect.hpp" />
+    <ClInclude Include="PreGameState.hpp" />
     <ClInclude Include="Projectile.hpp" />
     <ClInclude Include="ProjectileType.hpp" />
     <ClInclude Include="ReceiverCategories.hpp" />
     <ClInclude Include="ResourceHolder.hpp" />
     <ClInclude Include="ResourceIdentifiers.hpp" />
+    <ClInclude Include="RGBColour.hpp" />
     <ClInclude Include="SceneLayers.hpp" />
     <ClInclude Include="SceneNode.hpp" />
     <ClInclude Include="SettingsState.hpp" />

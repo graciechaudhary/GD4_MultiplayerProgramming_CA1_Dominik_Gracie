@@ -2,8 +2,6 @@
 enum class PickupType
 {
 	kHealthRefill,
-	kMissileRefill, 
-	kFireSpread,
-	kFireRate,
+	kSnowballRefill, 
 	kPickupCount
 };

@@ -12,7 +12,7 @@ enum class TextureID
 	kButtonActivated,
 	kBullet,
 	kHealthRefill,
-	kMissileRefill,
+	kSnowballRefill,
 	kFireSpread,
 	kFireRate,
 	kFinishLine,
