@@ -1,7 +1,7 @@
 #include "GameOverState.hpp"
 #include "ResourceHolder.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
-#include "Player.hpp"
+#include "PlayersController.hpp"
 #include "Utility.hpp"
 
 
@@ -14,7 +14,7 @@ GameOverState::GameOverState(StateStack& stack, Context context)
     sf::Vector2f window_size(context.window->getSize());
 
     m_game_over_text.setFont(font);
-    if (context.player->GetMissionStatus() == MissionStatus::kMissionSuccess)
+    if (context.players_controller->GetMissionStatus() == MissionStatus::kMissionSuccess)
     {
         m_game_over_text.setString("Mission Success");
     }

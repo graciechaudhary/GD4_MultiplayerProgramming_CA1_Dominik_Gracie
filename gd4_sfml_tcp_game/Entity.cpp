@@ -44,6 +44,16 @@ void Entity::Repair(int points)
     m_hitpoints += points;
 }
 
+void Entity::Repair(int points, int limit)
+{
+	assert(points > 0);
+	m_hitpoints += points;
+	if (m_hitpoints > limit)
+	{
+		m_hitpoints = limit;
+	}
+}
+
 void Entity::Damage(int points)
 {
     assert(points > 0);

@@ -3,7 +3,7 @@
 #include <SFML/System/Time.hpp>
 #include "ResourceIdentifiers.hpp"
 #include <functional>
-#include "Aircraft.hpp"
+#include "Character.hpp"
 
 
 struct Direction
@@ -35,7 +35,7 @@ struct ProjectileData
 
 struct PickupData
 {
-	std::function<void(Aircraft&)> m_action;
+	std::function<void(Character&)> m_action;
 	TextureID m_texture;
 	sf::IntRect m_texture_rect;
 };
