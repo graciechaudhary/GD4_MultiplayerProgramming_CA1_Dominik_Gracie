@@ -27,6 +27,10 @@ SoundPlayer::SoundPlayer()
 	m_sound_buffers.Load(SoundEffect::kCollectPickup, "Media/Sound/CollectPickup.wav");
 	m_sound_buffers.Load(SoundEffect::kButton, "Media/Sound/Button.wav");
 
+	m_sound_buffers.Load(SoundEffect::kSnowballHitPlayer, "MediaFiles/Sound/SnowballHitSoundEffect.ogg");
+	m_sound_buffers.Load(SoundEffect::kSnowballThrow, "MediaFiles/Sound/ThrowSoundEffect.ogg");
+	
+
 	// Listener points towards the screen (default in SFML)
 	sf::Listener::setDirection(0.f, 0.f, -1.f); //pointing towards the screen
 }
