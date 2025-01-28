@@ -244,7 +244,7 @@ void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 
 	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
 	{
-		PlayLocalSound(commands, IsAllied() ? SoundEffect::kEnemyGunfire : SoundEffect::kAlliedGunfire);
+		PlayLocalSound(commands, SoundEffect::kSnowballThrow);
 		commands.Push(m_throw_command);
 		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval /  1.f;
 		m_is_throwing = false;

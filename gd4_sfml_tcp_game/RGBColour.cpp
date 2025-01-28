@@ -26,7 +26,7 @@ int RGBColour::GetBlue() const
 
 sf::Color RGBColour::GetColour() const
 {
-    return sf::Color(r,g,b,50);
+    return sf::Color(r,g,b);
 }
 
 void RGBColour::addRed(int val)

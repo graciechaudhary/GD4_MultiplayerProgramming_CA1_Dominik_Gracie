@@ -3,11 +3,8 @@
 #include "Projectile.hpp"
 #include "ParticleNode.hpp"
 #include "SoundNode.hpp"
-<<<<<<< HEAD
 #include <set> 
-=======
 #include <iostream> 
->>>>>>> main
 
 World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
 	:m_target(output_target)
