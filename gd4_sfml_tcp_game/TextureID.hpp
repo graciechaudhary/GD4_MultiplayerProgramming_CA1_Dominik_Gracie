@@ -20,6 +20,18 @@ enum class TextureID
 	kJungle,
 	kButtons,
 	kExplosion,
-	kParticle
+	kParticle,
+
+	//new additions for the game
+	kCharacterMovement,
+	kCharacterAttack,
+	kSnowball,
+	kSnowTile,
+	kLakeTile,
+	kPurpleTree,
+	kGreenTree,
+	kDeadTree,
+	kMenuScreen,
+	kMenuButton
 
 };

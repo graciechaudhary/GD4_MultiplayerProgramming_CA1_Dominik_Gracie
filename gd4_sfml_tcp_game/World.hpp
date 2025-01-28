@@ -9,6 +9,7 @@
 #include "SpriteNode.hpp"
 #include "CommandQueue.hpp"
 #include "BloomEffect.hpp"
+#include "ShadowEffect.hpp"
 #include "SoundPlayer.hpp"
 
 #include <array>
@@ -31,6 +32,10 @@ private:
 	void AdaptPlayerPosition();
 	void AdaptPlayerVelocity();
 
+	void InitializeLayers();
+	void BuildSnowLandscape();
+	void BuildTreesRandom(sf::FloatRect lake_bounds);
+	void BuildTreesFixed(sf::FloatRect lake_bounds);
 	void CreatePickup(SceneNode& node, const TextureHolder& textures) const;
 	sf::FloatRect GetViewBounds() const;
 	sf::FloatRect GetBattleFieldBounds() const;
@@ -83,5 +88,8 @@ private:
 	std::vector<Character*> m_active_enemies;
 
 	BloomEffect m_bloom_effect;
+
+	//ShadowEffect m_shadow_effect;
+	
 };
 

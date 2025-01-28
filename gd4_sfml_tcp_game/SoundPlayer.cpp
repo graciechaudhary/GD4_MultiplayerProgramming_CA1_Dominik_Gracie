@@ -12,8 +12,8 @@ namespace
 	// Sound coordinate system, point of view of a player in front of the screen:
 	// X = left; Y = up; Z = back (out of the screen)
 	const float ListenerZ = 300.f;
-	const float Attenuation = 1.f;
-	const float MinDistance2D = 200.f;
+	const float Attenuation = 1.f; //how sound drops of
+	const float MinDistance2D = 200.f; //min distance at which it will play at full volume
 	const float MinDistance3D = std::sqrt(MinDistance2D * MinDistance2D + ListenerZ * ListenerZ);
 }
 
@@ -27,8 +27,12 @@ SoundPlayer::SoundPlayer()
 	m_sound_buffers.Load(SoundEffect::kCollectPickup, "Media/Sound/CollectPickup.wav");
 	m_sound_buffers.Load(SoundEffect::kButton, "Media/Sound/Button.wav");
 
+	m_sound_buffers.Load(SoundEffect::kSnowballHitPlayer, "MediaFiles/Sound/SnowballHitSoundEffect.ogg");
+	m_sound_buffers.Load(SoundEffect::kSnowballThrow, "MediaFiles/Sound/ThrowSoundEffect.ogg");
+	
+
 	// Listener points towards the screen (default in SFML)
-	sf::Listener::setDirection(0.f, 0.f, -1.f);
+	sf::Listener::setDirection(0.f, 0.f, -1.f); //pointing towards the screen
 }
 
 void SoundPlayer::Play(SoundEffect effect)
@@ -42,7 +46,7 @@ void SoundPlayer::Play(SoundEffect effect, sf::Vector2f position)
 	sf::Sound& sound = m_sounds.back();
 
 	sound.setBuffer(m_sound_buffers.Get(effect));
-	sound.setPosition(position.x, -position.y, 0.f);
+	sound.setPosition(position.x, -position.y, 0.f); 
 	sound.setAttenuation(Attenuation);
 	sound.setMinDistance(MinDistance3D);
 	sound.setVolume(100.f);

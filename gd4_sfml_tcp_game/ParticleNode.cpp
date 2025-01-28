@@ -14,7 +14,9 @@ ParticleNode::ParticleNode(ParticleType type, const TextureHolder& textures)
     : SceneNode()
     , m_texture(textures.Get(TextureID::kParticle))
     , m_type(type)
-    , m_vertex_array(sf::Quads)
+    , m_vertex_array(sf::Quads) 
+    /*fixed particle system glitch: as we were using four vertices in the ComputeVertices method but a triangular vertex array the fourth vertex 
+    would attach to the first vertex of the next particle which was fixed with using quads - GracieChaudhary*/
     , m_needs_vertex_update(true)
 {
 }
@@ -80,12 +82,15 @@ void ParticleNode::AddVertex(float worldX, float worldY, float texCoordX, float 
     m_vertex_array.append(vertex);
 }
 
+//adjusting size according to snow particle - GracieChaudhary
 void ParticleNode::ComputeVertices() const
 {
-    sf::Vector2f size(m_texture.getSize());
-    sf::Vector2f half = size / 2.f;
-
     m_vertex_array.clear();
+    
+    sf::Vector2f size(m_texture.getSize());
+    sf::Vector2f half = size / 4.f;
+        
+   
 
     for (const Particle& particle : m_particles)
     {
@@ -99,6 +104,6 @@ void ParticleNode::ComputeVertices() const
         AddVertex(pos.x + half.x, pos.y - half.y, size.x, 0.f, color);
         AddVertex(pos.x + half.x, pos.y + half.y, size.x, size.y, color);
         AddVertex(pos.x - half.x, pos.y + half.y, 0.f, size.y, color);
-    }
+    }  
 
 }

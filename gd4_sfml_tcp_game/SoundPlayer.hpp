@@ -24,5 +24,5 @@ public:
 
 private:
 	SoundBufferHolder m_sound_buffers;
-	std::list<sf::Sound> m_sounds;
+	std::list<sf::Sound> m_sounds; //they are larger, add them remove them without reallocating memory
 };

@@ -2,5 +2,10 @@
 enum class MusicThemes
 {
 	kMenuTheme,
-	kMissionTheme
+	kMissionTheme,
+	kMenu,
+	kGame,
+	kPause,
+	kGameOver
+
 };

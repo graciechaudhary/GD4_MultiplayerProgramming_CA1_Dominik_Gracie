@@ -5,17 +5,24 @@ MusicPlayer::MusicPlayer()
 {
 	m_filenames[MusicThemes::kMenuTheme] = "Media/Music/MenuTheme.ogg";
 	m_filenames[MusicThemes::kMissionTheme] = "Media/Music/MissionTheme.ogg";
+
+	//sfml doesnt support mp3, use audacity to convert if necessary
+	m_filenames[MusicThemes::kMenu] = "MediaFiles/Music/MenuMusic.ogg";
+	m_filenames[MusicThemes::kGame] = "MediaFiles/Music/GameplayMusic.ogg";
+	m_filenames[MusicThemes::kGameOver] = "";
+	m_filenames[MusicThemes::kPause] = "";
 }
 
 void MusicPlayer::Play(MusicThemes theme)
 {
 	std::string filename = m_filenames[theme];
 
-	if (!m_music.openFromFile(filename))
+	if (!m_music.openFromFile(filename)) //streaming the music not loading
 		throw std::runtime_error("Music " + filename + " could not be loaded.");
 
 	m_music.setVolume(m_volume);
 	m_music.setLoop(true);
+	
 	m_music.play();
 }
 

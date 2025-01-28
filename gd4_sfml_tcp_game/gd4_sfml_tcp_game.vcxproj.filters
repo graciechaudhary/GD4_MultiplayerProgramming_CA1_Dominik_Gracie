@@ -126,10 +126,14 @@
     <ClCompile Include="SoundNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+
+    <ClCompile Include="ShadowEffect.cpp">
+
     <ClCompile Include="PreGameState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RGBColour.cpp">
+
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -305,6 +309,9 @@
     <ClInclude Include="SoundNode.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+
+    <ClInclude Include="ShadowEffect.hpp">
+
     <ClInclude Include="FacingDirections.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

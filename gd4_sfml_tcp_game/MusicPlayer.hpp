@@ -20,6 +20,7 @@ public:
 
 	void SetPaused(bool paused);
 	void SetVolume(float volume);
+	//CHECK STATE OF MUSIC
 
 
 private:
