@@ -14,13 +14,13 @@ GameOverState::GameOverState(StateStack& stack, Context context)
     sf::Vector2f window_size(context.window->getSize());
 
     m_game_over_text.setFont(font);
-    if (context.players_controller->GetMissionStatus() == MissionStatus::kMissionSuccess)
+    if (context.players_controller->GetGameStatus() == GameStatus::kPlayerOneWin)
     {
-        m_game_over_text.setString("Mission Success");
+        m_game_over_text.setString("Player one wins");
     }
     else
     {
-        m_game_over_text.setString("Mission Failure");
+        m_game_over_text.setString("Player two wins");
     }
 
     m_game_over_text.setCharacterSize(70);

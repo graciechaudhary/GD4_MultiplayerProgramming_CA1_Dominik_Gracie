@@ -174,7 +174,7 @@
   <ItemGroup>
     <ClInclude Include="Action.hpp" />
     <ClInclude Include="Character.hpp" />
-    <ClInclude Include="AircraftType.hpp" />
+    <ClInclude Include="CharacterType.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Application.hpp" />
     <ClInclude Include="BloomEffect.hpp" />
@@ -196,7 +196,7 @@
     <ClInclude Include="Label.hpp" />
     <ClInclude Include="MenuOptions.hpp" />
     <ClInclude Include="MenuState.hpp" />
-    <ClInclude Include="MissionStatus.hpp" />
+    <ClInclude Include="GameStatus.hpp" />
     <ClInclude Include="MusicPlayer.hpp" />
     <ClInclude Include="MusicThemes.hpp" />
     <ClInclude Include="Particle.hpp" />

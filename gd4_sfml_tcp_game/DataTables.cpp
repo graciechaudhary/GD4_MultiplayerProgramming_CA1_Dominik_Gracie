@@ -1,47 +1,20 @@
 #include "DataTables.hpp"
-#include "AircraftType.hpp"
+#include "CharacterType.hpp"
 #include "ProjectileType.hpp"
 #include "PickupType.hpp"
 #include "Character.hpp"
 #include "ParticleType.hpp"
 
-std::vector<AircraftData> InitializeAircraftData()
+std::vector<CharacterData> InitializeCharacterData()
 {
-    std::vector<AircraftData> data(static_cast<int>(AircraftType::kAircraftCount));
+    std::vector<CharacterData> data(static_cast<int>(CharacterType::kCharacterCount));
 
-    data[static_cast<int>(AircraftType::kEagle)].m_hitpoints = 3;
-    data[static_cast<int>(AircraftType::kEagle)].m_speed = 200.f;
-    data[static_cast<int>(AircraftType::kEagle)].m_fire_interval = sf::seconds(1);
-    data[static_cast<int>(AircraftType::kEagle)].m_texture = TextureID::kCharacterMovement;
-    data[static_cast<int>(AircraftType::kEagle)].m_texture_rect = sf::IntRect(0, 0, 38, 42); //adapted to the new spritesheet
-    data[static_cast<int>(AircraftType::kEagle)].m_has_roll_animation = true;
-
-    data[static_cast<int>(AircraftType::kRaptor)].m_hitpoints = 3;
-    data[static_cast<int>(AircraftType::kRaptor)].m_speed = 200.f;
-    data[static_cast<int>(AircraftType::kRaptor)].m_fire_interval = sf::Time::Zero;
-    data[static_cast<int>(AircraftType::kRaptor)].m_texture = TextureID::kCharacterMovement;
-    data[static_cast<int>(AircraftType::kRaptor)].m_texture_rect = sf::IntRect(0, 0, 38, 42);
-    data[static_cast<int>(AircraftType::kRaptor)].m_has_roll_animation = false;
-
-    //AI for Raptor
-    data[static_cast<int>(AircraftType::kRaptor)].m_directions.emplace_back(Direction(+45.f, 80.f));
-    data[static_cast<int>(AircraftType::kRaptor)].m_directions.emplace_back(Direction(-45.f, 160.f));
-    data[static_cast<int>(AircraftType::kRaptor)].m_directions.emplace_back(Direction(+45.f, 80.f));
-
-
-    data[static_cast<int>(AircraftType::kAvenger)].m_hitpoints = 3;
-    data[static_cast<int>(AircraftType::kAvenger)].m_speed = 200.f;
-    data[static_cast<int>(AircraftType::kAvenger)].m_fire_interval = sf::seconds(2);
-    data[static_cast<int>(AircraftType::kAvenger)].m_texture = TextureID::kCharacterMovement;
-    data[static_cast<int>(AircraftType::kAvenger)].m_texture_rect = sf::IntRect(0, 0, 38, 42);
-    data[static_cast<int>(AircraftType::kAvenger)].m_has_roll_animation = false;
-
-    //AI for Raptor
-    data[static_cast<int>(AircraftType::kAvenger)].m_directions.emplace_back(Direction(+45.f, 50.f));
-    data[static_cast<int>(AircraftType::kAvenger)].m_directions.emplace_back(Direction(0.f, 50.f));
-    data[static_cast<int>(AircraftType::kAvenger)].m_directions.emplace_back(Direction(-45.f, 100.f));
-    data[static_cast<int>(AircraftType::kAvenger)].m_directions.emplace_back(Direction(0.f, 50.f));
-    data[static_cast<int>(AircraftType::kAvenger)].m_directions.emplace_back(Direction(45.f, 50.f));
+    data[static_cast<int>(CharacterType::kDefault)].m_hitpoints = 3;
+    data[static_cast<int>(CharacterType::kDefault)].m_speed = 200.f;
+    data[static_cast<int>(CharacterType::kDefault)].m_fire_interval = sf::seconds(1);
+	data[static_cast<int>(CharacterType::kDefault)].max_snowballs = 5;
+    data[static_cast<int>(CharacterType::kDefault)].m_texture = TextureID::kCharacterMovement;
+    data[static_cast<int>(CharacterType::kDefault)].m_texture_rect = sf::IntRect(0, 0, 38, 42);
 
     return data;
 }
@@ -50,15 +23,9 @@ std::vector<AircraftData> InitializeAircraftData()
 std::vector<ProjectileData> InitializeProjectileData()
 {
     std::vector<ProjectileData> data(static_cast<int>(ProjectileType::kProjectileCount));
-    data[static_cast<int>(ProjectileType::kAlliedBullet)].m_damage = 1;
-    data[static_cast<int>(ProjectileType::kAlliedBullet)].m_speed = 400;
-    data[static_cast<int>(ProjectileType::kAlliedBullet)].m_texture = TextureID::kSnowball;
-    //data[static_cast<int>(ProjectileType::kAlliedBullet)].m_texture_rect = sf::IntRect(175, 64, 3, 14);
-
-
-    data[static_cast<int>(ProjectileType::kEnemyBullet)].m_damage = 1;
-    data[static_cast<int>(ProjectileType::kEnemyBullet)].m_speed = 400;
-    data[static_cast<int>(ProjectileType::kEnemyBullet)].m_texture = TextureID::kSnowball;
+    data[static_cast<int>(ProjectileType::kSnowball)].m_damage = 1;
+    data[static_cast<int>(ProjectileType::kSnowball)].m_speed = 500;
+    data[static_cast<int>(ProjectileType::kSnowball)].m_texture = TextureID::kSnowball;
 
     return data;
 }
@@ -66,6 +33,7 @@ std::vector<ProjectileData> InitializeProjectileData()
 std::vector<PickupData> InitializePickupData()
 {
     std::vector<PickupData> data(static_cast<int>(PickupType::kPickupCount));
+
     data[static_cast<int>(PickupType::kHealthRefill)].m_texture = TextureID::kEntities;
     data[static_cast<int>(PickupType::kHealthRefill)].m_texture_rect = sf::IntRect(0, 64, 40, 40);
     data[static_cast<int>(PickupType::kHealthRefill)].m_action = [](Character& a)

@@ -12,27 +12,10 @@
 
 namespace
 {
-	const std::vector<AircraftData> Table = InitializeAircraftData();	
+	const std::vector<CharacterData> Table = InitializeCharacterData();	
 }
 
-TextureID ToTextureID(AircraftType type)
-{
-	switch (type)
-	{
-	case AircraftType::kEagle:
-		return TextureID::kEagle;
-		break;
-	case AircraftType::kRaptor:
-		return TextureID::kRaptor;
-		break;
-	case AircraftType::kAvenger:
-		return TextureID::kAvenger;
-		break;
-	}
-	return TextureID::kEagle;
-}
-
-Character::Character(AircraftType type, const TextureHolder& textures, const FontHolder& fonts)  
+Character::Character(CharacterType type, const TextureHolder& textures, const FontHolder& fonts, bool is_player_one)  
 	: Entity(Table[static_cast<int>(type)].m_hitpoints)
 	, m_type(type)
 	, m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
@@ -49,8 +32,9 @@ Character::Character(AircraftType type, const TextureHolder& textures, const Fon
 	, m_is_walking_down(false)
 	, m_is_walking_left(false)
 	, m_is_walking_right(false)
-	, m_current_direction(FacingDirections::kUp)
-	, m_snowball_count(3)
+	, m_current_direction(FacingDirections::kDown)
+	, m_snowball_count(Table[static_cast<int>(type)].max_snowballs)
+	, m_is_player_one(is_player_one)
 {
 	m_walk.SetFrameSize(sf::Vector2i(38, 42));
 	m_walk.SetNumFrames(4);
@@ -79,7 +63,7 @@ Character::Character(AircraftType type, const TextureHolder& textures, const Fon
 
 unsigned int Character::GetCategory() const
 {
-	if (IsAllied())
+	if (m_is_player_one)
 	{
 		return static_cast<unsigned int>(ReceiverCategories::kPlayerOne);
 	}
@@ -112,18 +96,18 @@ void Character::Throw()
 
 void Character::RechargeSnowballs()
 {
-	m_snowball_count = 3;
+	m_snowball_count = Table[static_cast<int>(m_type)].max_snowballs;
 	m_is_throwing = false;
 }
 
 void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) const
 {
-	ProjectileType type = IsAllied() ? ProjectileType::kAlliedBullet : ProjectileType::kEnemyBullet;
+	ProjectileType type = ProjectileType::kSnowball;
 	float x_offset = 0.f;
 	float y_offset = 0.5f;
 	sf::Vector2f velocity(0.f,0.f);
 
-	std::unique_ptr<Projectile> projectile(new Projectile(type, textures));
+	std::unique_ptr<Projectile> projectile(new Projectile(type, textures, m_is_player_one));
 
 	float snowball_speed = projectile->GetMaxSpeed();
 
@@ -179,18 +163,6 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 	projectile->SetVelocity(velocity);
 	node.AttachChild(std::move(projectile));
 	
-}
-
-void Character::CreateProjectile(SceneNode& node, ProjectileType type, float x_offset, float y_offset, const TextureHolder& textures) const
-{
-	std::unique_ptr<Projectile> projectile(new Projectile(type, textures));
-	sf::Vector2f offset(x_offset * m_sprite.getGlobalBounds().width, y_offset * m_sprite.getGlobalBounds().height);
-	sf::Vector2f velocity(0, projectile->GetMaxSpeed());
-
-	float sign = IsAllied() ? -1.f : 1.f;
-	projectile->setPosition(GetWorldPosition() + offset * sign);
-	projectile->SetVelocity(velocity* sign);
-	node.AttachChild(std::move(projectile));
 }
 
 sf::FloatRect Character::GetBoundingRect() const
@@ -265,30 +237,6 @@ void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	}
 }
 
-bool Character::IsAllied() const
-{
-	return m_type == AircraftType::kEagle;
-}
-
-void Character::UpdateRollAnimation()
-{
-	if (Table[static_cast<int>(m_type)].m_has_roll_animation)
-	{
-		sf::IntRect textureRect = Table[static_cast<int>(m_type)].m_texture_rect;
-
-		//Roll left: Texture rect is offset once
-		if (GetVelocity().x < 0.f)
-		{
-			textureRect.left += textureRect.width;
-		}
-		else if (GetVelocity().x > 0.f)
-		{
-			textureRect.left += 2 * textureRect.width;
-		}
-		m_sprite.setTextureRect(textureRect);
-
-	}
-}
 
 void Character::UpdateWalkAnimation(sf::Time dt)
 {

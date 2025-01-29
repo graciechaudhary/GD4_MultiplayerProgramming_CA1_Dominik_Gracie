@@ -88,33 +88,22 @@ CommandQueue& World::GetCommandQueue()
 	return m_command_queue;
 }
 
-bool World::HasAlivePlayer() const
+bool World::HasAlivePlayerOne() const
 {
 	return !m_character_one->IsMarkedForRemoval();
 }
 
-bool World::HasPlayerReachedEnd() const
+bool World::HasAlivePlayerTwo() const
 {
-	return !m_world_bounds.contains(m_character_one->getPosition());
+	return !m_character_two->IsMarkedForRemoval();
 }
 
 void World::LoadTextures()
 {
-	/*m_textures.Load(TextureID::kEagle, "Media/Textures/Eagle.png");
-	m_textures.Load(TextureID::kRaptor, "Media/Textures/Raptor.png");
-	m_textures.Load(TextureID::kAvenger, "Media/Textures/Avenger.png");
-	m_textures.Load(TextureID::kLandscape, "Media/Textures/Desert.png");
-	m_textures.Load(TextureID::kBullet, "Media/Textures/Bullet.png");
-	m_textures.Load(TextureID::kMissile, "Media/Textures/Missile.png");*/
-
 	m_textures.Load(TextureID::kHealthRefill, "Media/Textures/HealthRefill.png");
 	m_textures.Load(TextureID::kSnowballRefill, "Media/Textures/MissileRefill.png");
-	m_textures.Load(TextureID::kFireSpread, "Media/Textures/FireSpread.png");
-	m_textures.Load(TextureID::kFireRate, "Media/Textures/FireRate.png");
-	m_textures.Load(TextureID::kFinishLine, "Media/Textures/FinishLine.png");
 
 	m_textures.Load(TextureID::kEntities, "Media/Textures/Entities.png");
-	m_textures.Load(TextureID::kJungle, "Media/Textures/Jungle.png");
 	m_textures.Load(TextureID::kExplosion, "Media/Textures/Explosion.png");
 
 	//edited texture for the snow particle effect - GracieChaudhary
@@ -139,21 +128,15 @@ void World::BuildScene()
 	//builds snow landsacpe, adds tree sprite - Gracie Chaudhary
 	BuildSnowLandscape();	
 
-	//Add the finish line
-	sf::Texture& finish_texture = m_textures.Get(TextureID::kFinishLine);
-	std::unique_ptr<SpriteNode> finish_sprite(new SpriteNode(finish_texture));
-	finish_sprite->setPosition(0.f, -76.f);
-	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(finish_sprite));
-
 	//Add the player's aircraft
-	std::unique_ptr<Character> leader(new Character(AircraftType::kEagle, m_textures, m_fonts));
+	std::unique_ptr<Character> leader(new Character(CharacterType::kDefault, m_textures, m_fonts, true));
 	m_character_one = leader.get();
 	m_character_one->setPosition(m_spawn_position);
 	m_character_one->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 	
 
-	std::unique_ptr<Character> second(new Character(AircraftType::kAvenger, m_textures, m_fonts));
+	std::unique_ptr<Character> second(new Character(CharacterType::kDefault, m_textures, m_fonts, false));
 	m_character_two = second.get();
 	m_character_two->setPosition(40.f,40.f);
 	m_character_two->SetVelocity(0, 0);
@@ -524,51 +507,6 @@ void World::DestroyEntitiesOutsideView()
 	m_command_queue.Push(command);
 }
 
-void World::GuideMissiles()
-{
-	//Target the closest enemy in the world
-	Command enemyCollector;
-	enemyCollector.category = static_cast<int>(ReceiverCategories::kPlayerTwo);
-	enemyCollector.action = DerivedAction<Character>([this](Character& enemy, sf::Time)
-		{
-			if (!enemy.IsDestroyed())
-			{
-				m_active_enemies.emplace_back(&enemy);
-			}
-		});
-
-	Command missileGuider;
-	missileGuider.category = static_cast<int>(ReceiverCategories::kPlayerOneProjectile);
-	missileGuider.action = DerivedAction<Projectile>([this](Projectile& missile, sf::Time dt)
-		{
-			if (!missile.IsGuided())
-			{
-				return;
-			}
-
-			float min_distance = std::numeric_limits<float>::max();
-			Character* closest_enemy = nullptr;
-
-			for (Character* enemy : m_active_enemies)
-			{
-				float enemy_distance = Distance(missile, *enemy);
-				if (enemy_distance < min_distance)
-				{
-					closest_enemy = enemy;
-					min_distance = enemy_distance;
-				}
-			}
-
-			if (closest_enemy)
-			{
-				missile.GuideTowards(closest_enemy->GetWorldPosition());
-			}
-		});
-
-	m_command_queue.Push(enemyCollector);
-	m_command_queue.Push(missileGuider);
-	m_active_enemies.clear();
-}
 
 bool MatchesCategories(SceneNode::Pair& colliders, ReceiverCategories type1, ReceiverCategories type2)
 {
@@ -637,7 +575,7 @@ void World::HandleCollisions()
 			//Collision response
 			character.Damage(projectile.GetDamage());
 			character.SetVelocity(0.f, 0.f);
-			character.Accelerate(projectile.GetVelocity() / (2.5f,2.5f));
+			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));
 
 			projectile.Destroy();
 		}

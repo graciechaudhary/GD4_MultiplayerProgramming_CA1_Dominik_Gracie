@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.hpp"
-#include "AircraftType.hpp"
+#include "CharacterType.hpp"
 #include "ResourceIdentifiers.hpp"
 #include "TextNode.hpp"
 #include "Utility.hpp"
@@ -12,7 +12,7 @@
 class Character : public Entity
 {
 public:
-	Character(AircraftType type, const TextureHolder& textures, const FontHolder& fonts);
+	Character(CharacterType type, const TextureHolder& textures, const FontHolder& fonts, bool is_player_one);
 	unsigned int GetCategory() const override;
 
 	int GetMaxHitpoints() const;
@@ -23,8 +23,8 @@ public:
 	void Throw();
 
 	void RechargeSnowballs();
+
 	void CreateSnowball(SceneNode& node, const TextureHolder& textures) const;
-	void CreateProjectile(SceneNode& node, ProjectileType type, float x_float, float y_offset, const TextureHolder& textures) const;
 
 	sf::FloatRect GetBoundingRect() const override;
 	bool IsMarkedForRemoval() const override;
@@ -52,15 +52,13 @@ private:
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
 	void CheckProjectileLaunch(sf::Time dt, CommandQueue& commands);
-	bool IsAllied() const;
-	void UpdateRollAnimation();
 
 	void UpdateWalkAnimation(sf::Time dt);
 
 	void UpdateCurrentDirection();
 
 private:
-	AircraftType m_type;
+	CharacterType m_type;
 	sf::Sprite m_sprite;
 	Animation m_explosion;
 	Animation m_walk;
@@ -86,5 +84,7 @@ private:
 	FacingDirections m_current_direction;
 
 	sf::Time m_clear_flags_time;
+
+	bool m_is_player_one;
 };
 

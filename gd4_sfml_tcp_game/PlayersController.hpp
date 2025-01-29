@@ -2,7 +2,7 @@
 #include <SFML/Window/Event.hpp>
 #include "Action.hpp"
 #include "CommandQueue.hpp"
-#include "MissionStatus.hpp"
+#include "GameStatus.hpp"
 #include "RGBColour.hpp"
 #include <map>
 
@@ -19,8 +19,8 @@ public:
 
 	void AssignKey(Action action, sf::Keyboard::Key key);
 	sf::Keyboard::Key GetAssignedKey(Action action) const;
-	void SetMissionStatus(MissionStatus status);
-	MissionStatus GetMissionStatus() const;
+	void SetGameStatus(GameStatus status);
+	GameStatus GetGameStatus() const;
 	void SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two);
 
 	void UpdateColours(CommandQueue& command_queue);
@@ -33,7 +33,7 @@ private:
 	std::map<sf::Keyboard::Key, Action> m_key_binding;
 	std::map<Action, Command> m_action_binding;
 
-	MissionStatus m_current_mission_status;
+	GameStatus m_current_game_status;
 
 	std::unique_ptr<RGBColour> m_colour_one;
 	std::unique_ptr<RGBColour> m_colour_two;

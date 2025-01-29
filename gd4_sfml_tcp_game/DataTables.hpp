@@ -14,17 +14,6 @@ struct Direction
 	float m_distance;
 };
 
-struct AircraftData
-{
-	int m_hitpoints;
-	float m_speed;
-	TextureID m_texture;
-	sf::IntRect m_texture_rect;
-	sf::Time m_fire_interval;
-	std::vector<Direction> m_directions;
-	bool m_has_roll_animation;
-};
-
 struct CharacterData
 {
 	int m_hitpoints;
@@ -32,7 +21,7 @@ struct CharacterData
 	TextureID m_texture;
 	sf::IntRect m_texture_rect;
 	sf::Time m_fire_interval;
-	std::vector<Direction> m_directions;
+	int max_snowballs;
 };
 
 struct ProjectileData
@@ -56,7 +45,7 @@ struct ParticleData
 	sf::Time m_lifetime;
 };
 
-std::vector<AircraftData> InitializeAircraftData();
+std::vector<CharacterData> InitializeCharacterData();
 std::vector<ProjectileData> InitializeProjectileData();
 std::vector<PickupData> InitializePickupData();
 std::vector<ParticleData> InitializeParticleData();

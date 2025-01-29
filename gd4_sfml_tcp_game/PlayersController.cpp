@@ -106,7 +106,7 @@ struct CharacterMover
 	Direction direction;
 };
 
-PlayersController::PlayersController() : m_current_mission_status(MissionStatus::kMissionRunning), m_should_update_colours(false)
+PlayersController::PlayersController() : m_current_game_status(GameStatus::kGameRunning), m_should_update_colours(false)
 {
     //Set initial key bindings
     m_key_binding[sf::Keyboard::A] = Action::kMoveLeft;
@@ -195,14 +195,14 @@ sf::Keyboard::Key PlayersController::GetAssignedKey(Action action) const
     return sf::Keyboard::Unknown;
 }
 
-void PlayersController::SetMissionStatus(MissionStatus status)
+void PlayersController::SetGameStatus(GameStatus status)
 {
-    m_current_mission_status = status;
+    m_current_game_status = status;
 }
 
-MissionStatus PlayersController::GetMissionStatus() const
+GameStatus PlayersController::GetGameStatus() const
 {
-    return m_current_mission_status;
+    return m_current_game_status;
 }
 
 void PlayersController::SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two)
