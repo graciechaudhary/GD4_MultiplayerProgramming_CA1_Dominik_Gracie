@@ -104,7 +104,7 @@ void World::LoadTextures()
 	m_textures.Load(TextureID::kSnowballRefill, "Media/Textures/MissileRefill.png");
 
 	m_textures.Load(TextureID::kEntities, "Media/Textures/Entities.png");
-	m_textures.Load(TextureID::kExplosion, "Media/Textures/Explosion.png");
+	m_textures.Load(TextureID::kExplosion, "MediaFiles/Textures/Explosion/Explosion.png");
 
 	//edited texture for the snow particle effect - GracieChaudhary
 	m_textures.Load(TextureID::kParticle, "MediaFiles/Textures/Particles/SnowBits.png");

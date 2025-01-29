@@ -38,12 +38,13 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 {
 	m_walk.SetFrameSize(sf::Vector2i(38, 42));
 	m_walk.SetNumFrames(4);
-	m_walk.SetDuration(sf::seconds(1));
+	m_walk.SetDuration(sf::seconds(1.5f));
 	m_walk.SetRepeating(true);
 
-	m_explosion.SetFrameSize(sf::Vector2i(256, 256));
-	m_explosion.SetNumFrames(16);
-	m_explosion.SetDuration(sf::seconds(1));
+	m_explosion.SetFrameSize(sf::Vector2i(100, 100));
+	m_explosion.SetNumFrames(81);
+	m_explosion.SetDuration(sf::seconds(1.5f));
+	m_explosion.scale(2, 2);
 	Utility::CentreOrigin(m_sprite);
 	Utility::CentreOrigin(m_explosion);
 
@@ -195,8 +196,8 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		// Play explosion sound only once
 		if (!m_played_explosion_sound)
 		{
-			SoundEffect soundEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
-			PlayLocalSound(commands, soundEffect);
+			SoundEffect explosionEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
+			PlayLocalSound(commands, explosionEffect);
 
 			m_played_explosion_sound = true;
 		}
