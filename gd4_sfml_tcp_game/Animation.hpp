@@ -32,6 +32,8 @@ public:
 	sf::FloatRect GetGlobalBounds() const;
 
 	void Update(sf::Time dt);
+	 
+	std::size_t GetCurrentFrame();
 
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
