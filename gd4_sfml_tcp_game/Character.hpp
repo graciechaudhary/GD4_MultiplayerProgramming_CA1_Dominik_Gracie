@@ -55,12 +55,15 @@ private:
 	bool IsAllied() const;
 	void UpdateRollAnimation();
 
+	void UpdateWalkAnimation(sf::Time dt);
+
 	void UpdateCurrentDirection();
 
 private:
 	AircraftType m_type;
 	sf::Sprite m_sprite;
 	Animation m_explosion;
+	Animation m_walk;
 
 	TextNode* m_health_display;
 

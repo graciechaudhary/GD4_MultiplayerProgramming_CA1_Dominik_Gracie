@@ -25,6 +25,16 @@ struct AircraftData
 	bool m_has_roll_animation;
 };
 
+struct CharacterData
+{
+	int m_hitpoints;
+	float m_speed;
+	TextureID m_texture;
+	sf::IntRect m_texture_rect;
+	sf::Time m_fire_interval;
+	std::vector<Direction> m_directions;
+};
+
 struct ProjectileData
 {
 	int m_damage;

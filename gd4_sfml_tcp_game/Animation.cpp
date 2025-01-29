@@ -138,8 +138,15 @@ void Animation::Update(sf::Time dt)
     m_sprite.setTextureRect(textureRect);
 }
 
+std::size_t Animation::GetCurrentFrame()
+{
+    return m_current_frame;
+}
+
 void Animation::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();
     target.draw(m_sprite, states);
 }
+
+
