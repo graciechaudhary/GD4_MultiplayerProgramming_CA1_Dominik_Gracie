@@ -10,8 +10,8 @@ namespace
     const std::vector<ProjectileData> Table = InitializeProjectileData();
 }
 
-Projectile::Projectile(ProjectileType type, const TextureHolder& textures)
-    : Entity(1), m_type(type), m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
+Projectile::Projectile(ProjectileType type, const TextureHolder& textures, bool is_player_one)
+	: Entity(1), m_type(type), m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect), m_is_player_one(is_player_one)
 {
     Utility::CentreOrigin(m_sprite);    
 
@@ -20,39 +20,18 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures)
     std::unique_ptr<EmitterNode> snow(new EmitterNode(ParticleType::kSnow));
     snow->setPosition(0.f, GetBoundingRect().height / 2.f);
     AttachChild(std::move(snow));
-
-    //Add particle system for missiles
-    /*if (IsGuided())
-    {
-        std::unique_ptr<EmitterNode> smoke(new EmitterNode(ParticleType::kSmoke));
-        smoke->setPosition(0.f, GetBoundingRect().height / 2.f);
-        AttachChild(std::move(smoke));
-
-        std::unique_ptr<EmitterNode> propellant(new EmitterNode(ParticleType::kPropellant));
-        propellant->setPosition(0.f, GetBoundingRect().height / 2.f);
-        AttachChild(std::move(propellant));
-    }*/
-}
-
-void Projectile::GuideTowards(sf::Vector2f position)
-{
-    assert(IsGuided());
-    m_target_direction = Utility::UnitVector(position - GetWorldPosition());
-}
-
-bool Projectile::IsGuided() const
-{
-    return m_type == ProjectileType::kMissile;
 }
 
 unsigned int Projectile::GetCategory() const
 {
-    if (m_type == ProjectileType::kEnemyBullet)
+    if (m_is_player_one)
     {
-        return static_cast<int>(ReceiverCategories::kPlayerTwoProjectile);
+        return static_cast<int>(ReceiverCategories::kPlayerOneProjectile);
+        
     }
     else
-        return static_cast<int>(ReceiverCategories::kPlayerOneProjectile);
+        return static_cast<int>(ReceiverCategories::kPlayerTwoProjectile);
+        
 }
  
 sf::FloatRect Projectile::GetBoundingRect() const
@@ -72,15 +51,6 @@ float Projectile::GetDamage() const
 
 void Projectile::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
-    if (IsGuided())
-    {
-        const float approach_rate = 200;
-        sf::Vector2f new_velocity = Utility::UnitVector(approach_rate * dt.asSeconds() * m_target_direction + GetVelocity());
-        new_velocity *= GetMaxSpeed();
-        float angle = std::atan2(new_velocity.y, new_velocity.x);
-        setRotation(Utility::ToDegrees(angle) + 90.f);
-        SetVelocity(new_velocity);
-    }
     Entity::UpdateCurrent(dt, commands);
 }
 

@@ -1,6 +1,6 @@
 #include "GameState.hpp"
 #include "PlayersController.hpp"
-#include "MissionStatus.hpp"
+#include "GameStatus.hpp"
 
 GameState::GameState(StateStack& stack, Context context) : State(stack, context), m_world(*context.window, *context.fonts, *context.sounds), m_players_controller(*context.players_controller)
 {
@@ -21,14 +21,14 @@ void GameState::Draw()
 bool GameState::Update(sf::Time dt)
 {
 	m_world.Update(dt);
-	if (!m_world.HasAlivePlayer())
+	if (!m_world.HasAlivePlayerOne())
 	{
-		m_players_controller.SetMissionStatus(MissionStatus::kMissionFailure);
+		m_players_controller.SetGameStatus(GameStatus::kPlayerTwoWin);
 		RequestStackPush(StateID::kGameOver);
 	}
-	else if(m_world.HasPlayerReachedEnd())
+	else if(!m_world.HasAlivePlayerTwo())
 	{ 
-		m_players_controller.SetMissionStatus(MissionStatus::kMissionSuccess);
+		m_players_controller.SetGameStatus(GameStatus::kPlayerOneWin);
 		RequestStackPush(StateID::kGameOver);
 	}
 	CommandQueue& commands = m_world.GetCommandQueue();

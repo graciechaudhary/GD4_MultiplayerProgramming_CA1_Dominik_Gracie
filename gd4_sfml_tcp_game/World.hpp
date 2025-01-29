@@ -23,8 +23,8 @@ public:
 
 	CommandQueue& GetCommandQueue();
 
-	bool HasAlivePlayer() const;
-	bool HasPlayerReachedEnd() const;
+	bool HasAlivePlayerOne() const;
+	bool HasAlivePlayerTwo() const;
 
 private:
 	void LoadTextures();
@@ -41,7 +41,6 @@ private:
 	sf::FloatRect GetBattleFieldBounds() const;
 
 	void DestroyEntitiesOutsideView();
-	void GuideMissiles();
 
 	void HandleCollisions();
 	void UpdateSounds();
@@ -52,11 +51,11 @@ private:
 private:
 	struct SpawnPoint
 	{
-		SpawnPoint(AircraftType type, float x, float y) :m_type(type), m_x(x), m_y(y)
+		SpawnPoint(CharacterType type, float x, float y) :m_type(type), m_x(x), m_y(y)
 		{
 
 		}
-		AircraftType m_type;
+		CharacterType m_type;
 		float m_x;
 		float m_y;
 	};
