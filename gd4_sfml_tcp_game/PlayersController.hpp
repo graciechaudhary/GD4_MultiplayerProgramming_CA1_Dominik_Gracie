@@ -17,6 +17,8 @@ public:
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
 	void HandleRealTimeInput(CommandQueue& command_queue);
 
+	void HandleControllerInput(CommandQueue& command_queue);
+
 	void AssignKey(Action action, sf::Keyboard::Key key);
 	sf::Keyboard::Key GetAssignedKey(Action action) const;
 	void SetGameStatus(GameStatus status);

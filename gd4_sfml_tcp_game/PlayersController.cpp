@@ -166,6 +166,53 @@ void PlayersController::HandleRealTimeInput(CommandQueue& command_queue)
     }
 }
 
+void PlayersController::HandleControllerInput(CommandQueue& command_queue) {
+    if (sf::Joystick::isConnected(0)) {
+        if (sf::Joystick::isButtonPressed(0,0))
+        {
+			command_queue.Push(m_action_binding[Action::kBulletFire]);
+        }
+        if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) < -50)
+        {
+            command_queue.Push(m_action_binding[Action::kMoveLeft]);
+        }
+		if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) > 50)
+		{
+			command_queue.Push(m_action_binding[Action::kMoveRight]);
+		}
+        if (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) < -50)
+        {
+            command_queue.Push(m_action_binding[Action::kMoveUp]);
+        }
+		if (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) > 50)
+		{
+			command_queue.Push(m_action_binding[Action::kMoveDown]);
+		}
+    }
+    if (sf::Joystick::isConnected(1)) {
+        if (sf::Joystick::isButtonPressed(1, 0))
+        {
+            command_queue.Push(m_action_binding[Action::kThrow2]);
+        }
+        if (sf::Joystick::getAxisPosition(1, sf::Joystick::X) < -50)
+        {
+            command_queue.Push(m_action_binding[Action::kMoveLeft2]);
+        }
+        if (sf::Joystick::getAxisPosition(1, sf::Joystick::X) > 50)
+        {
+            command_queue.Push(m_action_binding[Action::kMoveRight2]);
+        }
+        if (sf::Joystick::getAxisPosition(1, sf::Joystick::Y) < -50)
+        {
+            command_queue.Push(m_action_binding[Action::kMoveUp2]);
+        }
+        if (sf::Joystick::getAxisPosition(1, sf::Joystick::Y) > 50)
+        {
+            command_queue.Push(m_action_binding[Action::kMoveDown2]);
+        }
+    }
+}
+
 void PlayersController::AssignKey(Action action, sf::Keyboard::Key key)
 {
     //Remove keys that are currently bound to the action
