@@ -1,6 +1,6 @@
 #include "RGBColour.hpp"
 
-RGBColour::RGBColour() : r(0), g(0), b(0)
+RGBColour::RGBColour() : r(220), g(220), b(220)
 {
 }
 
@@ -32,13 +32,13 @@ sf::Color RGBColour::GetColour() const
 void RGBColour::addRed(int val)
 {
 	r += val;
-	if (r > 255)
+	if (r > 220)
 	{
-		r = r - 256;
+		r = r - (220 - val);
 	}
-	if (r < 0)
+	if (r < 40)
 	{
-		r = 256 + r;
+		r = (220 + val) + r;
 	}
 
 }
@@ -46,25 +46,26 @@ void RGBColour::addRed(int val)
 void RGBColour::addGreen(int val)
 {
 	g += val;
-	if (g > 255)
+	if (g > 220)
 	{
-		g = g - 256;
+		g = g - (220 - val);
 	}
-	if (g < 0)
+	if (g < 40)
 	{
-		g = 256 + g;
+		g = (220 + val) + g;
 	}
 }
 
 void RGBColour::addBlue(int val)
 {
 	b += val;
-	if (b > 255)
+	if (b > 220)
 	{
-		b = b - 256;
+		b = b - (220 - val);
 	}
-	if (b < 0)
+	if (b < 40)
 	{
-		b = 256 + b;
+		b = (220 + val) + b;
 	}
+
 }

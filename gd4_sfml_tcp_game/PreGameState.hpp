@@ -28,5 +28,8 @@ private:
 
 	bool m_is_player_one_ready;
 	bool m_is_player_two_ready;
+
+	sf::Sprite m_sprite_one;
+	sf::Sprite m_sprite_two;
 };
 

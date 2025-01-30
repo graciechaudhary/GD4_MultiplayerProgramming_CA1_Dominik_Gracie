@@ -17,6 +17,8 @@ namespace gui
 
 		void SetColor(sf::Color color) { m_text.setFillColor(color); }
 
+		void SetSize(int size) { m_text.setCharacterSize(size); }
+
 	private:
 		void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
