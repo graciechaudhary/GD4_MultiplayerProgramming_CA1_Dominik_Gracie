@@ -8,7 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include "Animation.hpp"
 #include "FacingDirections.hpp"
-#include "AmmoNode.hpp"
+#include "ResourceNode.hpp"
 
 class Character : public Entity
 {
@@ -17,8 +17,6 @@ public:
 	unsigned int GetCategory() const override;
 
 	int GetMaxHitpoints() const;
-
-	void UpdateTexts();
 	float GetMaxSpeed() const;
 
 	void Throw();
@@ -64,8 +62,9 @@ private:
 	Animation m_explosion;
 	Animation m_walk;
 
-	TextNode* m_health_display;
-	AmmoNode* m_snowball_display;
+	ResourceNode* m_health_display;
+	ResourceNode* m_snowball_display;
+
 
 	Command m_throw_command;
 
