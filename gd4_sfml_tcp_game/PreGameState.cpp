@@ -12,17 +12,18 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	m_colour_one(std::make_unique<RGBColour>()),
 	m_colour_two(std::make_unique<RGBColour>()),
 	m_is_player_one_ready(false),
-	m_is_player_two_ready(false)
+	m_is_player_two_ready(false),
+	m_textures()
 {
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
-	context.textures->Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
+	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
 
-	m_sprite_one.setTexture(context.textures->Get(TextureID::kCharacterMovement));
+	m_sprite_one.setTexture(m_textures.Get(TextureID::kCharacterMovement));
 	m_sprite_one.setPosition(context.window->getSize().x / 2.f - 249, context.window->getSize().y / 2.f - 21);
 	m_sprite_one.setTextureRect(sf::IntRect(0, 0, 38, 42));
 
-	m_sprite_two.setTexture(context.textures->Get(TextureID::kCharacterMovement));
+	m_sprite_two.setTexture(m_textures.Get(TextureID::kCharacterMovement));
 	m_sprite_two.setPosition(context.window->getSize().x / 2.f + 201, context.window->getSize().y / 2.f - 21);
 	m_sprite_two.setTextureRect(sf::IntRect(0, 0, 38, 42));
 
