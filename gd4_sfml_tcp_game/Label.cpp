@@ -4,6 +4,7 @@
 gui::Label::Label(const std::string& text, const FontHolder& fonts)
     :m_text(text, fonts.Get(Font::kMain), 16)
 {
+    m_text.setStyle(sf::Text::Bold);
 }
 
 bool gui::Label::IsSelectable() const

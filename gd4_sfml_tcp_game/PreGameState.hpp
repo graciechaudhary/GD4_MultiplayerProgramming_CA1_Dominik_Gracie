@@ -6,6 +6,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include "RGBColour.hpp"
 #include "Label.hpp"
+#include "ResourceIdentifiers.hpp"
 
 class PreGameState : public State
 {
@@ -28,5 +29,10 @@ private:
 
 	bool m_is_player_one_ready;
 	bool m_is_player_two_ready;
+
+	sf::Sprite m_sprite_one;
+	sf::Sprite m_sprite_two;
+
+	TextureHolder m_textures;
 };
 

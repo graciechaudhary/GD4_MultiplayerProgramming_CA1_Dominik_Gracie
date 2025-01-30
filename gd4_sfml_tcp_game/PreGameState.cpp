@@ -9,45 +9,58 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
     State(stack, context),
 	m_gui_container_one(true),
 	m_gui_container_two(false),
-	m_colour_one(std::make_unique<RGBColour>(0, 0, 0)),
-	m_colour_two(std::make_unique<RGBColour>(0, 0, 0)),
+	m_colour_one(std::make_unique<RGBColour>()),
+	m_colour_two(std::make_unique<RGBColour>()),
 	m_is_player_one_ready(false),
-	m_is_player_two_ready(false)
+	m_is_player_two_ready(false),
+	m_textures()
 {
 	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
 
+	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
+
+	m_sprite_one.setTexture(m_textures.Get(TextureID::kCharacterMovement));
+	m_sprite_one.setPosition(context.window->getSize().x / 2.f - 249, context.window->getSize().y / 2.f - 21);
+	m_sprite_one.setTextureRect(sf::IntRect(0, 0, 38, 42));
+
+	m_sprite_two.setTexture(m_textures.Get(TextureID::kCharacterMovement));
+	m_sprite_two.setPosition(context.window->getSize().x / 2.f + 201, context.window->getSize().y / 2.f - 21);
+	m_sprite_two.setTextureRect(sf::IntRect(0, 0, 38, 42));
+
+	std::string color_text = "220";
+
 	auto red_button_one = std::make_shared<gui::Button>(context);
-	red_button_one->setPosition(100, 250);
-	red_button_one->SetText("0");
+	red_button_one->setPosition(175, 450);
+	red_button_one->SetText(color_text);
 	red_button_one->SetToggle(true);
 
 	auto green_button_one = std::make_shared<gui::Button>(context);
-	green_button_one->setPosition(100, 300);
-	green_button_one->SetText("0");
+	green_button_one->setPosition(175, 500);
+	green_button_one->SetText(color_text);
 	green_button_one->SetToggle(true);
 
 	auto blue_button_one = std::make_shared<gui::Button>(context);
-	blue_button_one->setPosition(100, 350);
-	blue_button_one->SetText("0");
+	blue_button_one->setPosition(175, 550);
+	blue_button_one->SetText(color_text);
 	blue_button_one->SetToggle(true);
 
 	auto red_button_two = std::make_shared<gui::Button>(context);
-	red_button_two->setPosition(400, 250);
-	red_button_two->SetText("0");
+	red_button_two->setPosition(625, 450);
+	red_button_two->SetText(color_text);
 	red_button_two->SetToggle(true);
 
 	auto green_button_two = std::make_shared<gui::Button>(context);
-	green_button_two->setPosition(400, 300);
-	green_button_two->SetText("0");
+	green_button_two->setPosition(625, 500);
+	green_button_two->SetText(color_text);
 	green_button_two->SetToggle(true);
 
 	auto blue_button_two = std::make_shared<gui::Button>(context);
-	blue_button_two->setPosition(400, 350);
-	blue_button_two->SetText("0");
+	blue_button_two->setPosition(625, 550);
+	blue_button_two->SetText(color_text);
 	blue_button_two->SetToggle(true);
 
 	auto ready_button_one = std::make_shared<gui::Button>(context);
-	ready_button_one->setPosition(100, 500);
+	ready_button_one->setPosition(175, 650);
 	ready_button_one->SetText("Confirm");
 	ready_button_one->SetCallback([this]()
 		{
@@ -65,7 +78,7 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 		});
 
 	auto ready_button_two = std::make_shared<gui::Button>(context);
-	ready_button_two->setPosition(400, 500);
+	ready_button_two->setPosition(625, 650);
 	ready_button_two->SetText("Confirm");
 	ready_button_two->SetCallback([this]()
 		{
@@ -102,30 +115,55 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	}
 
 	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
-	red_label->setPosition(325, 265);
+	red_label->setPosition(475, 465);
 	red_label->SetColor(sf::Color::Red);
-	
+	red_label->SetSize(25);
 
 	auto green_label = std::make_shared<gui::Label>("Green", *context.fonts);
-	green_label->setPosition(325, 315);
+	green_label->setPosition(467, 515);
 	green_label->SetColor(sf::Color::Green);
+	green_label->SetSize(25);
 
 	auto blue_label = std::make_shared<gui::Label>("Blue", *context.fonts);
-	blue_label->setPosition(325, 365);
+	blue_label->setPosition(475, 565);
 	blue_label->SetColor(sf::Color::Blue);
+	blue_label->SetSize(25);
 
 	m_gui_container_one.Pack(red_label);
 	m_gui_container_one.Pack(green_label);
 	m_gui_container_one.Pack(blue_label);
+
+	auto player_one_label = std::make_shared<gui::Label>("Player One", *context.fonts);
+	player_one_label->setPosition(222, 315);
+	player_one_label->SetColor(sf::Color::Red);
+	player_one_label->SetSize(25);
+
+	auto player_two_label = std::make_shared<gui::Label>("Player Two", *context.fonts);
+	player_two_label->setPosition(672, 315);
+	player_two_label->SetColor(sf::Color::Red);
+	player_two_label->SetSize(25);
+
+	m_gui_container_one.Pack(player_one_label);
+	m_gui_container_two.Pack(player_two_label);
+
+	auto title_label = std::make_shared<gui::Label>("Colour Selection", *context.fonts);
+	title_label->setPosition(280, 100);
+	title_label->SetColor(sf::Color::Red);
+	title_label->SetSize(60);
+
+	m_gui_container_one.Pack(title_label);
+
 }
 
 void PreGameState::Draw()
 {
 	sf::RenderWindow& window = *GetContext().window;
 	window.setView(window.getDefaultView());
-	window.draw(m_background_sprite);
+	//window.draw(m_background_sprite);
 	window.draw(m_gui_container_one);
 	window.draw(m_gui_container_two);
+	window.draw(m_sprite_one);
+	window.draw(m_sprite_two);
 }
 
 bool PreGameState::Update(sf::Time dt)
@@ -167,11 +205,11 @@ bool PreGameState::HandleEvent(const sf::Event& event)
 					int add = 0;
 					if (event.key.code == sf::Keyboard::D)
 					{
-						add = 1;
+						add = 20;
 					}
 					else if (event.key.code == sf::Keyboard::A)
 					{
-						add = -1;
+						add = -20;
 					}
 					switch (i)
 					{
@@ -191,6 +229,7 @@ bool PreGameState::HandleEvent(const sf::Event& event)
 						break;
 					}
 				}
+				m_sprite_one.setColor(m_colour_one->GetColour());
 			}
 
 			if (is_two_colour_selecting)
@@ -203,11 +242,11 @@ bool PreGameState::HandleEvent(const sf::Event& event)
 					int add = 0;
 					if (event.key.code == sf::Keyboard::Right)
 					{
-						add = 1;
+						add = 20;
 					}
 					else if (event.key.code == sf::Keyboard::Left)
 					{
-						add = -1;
+						add = -20;
 					}
 					switch (i)
 					{
@@ -227,18 +266,12 @@ bool PreGameState::HandleEvent(const sf::Event& event)
 						break;
 					}
 				}
-			}
-			else
-			{
-
+				m_sprite_two.setColor(m_colour_two->GetColour());
 			}
 		}
+
 		m_gui_container_one.HandleEvent(event);
 		m_gui_container_two.HandleEvent(event);
-
-
-
-
 	}
     return false;
 }

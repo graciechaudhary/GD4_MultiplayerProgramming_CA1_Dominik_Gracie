@@ -15,7 +15,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_scenegraph(ReceiverCategories::kNone)
 	,m_scene_layers()
 	,m_world_bounds(0.f,0.f, m_camera.getSize().x, m_camera.getSize().y)
-	,m_spawn_position(m_camera.getSize().x/2.f, m_camera.getSize().y/2.f)
+	,m_centre_position(m_camera.getSize().x/2.f, m_camera.getSize().y/2.f)
 	,m_scrollspeed(-50.f)
 	,m_character_one(nullptr)
 	, m_time_since_last_drop(sf::Time::Zero)
@@ -26,7 +26,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
 	BuildScene();
-	m_camera.setCenter(m_spawn_position);
+	m_camera.setCenter(m_centre_position);
 
 	m_create_pickup_command.category = static_cast<int>(ReceiverCategories::kScene);
 	m_create_pickup_command.action = [this](SceneNode& node, sf::Time)
@@ -131,14 +131,14 @@ void World::BuildScene()
 	//Add the player's aircraft
 	std::unique_ptr<Character> leader(new Character(CharacterType::kDefault, m_textures, m_fonts, true));
 	m_character_one = leader.get();
-	m_character_one->setPosition(m_spawn_position);
+	m_character_one->setPosition(m_centre_position.x - 230, m_centre_position.y);
 	m_character_one->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 	
 
 	std::unique_ptr<Character> second(new Character(CharacterType::kDefault, m_textures, m_fonts, false));
 	m_character_two = second.get();
-	m_character_two->setPosition(40.f,40.f);
+	m_character_two->setPosition(m_centre_position.x + 220, m_centre_position.y);
 	m_character_two->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(second));
 
