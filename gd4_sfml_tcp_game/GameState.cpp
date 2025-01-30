@@ -33,6 +33,7 @@ bool GameState::Update(sf::Time dt)
 	}
 	CommandQueue& commands = m_world.GetCommandQueue();
 	m_players_controller.HandleRealTimeInput(commands);
+	m_players_controller.HandleControllerInput(commands);
 	m_players_controller.UpdateColours(commands);
 	return true;
 }
