@@ -8,6 +8,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include "Animation.hpp"
 #include "FacingDirections.hpp"
+#include "AmmoNode.hpp"
 
 class Character : public Entity
 {
@@ -64,6 +65,7 @@ private:
 	Animation m_walk;
 
 	TextNode* m_health_display;
+	AmmoNode* m_snowball_display;
 
 	Command m_throw_command;
 

@@ -41,6 +41,7 @@
     <ClCompile Include="TitleState.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="World.cpp" />
+    <ClCompile Include="AmmoNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.hpp" />
@@ -104,6 +105,7 @@
     <ClInclude Include="TitleState.hpp" />
     <ClInclude Include="Utility.hpp" />
     <ClInclude Include="World.hpp" />
+    <ClInclude Include="AmmoNode.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ResourceHolder.inl" />

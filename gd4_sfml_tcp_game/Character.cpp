@@ -58,6 +58,11 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 	m_health_display = health_display.get();
 	AttachChild(std::move(health_display));
 
+	std::unique_ptr<AmmoNode> snowball_display(new AmmoNode(textures, m_snowball_count));
+	m_snowball_display = snowball_display.get();
+	m_snowball_display->setPosition(-24.f, -38.f);
+	AttachChild(std::move(snowball_display));
+
 	UpdateTexts();
 }
 
@@ -205,6 +210,9 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 	Entity::UpdateCurrent(dt, commands);
 	UpdateTexts();
+
+	m_snowball_display->SetAmmo(m_snowball_count);
+
 	//UpdateMovementPattern(dt);
 
 	//UpdateRollAnimation();
