@@ -11,8 +11,7 @@ MusicPlayer::MusicPlayer()
 	//sfml doesnt support mp3, use audacity to convert if necessary
 	m_filenames[MusicThemes::kMenu] = "MediaFiles/Music/MenuMusic.ogg";
 	m_filenames[MusicThemes::kGame] = "MediaFiles/Music/GameplayMusic.ogg";
-	m_filenames[MusicThemes::kGameOver] = "";
-	m_filenames[MusicThemes::kPause] = "";
+	m_filenames[MusicThemes::kGameOver] = "MediaFiles/Music/GameOverMusic.wav";
 }
 
 void MusicPlayer::Play(MusicThemes theme)

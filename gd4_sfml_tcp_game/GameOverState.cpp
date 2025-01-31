@@ -29,6 +29,10 @@ GameOverState::GameOverState(StateStack& stack, Context context)
     Utility::CentreOrigin(m_game_over_text);
     m_game_over_text.setPosition(0.5f * window_size.x, 0.4 * window_size.y);
 
+    context.music->SetVolume(150);
+    context.music->Play(MusicThemes::kGameOver);
+    
+
 }
 
 void GameOverState::Draw()
@@ -49,7 +53,7 @@ bool GameOverState::Update(sf::Time dt)
 {
     //Show gameover for 3 seconds and then return to the main menu
     m_elapsed_time += dt;
-    if (m_elapsed_time > sf::seconds(3))
+    if (m_elapsed_time > sf::seconds(13))
     {
         RequestStackClear();
         RequestStackPush(StateID::kMenu);

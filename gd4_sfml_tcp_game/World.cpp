@@ -568,9 +568,10 @@ void World::HandleCollisions()
 			auto& pickup = static_cast<Pickup&>(*pair.second);
 			//Collision response
 			pickup.Apply(player);
+			SoundEffect pickupSoundEffect = pickup.GetPickupType() == PickupType::kHealthRefill ? SoundEffect::kHealthPickup: SoundEffect::kSnowballPickup;
 			m_pickups_spawned--;
 			pickup.Destroy();
-			player.PlayLocalSound(m_command_queue, SoundEffect::kCollectPickup);
+			player.PlayLocalSound(m_command_queue, pickupSoundEffect);
 		}
 		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPlayerTwoProjectile) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPlayerOneProjectile))
 		{
@@ -581,7 +582,7 @@ void World::HandleCollisions()
 			character.Impacted();
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));
-
+			character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			projectile.Destroy();
 		}
 	}
