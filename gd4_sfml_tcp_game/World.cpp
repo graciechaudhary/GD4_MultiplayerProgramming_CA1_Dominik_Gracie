@@ -102,10 +102,10 @@ bool World::HasAlivePlayerTwo() const
 
 void World::LoadTextures()
 {
-	m_textures.Load(TextureID::kHealthRefill, "Media/Textures/HealthRefill.png");
-	m_textures.Load(TextureID::kSnowballRefill, "Media/Textures/MissileRefill.png");
+	m_textures.Load(TextureID::kHealthRefill, "MediaFiles/Textures/UI/HealthPickupV2.png");
+	m_textures.Load(TextureID::kSnowballRefill, "MediaFiles/Textures/UI/SnowballPickup.png");
 
-	m_textures.Load(TextureID::kEntities, "Media/Textures/Entities.png");
+	//m_textures.Load(TextureID::kEntities, "MediaFiles/Textures/Entities.png");
 	m_textures.Load(TextureID::kExplosion, "MediaFiles/Textures/Explosion/Explosion.png");
 	m_textures.Load(TextureID::kImpact, "MediaFiles/Textures/Explosion/Impact.png");
 
@@ -557,9 +557,10 @@ void World::HandleCollisions()
 			auto& pickup = static_cast<Pickup&>(*pair.second);
 			//Collision response
 			pickup.Apply(player);
+			SoundEffect pickupSoundEffect = pickup.GetPickupType() == PickupType::kHealthRefill ? SoundEffect::kHealthPickup: SoundEffect::kSnowballPickup;
 			m_pickups_spawned--;
 			pickup.Destroy();
-			player.PlayLocalSound(m_command_queue, SoundEffect::kCollectPickup);
+			player.PlayLocalSound(m_command_queue, pickupSoundEffect);
 		}
 		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPlayerTwoProjectile) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPlayerOneProjectile))
 		{
@@ -568,7 +569,8 @@ void World::HandleCollisions()
 			//Collision response
 			character.Damage(projectile.GetDamage());
 			character.SetVelocity(0.f, 0.f);
-			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));	
+			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));
+			character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			projectile.Destroy();
 
 		}

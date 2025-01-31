@@ -8,9 +8,9 @@ GameState::GameState(StateStack& stack, Context context) : State(stack, context)
 {
 	//Play the music
 
-	//context.music->Play(MusicThemes::kMissionTheme);
+		
 	context.music->Play(MusicThemes::kGame);
-	//context.music->SetVolume(100);
+	
 	HandleEvent(sf::Event());
 
 }

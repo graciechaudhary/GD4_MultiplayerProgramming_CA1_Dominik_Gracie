@@ -15,6 +15,7 @@ public:
 	virtual sf::FloatRect GetBoundingRect() const;
 	void Apply(Character& player) const;
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const override;
+	PickupType GetPickupType();
 
 private:
 	PickupType m_type;
