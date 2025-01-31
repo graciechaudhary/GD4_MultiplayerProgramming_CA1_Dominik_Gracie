@@ -593,6 +593,8 @@ void World::UpdateSounds()
 
 void World::CheckPickupDrop(sf::Time dt)
 {
+
+
 	// Check if it's time to spawn a new pickup
 	if (m_time_since_last_drop > m_pickup_drop_interval)
 	{
@@ -600,8 +602,16 @@ void World::CheckPickupDrop(sf::Time dt)
 		m_pickups_spawned++;
 		m_command_queue.Push(m_create_pickup_command);
 	}
-	else if(m_pickups_spawned < m_max_pickups)
+
+	if (m_pickups_spawned == 0)
 	{
 		m_time_since_last_drop += dt;
 	}
+
+	if(m_pickups_spawned < m_max_pickups)
+	{
+		m_time_since_last_drop += dt;
+	}
+
+
 }
