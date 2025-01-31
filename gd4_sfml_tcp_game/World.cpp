@@ -102,10 +102,10 @@ bool World::HasAlivePlayerTwo() const
 
 void World::LoadTextures()
 {
-	m_textures.Load(TextureID::kHealthRefill, "Media/Textures/HealthRefill.png");
-	m_textures.Load(TextureID::kSnowballRefill, "Media/Textures/MissileRefill.png");
+	m_textures.Load(TextureID::kHealthRefill, "MediaFiles/Textures/UI/HealthPickup.png");
+	m_textures.Load(TextureID::kSnowballRefill, "MediaFiles/Textures/UI/SnowballPickup.png");
 
-	m_textures.Load(TextureID::kEntities, "Media/Textures/Entities.png");
+	//m_textures.Load(TextureID::kEntities, "MediaFiles/Textures/Entities.png");
 	m_textures.Load(TextureID::kExplosion, "MediaFiles/Textures/Explosion/Explosion.png");
 
 	//edited texture for the snow particle effect - GracieChaudhary

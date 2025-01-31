@@ -44,7 +44,7 @@ MenuState::MenuState(StateStack& stack, Context context)
     m_gui_container.Pack(settings_button);
     m_gui_container.Pack(exit_button);
 
-    context.music->SetVolume(100);
+   
     context.music->Play(MusicThemes::kMenu);
 }
 
