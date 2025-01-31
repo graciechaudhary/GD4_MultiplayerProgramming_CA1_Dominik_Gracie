@@ -38,3 +38,8 @@ void Pickup::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) cons
 {
     target.draw(m_sprite, states);
 }
+
+PickupType Pickup::GetPickupType()
+{
+    return m_type;
+}

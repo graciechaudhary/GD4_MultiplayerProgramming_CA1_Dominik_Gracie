@@ -7,7 +7,6 @@ enum class MusicThemes
 	kMissionTheme,
 	kMenu,
 	kGame,
-	kPause,
 	kGameOver
 
 };

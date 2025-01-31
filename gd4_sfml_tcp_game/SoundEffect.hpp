@@ -3,22 +3,21 @@
 #pragma once
 enum class SoundEffect
 {
-	kAlliedGunfire,
-	kEnemyGunfire,
+	
 	kExplosion1,
 	kExplosion2,
-	kLaunchMissile,
-	kCollectPickup,
+	
+	kSnowballPickup,
+	kHealthPickup,
 	kButton,
 
 	//game sound effects
 	kSnowballThrow,
 	kSnowballHitPlayer,
-	//kSnowballHitGround, - still under consideration as it might cause audio clutter
+	
 
 	//ui sound effects
 	kMenuButton,
-	kPauseButton,
-	kLifeDrop,
-	kLifeGain
+	kPauseButton
+
 };

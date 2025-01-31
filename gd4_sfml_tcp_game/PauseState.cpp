@@ -26,7 +26,8 @@ PauseState::PauseState(StateStack& stack, Context context)
     m_instruction_text.setPosition(0.5f * view_size.x, 0.6f * view_size.y);
 
     //Pause the music
-    GetContext().music->SetPaused(true);
+   GetContext().music->SetPaused(true);
+   
 }
 
 void PauseState::Draw()
