@@ -464,9 +464,6 @@ void World::AdaptPlayerVelocity()
 
 	m_character_one->HandleSliding();
 	m_character_two->HandleSliding();
-
-
-
 	////If they are moving diagonally divide by sqrt 2
 	//if (velocity.x != 0.f && velocity.y != 0.f)
 	//{
@@ -476,9 +473,12 @@ void World::AdaptPlayerVelocity()
 
 void World::CreatePickup(SceneNode& node, const TextureHolder& textures) const
 {
+	float border_distance = 65.f;
 	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
 	std::unique_ptr<Pickup> pickup(new Pickup(type, textures));
-	pickup->setPosition(Utility::RandomInt(GetViewBounds().width), Utility::RandomInt(GetViewBounds().height));
+	float x = Utility::RandomInt(GetViewBounds().width - border_distance * 2) + border_distance;
+	float y = Utility::RandomInt(GetViewBounds().height - border_distance * 2) + border_distance;
+	pickup->setPosition(x,y);
 	node.AttachChild(std::move(pickup));
 }
 
