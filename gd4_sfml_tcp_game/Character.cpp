@@ -526,13 +526,7 @@ sf::Color Character::GetColour()
 }
 
 
-void Character::Impacted()
-{
-	m_current_animation = CharacterAnimationType::kImpact;
-	m_impact_duration = sf::seconds(0.5f);
-	m_blink_timer = sf::Time::Zero;
-	m_impact_timer = sf::Time::Zero;
-}
+
 
 
 

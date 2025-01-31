@@ -64,8 +64,6 @@ std::vector<ParticleData> InitializeParticleData()
     data[static_cast<int>(ParticleType::kSnowTwo)].m_color = sf::Color(255, 255, 255);
     data[static_cast<int>(ParticleType::kSnowTwo)].m_lifetime = sf::seconds(1.f);
 
-    data[static_cast<int>(ParticleType::kSnowExplosion)].m_color = sf::Color(255, 255, 255);
-    data[static_cast<int>(ParticleType::kSnowExplosion)].m_lifetime = sf::seconds(1.f);
 
     return data;
 }

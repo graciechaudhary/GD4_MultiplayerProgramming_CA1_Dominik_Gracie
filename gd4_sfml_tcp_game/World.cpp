@@ -107,6 +107,7 @@ void World::LoadTextures()
 
 	m_textures.Load(TextureID::kEntities, "Media/Textures/Entities.png");
 	m_textures.Load(TextureID::kExplosion, "MediaFiles/Textures/Explosion/Explosion.png");
+	m_textures.Load(TextureID::kImpact, "MediaFiles/Textures/Explosion/Impact.png");
 
 	//edited texture for the snow particle effect - GracieChaudhary
 	m_textures.Load(TextureID::kParticle, "MediaFiles/Textures/Particles/SnowBits.png");
@@ -150,8 +151,6 @@ void World::BuildScene()
 	std::unique_ptr<ParticleNode> snowNodeTwo(new ParticleNode(ParticleType::kSnowTwo, m_textures, false));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNodeTwo));
 
-	std::unique_ptr<ParticleNode> snowExplosion(new ParticleNode(ParticleType::kSnowExplosion, m_textures, false));
-	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowExplosion));
 
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
@@ -568,7 +567,6 @@ void World::HandleCollisions()
 			auto& projectile = static_cast<Projectile&>(*pair.second);
 			//Collision response
 			character.Damage(projectile.GetDamage());
-			character.Impacted();
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));	
 			projectile.Destroy();

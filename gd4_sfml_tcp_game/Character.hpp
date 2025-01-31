@@ -48,7 +48,7 @@ public:
 	void WalkDown();
 
 	void SetColour(sf::Color colour);
-	void Impacted();
+	
 	void SetImpact(bool is_impacted);
 
 	sf::Color GetColour();
