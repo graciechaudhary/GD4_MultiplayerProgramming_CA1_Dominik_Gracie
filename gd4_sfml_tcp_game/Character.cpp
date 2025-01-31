@@ -196,6 +196,7 @@ void Character::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) c
 	else
 	{
 		target.draw(m_sprite, states);
+		
 	}
 }
 
@@ -222,7 +223,6 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	m_snowball_display->SetResource(m_snowball_count);
 
 	
-
 	//Check if bullets or misiles are fired
 	CheckProjectileLaunch(dt, commands);
 		
@@ -320,7 +320,7 @@ void Character::UpdateAttackingAnimation(sf::Time dt)
 void Character::UpdateImpactAnimation(sf::Time dt)
 {
 	
-	sf::Color original_color = m_sprite.getColor();
+	
 	if (m_current_animation != CharacterAnimationType::kImpact)
 	{
 		m_walking.Update(dt); 
@@ -331,14 +331,14 @@ void Character::UpdateImpactAnimation(sf::Time dt)
 
 	if (m_blink_timer >= sf::seconds(0.1f))
 	{
-		m_sprite.setColor(m_sprite.getColor() == sf::Color::Transparent ? original_color : sf::Color::Transparent);
+		m_sprite.setColor(m_sprite.getColor() == sf::Color::Transparent ? m_colour : sf::Color::Transparent);
 		m_blink_timer = sf::Time::Zero;
 	}
 
 	if (m_impact_timer >= m_impact_duration)
 	{
 		m_current_animation = CharacterAnimationType::kWalk; 
-		m_sprite.setColor(original_color);
+		m_sprite.setColor(m_colour);
 		m_impact_timer = sf::Time::Zero;  
 	}
 
@@ -526,13 +526,7 @@ sf::Color Character::GetColour()
 }
 
 
-void Character::Impacted()
-{
-	m_current_animation = CharacterAnimationType::kImpact;
-	m_impact_duration = sf::seconds(0.5f);
-	m_blink_timer = sf::Time::Zero;
-	m_impact_timer = sf::Time::Zero;
-}
+
 
 
 

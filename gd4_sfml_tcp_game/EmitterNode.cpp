@@ -1,6 +1,7 @@
 //Gracie Chaudhary D00251769  
 //Dominik Hampejs D00250604  
 #include "EmitterNode.hpp"
+#include <iostream>
 
 EmitterNode::EmitterNode(ParticleType type)
 	:SceneNode()
@@ -14,8 +15,9 @@ void EmitterNode::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	if (m_particle_system)
 	{
-		EmitParticles(dt);
+		EmitRadialParticles(dt);			
 	}
+	
 	else
 	{
 		// Find particle node with the same type as the emitter
@@ -32,22 +34,9 @@ void EmitterNode::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	}
 }
 
-//void EmitterNode::EmitParticles(sf::Time dt)
-//{
-//	const float emissionRate = 5.f;
-//	const sf::Time interval = sf::seconds(1.f) / emissionRate;
-//
-//	m_accumulated_time += dt;
-//	while (m_accumulated_time > interval)
-//	{
-//		m_accumulated_time -= interval;
-//		m_particle_system->AddParticle(GetWorldPosition());
-//	}
-//}
-
 
 //setting new emission pattern - Gracie Chaudhary
-void EmitterNode::EmitParticles(sf::Time dt)
+void EmitterNode::EmitRadialParticles(sf::Time dt)
 {
 	const float emissionRate = 50.f; 
 	const sf::Time interval = sf::seconds(1.f) / emissionRate;
@@ -65,3 +54,6 @@ void EmitterNode::EmitParticles(sf::Time dt)
 		m_particle_system->AddParticle(GetWorldPosition() + offset);
 	}
 }
+
+
+

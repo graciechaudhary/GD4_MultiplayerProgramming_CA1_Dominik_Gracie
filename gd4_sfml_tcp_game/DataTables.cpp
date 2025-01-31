@@ -64,8 +64,5 @@ std::vector<ParticleData> InitializeParticleData()
     data[static_cast<int>(ParticleType::kSnowTwo)].m_lifetime = sf::seconds(1.f);
 
 
-
-
-
     return data;
 }

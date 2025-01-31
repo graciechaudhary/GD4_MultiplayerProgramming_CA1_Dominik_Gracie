@@ -4,6 +4,7 @@
 #include "Entity.hpp"
 #include "ResourceIdentifiers.hpp"
 #include "ProjectileType.hpp"
+#include "Animation.hpp"
 
 class Projectile : public Entity
 {
@@ -14,6 +15,9 @@ public:
 	sf::FloatRect GetBoundingRect() const override;
 	float GetMaxSpeed() const;
 	float GetDamage() const;
+	bool IsMarkedForRemoval() const override;
+	
+	
 
 private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
@@ -24,5 +28,7 @@ private:
 	sf::Sprite m_sprite;
 	bool m_is_player_one;
 	sf::Vector2f m_target_direction;
+	Animation m_impact_animation;
+	
 };
 

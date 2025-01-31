@@ -15,6 +15,7 @@ enum class TextureID
 	kButtons,
 	kExplosion,
 	kParticle,
+	kImpact,
 	//new additions for the game
 	kCharacterMovement,
 	kSnowball,

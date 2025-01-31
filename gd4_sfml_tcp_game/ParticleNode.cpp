@@ -92,10 +92,8 @@ void ParticleNode::ComputeVertices() const
     m_vertex_array.clear();
     
     sf::Vector2f size(m_texture.getSize());
-    sf::Vector2f half = size / 4.f;
-        
+    sf::Vector2f half = size / 4.f;     
    
-
     for (const Particle& particle : m_particles)
     {
         sf::Vector2f pos = particle.m_position;
