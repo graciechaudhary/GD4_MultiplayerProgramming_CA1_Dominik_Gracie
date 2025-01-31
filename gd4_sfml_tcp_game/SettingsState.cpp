@@ -8,14 +8,12 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 	: State(stack, context)
 	, m_gui_container(true)
 {
-	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
-
 	//Build key binding buttons and labels
 	AddButtonLabel(Action::kMoveUp, 50.f, "Move Up", context);
 	AddButtonLabel(Action::kMoveDown, 100.f, "Move Down", context);
 	AddButtonLabel(Action::kMoveRight, 150.f, "Move Right", context);
 	AddButtonLabel(Action::kMoveLeft, 200.f, "Move Left", context);
-	AddButtonLabel(Action::kBulletFire, 250.f, "Fire", context);
+	AddButtonLabel(Action::kBulletFire, 250.f, "Throw", context);
 	AddButtonLabel(Action::kMoveUp2, 300.f, "Move Up 2", context);
 	AddButtonLabel(Action::kMoveDown2, 350.f, "Move Down 2", context);
 	AddButtonLabel(Action::kMoveRight2, 400.f, "Move Right 2", context);

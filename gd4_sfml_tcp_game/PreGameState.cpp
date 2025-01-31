@@ -131,17 +131,17 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
 	red_label->setPosition(475, 465);
 	red_label->SetColor(sf::Color::Red);
-	red_label->SetSize(25);
+	red_label->SetSize(30);
 
 	auto green_label = std::make_shared<gui::Label>("Green", *context.fonts);
 	green_label->setPosition(467, 515);
 	green_label->SetColor(sf::Color::Green);
-	green_label->SetSize(25);
+	green_label->SetSize(30);
 
 	auto blue_label = std::make_shared<gui::Label>("Blue", *context.fonts);
 	blue_label->setPosition(475, 565);
 	blue_label->SetColor(sf::Color::Blue);
-	blue_label->SetSize(25);
+	blue_label->SetSize(30);
 
 	m_gui_container_one.Pack(red_label);
 	m_gui_container_one.Pack(green_label);
@@ -149,23 +149,23 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 
 	//Set up the labels for the players
 	auto player_one_label = std::make_shared<gui::Label>("Player One", *context.fonts);
-	player_one_label->setPosition(222, 315);
+	player_one_label->setPosition(224, 305);
 	player_one_label->SetColor(sf::Color::Red);
-	player_one_label->SetSize(25);
+	player_one_label->SetSize(30);
 
 	auto player_two_label = std::make_shared<gui::Label>("Player Two", *context.fonts);
-	player_two_label->setPosition(672, 315);
+	player_two_label->setPosition(674, 305);
 	player_two_label->SetColor(sf::Color::Red);
-	player_two_label->SetSize(25);
+	player_two_label->SetSize(30);
 
 	m_gui_container_one.Pack(player_one_label);
 	m_gui_container_two.Pack(player_two_label);
 
 	//Set up the title label
 	auto title_label = std::make_shared<gui::Label>("Colour Selection", *context.fonts);
-	title_label->setPosition(280, 100);
+	title_label->setPosition(310, 100);
 	title_label->SetColor(sf::Color::Red);
-	title_label->SetSize(60);
+	title_label->SetSize(80);
 
 	m_gui_container_one.Pack(title_label);
 

@@ -22,8 +22,9 @@ PauseState::PauseState(StateStack& stack, Context context)
 
     m_instruction_text.setFont(font);
     m_instruction_text.setString("Press backspace to return to main menu, esc to game");
+    m_instruction_text.setCharacterSize(40);
     Utility::CentreOrigin(m_instruction_text);
-    m_instruction_text.setPosition(0.5f * view_size.x, 0.6f * view_size.y);
+    m_instruction_text.setPosition(0.52f * view_size.x, 0.6f * view_size.y);
 
     //Pause the music
    GetContext().music->SetPaused(true);

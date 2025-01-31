@@ -15,7 +15,7 @@ Application::Application() : m_window(sf::VideoMode(1024, 768), "States", sf::St
 	, m_stack(State::Context(m_window, m_textures, m_fonts, m_players_controller, m_music, m_sound))
 {
 	m_window.setKeyRepeatEnabled(false);
-	m_fonts.Load(Font::kMain, "Media/Fonts/Sansation.ttf");
+	m_fonts.Load(Font::kMain, "Media/Fonts/HappySunshine.otf");
 	m_textures.Load(TextureID::kTitleScreen, "Media/Textures/TitleScreen.png");
 	
 	m_textures.Load(TextureID::kButtonNormal, "Media/Textures/ButtonNormal.png");
