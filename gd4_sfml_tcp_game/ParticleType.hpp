@@ -5,6 +5,5 @@
 enum class ParticleType {
 	kSnowOne,
 	kSnowTwo,
-	kSnowExplosion,
 	kParticleCount
 };

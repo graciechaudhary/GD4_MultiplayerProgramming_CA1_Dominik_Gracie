@@ -571,11 +571,6 @@ void World::HandleCollisions()
 			character.Impacted();
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));	
-			
-			/*std::unique_ptr<EmitterNode> snowExplosion(new EmitterNode(ParticleType::kSnowExplosion));
-			snowExplosion->setPosition(projectile.getPosition());
-			projectile.AttachChild(std::move(snowExplosion));*/
-			//projectile.OnDestruction();
 			projectile.Destroy();
 
 		}
