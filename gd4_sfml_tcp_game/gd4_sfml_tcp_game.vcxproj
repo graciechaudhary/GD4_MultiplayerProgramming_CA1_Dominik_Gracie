@@ -169,11 +169,13 @@
     <ClCompile Include="TextureHolder.cpp" />
     <ClCompile Include="TitleState.cpp" />
     <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="CharacterAnimation.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.hpp" />
     <ClInclude Include="Character.hpp" />
+    <ClInclude Include="CharacterAnimationType.hpp" />
     <ClInclude Include="CharacterType.hpp" />
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="Application.hpp" />
@@ -232,6 +234,7 @@
     <ClInclude Include="TextureID.hpp" />
     <ClInclude Include="TitleState.hpp" />
     <ClInclude Include="Utility.hpp" />
+    <ClInclude Include="CharacterAnimation.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 #include "ProjectileType.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 #include "Animation.hpp"
+#include "CharacterAnimation.hpp"
 #include "FacingDirections.hpp"
 
 class Character : public Entity
@@ -53,7 +54,7 @@ private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
 	void CheckProjectileLaunch(sf::Time dt, CommandQueue& commands);
 
-	void UpdateWalkAnimation(sf::Time dt);
+	void UpdateCharacterAnimation(sf::Time dt);
 
 	void UpdateCurrentDirection();
 
@@ -62,6 +63,9 @@ private:
 	sf::Sprite m_sprite;
 	Animation m_explosion;
 	Animation m_walk;
+	CharacterAnimation m_walking;
+	CharacterAnimation m_attacking;
+
 
 	TextNode* m_health_display;
 

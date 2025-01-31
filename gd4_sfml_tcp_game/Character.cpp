@@ -21,6 +21,8 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 	, m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
 	, m_explosion(textures.Get(TextureID::kExplosion))
 	, m_walk(textures.Get(TextureID::kCharacterMovement))
+	, m_walking(CharacterAnimationType::kWalk, textures.Get(TextureID::kCharacterMovement))
+	, m_attacking(CharacterAnimationType::kWalk, textures.Get(TextureID::kCharacterMovement))
 	, m_health_display(nullptr)
 	, m_is_throwing(false)
 	, m_throw_countdown(sf::Time::Zero)
@@ -40,6 +42,11 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 	m_walk.SetNumFrames(4);
 	m_walk.SetDuration(sf::seconds(1.5f));
 	m_walk.SetRepeating(true);
+
+	m_walking.SetFrameSize(sf::Vector2i(38, 42));
+	m_walking.SetNumFrames(4);
+	m_walking.SetDuration(sf::seconds(1.f));
+	m_walking.SetRepeating(true);
 
 	m_explosion.SetFrameSize(sf::Vector2i(100, 100));
 	m_explosion.SetNumFrames(81);
@@ -209,7 +216,7 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	//UpdateMovementPattern(dt);
 
 	//UpdateRollAnimation();
-	UpdateWalkAnimation(dt);
+	UpdateCharacterAnimation(dt);
 
 	//Check if bullets or misiles are fired
 	CheckProjectileLaunch(dt, commands);
@@ -239,112 +246,36 @@ void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 }
 
 
-void Character::UpdateWalkAnimation(sf::Time dt)
+void Character::UpdateCharacterAnimation(sf::Time dt)
 {
-	
-	sf::IntRect textureRect = Table[static_cast<int>(m_type)].m_texture_rect;
-
-	const int frame_count = 4;
-	static int current_frame = 0;
-	static sf::Time elapsed_time = sf::Time::Zero;
-	sf::Time frame_duration = sf::milliseconds(1500); 
-
-	elapsed_time += sf::seconds(1.f / 60.f); 
-
+		
 	if (GetVelocity() == sf::Vector2f(0.f, 0.f))
 	{
-		current_frame = 0;
+		m_walking.Restart();  // Reset animation when not moving
 	}
 	else
 	{
-		elapsed_time += dt; // Use actual delta time
-
-		if (elapsed_time >= frame_duration)
-		{
-			current_frame = (current_frame + 1) % frame_count;
-			elapsed_time -= frame_duration; // Subtract instead of resetting to avoid frame skipping
-		}
+		m_walking.Update(dt);
 	}
 
+	// Set the animation row based on direction
 	switch (m_current_direction)
 	{
-	case FacingDirections::kDown:
-		textureRect.top = textureRect.height * 0;
-		break;
-	case FacingDirections::kDownLeft:
-		textureRect.top = textureRect.height * 1;
-		break;
-	case FacingDirections::kDownRight:
-		textureRect.top = textureRect.height * 2;
-		break;
-	case FacingDirections::kLeft:
-		textureRect.top = textureRect.height * 3;
-		break;
-	case FacingDirections::kRight:
-		textureRect.top = textureRect.height * 4;
-		break;
-	case FacingDirections::kUp:
-		textureRect.top = textureRect.height * 5;
-		break;
-	case FacingDirections::kUpLeft:
-		textureRect.top = textureRect.height * 6;
-		break;
-	case FacingDirections::kUpRight:
-		textureRect.top = textureRect.height * 7;
-		break;
+	case FacingDirections::kDown: 		m_walking.SetRow(0);		break;
+	case FacingDirections::kDownLeft:		m_walking.SetRow(1);		break;
+	case FacingDirections::kDownRight:		m_walking.SetRow(2);		break;
+	case FacingDirections::kLeft:		m_walking.SetRow(3);		break;
+	case FacingDirections::kRight:		m_walking.SetRow(4);		break;
+	case FacingDirections::kUp:		m_walking.SetRow(5);		break;
+	case FacingDirections::kUpLeft:		m_walking.SetRow(6);		break;
+	case FacingDirections::kUpRight:		m_walking.SetRow(7);		break;
 	}
 
-	 
-	textureRect.left = textureRect.width * current_frame;
-
-	 
-	m_sprite.setTextureRect(textureRect);
+	// Update the sprite based on the animation
+	m_sprite.setTextureRect(m_walking.GetCurrentTextureRect());
 }
 
-//void Character::UpdateWalkAnimation(sf::Time dt) {
-//	if (GetVelocity() == sf::Vector2f(0.f, 0.f))
-//	{
-//		m_walk.Restart();
-//	}
-//	else
-//	{
-//		sf::IntRect texture_rect = m_sprite.getTextureRect();
-//
-//		switch (m_current_direction)
-//		{
-//		case FacingDirections::kDown:
-//			texture_rect.top = texture_rect.height * 0;
-//			break;
-//		case FacingDirections::kDownLeft:
-//			texture_rect.top = texture_rect.height * 1;
-//			break;
-//		case FacingDirections::kDownRight:
-//			texture_rect.top = texture_rect.height * 2;
-//			break;
-//		case FacingDirections::kLeft:
-//			texture_rect.top = texture_rect.height * 3;
-//			break;
-//		case FacingDirections::kRight:
-//			texture_rect.top = texture_rect.height * 4;
-//			break;
-//		case FacingDirections::kUp:
-//			texture_rect.top = texture_rect.height * 5;
-//			break;
-//		case FacingDirections::kUpLeft:
-//			texture_rect.top = texture_rect.height * 6;
-//			break;
-//		case FacingDirections::kUpRight:
-//			texture_rect.top = texture_rect.height * 7;
-//			break;
-//		}
-//
-//		texture_rect.left = texture_rect.width * m_walk.GetCurrentFrame();
-//		m_walk.
-//		m_walk.Update(dt);
-//		
-//	}
-//
-//}
+
 
 void Character::UpdateCurrentDirection()
 {
