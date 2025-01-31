@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "RGBColour.hpp"
 
 RGBColour::RGBColour() : r(220), g(220), b(220)

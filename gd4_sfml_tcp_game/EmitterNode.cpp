@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "EmitterNode.hpp"
 
 EmitterNode::EmitterNode(ParticleType type)
