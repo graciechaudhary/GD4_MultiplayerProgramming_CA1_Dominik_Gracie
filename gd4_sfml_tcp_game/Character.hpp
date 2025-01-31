@@ -54,7 +54,10 @@ private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
 	void CheckProjectileLaunch(sf::Time dt, CommandQueue& commands);
 
-	void UpdateCharacterAnimation(sf::Time dt);
+	void UpdateAnimation(sf::Time dt);
+	void UpdateWalkingAnimation(sf::Time dt);
+	void UpdateAttackingAnimation(sf::Time dt);
+	void UpdateImpactAnimation(sf::Time dt);
 
 	void UpdateCurrentDirection();
 
@@ -62,11 +65,10 @@ private:
 	CharacterType m_type;
 	sf::Sprite m_sprite;
 	Animation m_explosion;
-	Animation m_walk;
+	CharacterAnimationType m_current_animation;
 	CharacterAnimation m_walking;
 	CharacterAnimation m_attacking;
-
-
+	
 	TextNode* m_health_display;
 
 	Command m_throw_command;

@@ -98,6 +98,7 @@ sf::FloatRect CharacterAnimation::GetGlobalBounds() const
 
 void CharacterAnimation::Update(sf::Time dt)
 {
+
     sf::Time time_per_frame = m_duration / static_cast<float>(m_num_frames);
     m_elapsed_time += dt;
 
@@ -137,4 +138,11 @@ sf::IntRect CharacterAnimation::GetCurrentTextureRect() const
 
 void CharacterAnimation::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    states.transform *= getTransform();
+    target.draw(m_sprite, states);
+}
+
+std::size_t CharacterAnimation::GetCurrentFrame()
+{
+    return m_current_frame;
 }
