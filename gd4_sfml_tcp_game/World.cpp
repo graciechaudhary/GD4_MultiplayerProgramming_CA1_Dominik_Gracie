@@ -149,8 +149,11 @@ void World::BuildScene()
 	std::unique_ptr<ParticleNode> propellantNode(new ParticleNode(ParticleType::kPropellant, m_textures));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(propellantNode));*/
 
-	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures));
+	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnowOne, m_textures,true));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
+
+	std::unique_ptr<ParticleNode> snowNodeTwo(new ParticleNode(ParticleType::kSnowTwo, m_textures, false));
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNodeTwo));
 
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));

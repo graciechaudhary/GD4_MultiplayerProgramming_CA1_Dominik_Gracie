@@ -46,6 +46,8 @@ public:
 
 	void SetColour(sf::Color colour);
 
+	sf::Color GetColour();
+
 
 private:
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -87,5 +89,7 @@ private:
 	sf::Time m_clear_flags_time;
 
 	bool m_is_player_one;
+
+	sf::Color m_colour;
 };
 

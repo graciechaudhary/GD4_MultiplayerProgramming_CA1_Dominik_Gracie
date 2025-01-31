@@ -2,6 +2,7 @@
 #include "ReceiverCategories.hpp"
 #include "Character.hpp"
 #include <iostream>
+#include "ParticleNode.hpp"
 
 
 enum class Direction
@@ -327,7 +328,31 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
             character.SetColour(m_colour_two->GetColour());
         };
 
+	Command set_particle_colour_one;
+	set_particle_colour_one.category = static_cast<int>(ReceiverCategories::kParticleSystem);
+	set_particle_colour_one.action = [this](SceneNode& node, sf::Time)
+		{
+			ParticleNode& particle = static_cast<ParticleNode&>(node);
+            if (particle.IsPlayerOne())
+            {
+                particle.SetColor(m_colour_one->GetColour());
+            }
+		};
+
+	Command set_particle_colour_two;
+	set_particle_colour_two.category = static_cast<int>(ReceiverCategories::kParticleSystem);
+	set_particle_colour_two.action = [this](SceneNode& node, sf::Time)
+		{
+			ParticleNode& particle = static_cast<ParticleNode&>(node);
+			if (!particle.IsPlayerOne())
+			{
+				particle.SetColor(m_colour_two->GetColour());
+			}
+		};
+
     command_queue.Push(set_colour_one);
     command_queue.Push(set_colour_two);
+	command_queue.Push(set_particle_colour_one);
+	command_queue.Push(set_particle_colour_two);
 	m_should_update_colours = false;
 }

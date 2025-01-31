@@ -10,22 +10,24 @@ namespace
     const std::vector<ParticleData> Table = InitializeParticleData();
 }
 
-ParticleNode::ParticleNode(ParticleType type, const TextureHolder& textures)
+ParticleNode::ParticleNode(ParticleType type, const TextureHolder& textures, bool is_player_one)
     : SceneNode()
     , m_texture(textures.Get(TextureID::kParticle))
     , m_type(type)
-    , m_vertex_array(sf::Quads) 
+    , m_vertex_array(sf::Quads)
     /*fixed particle system glitch: as we were using four vertices in the ComputeVertices method but a triangular vertex array the fourth vertex 
     would attach to the first vertex of the next particle which was fixed with using quads - GracieChaudhary*/
     , m_needs_vertex_update(true)
+	, m_is_player_one(is_player_one)
 {
+	m_color = Table[static_cast<int>(type)].m_color;
 }
 
 void ParticleNode::AddParticle(sf::Vector2f position)
 {
     Particle particle;
     particle.m_position = position;
-    particle.m_color = Table[static_cast<int>(m_type)].m_color;
+    particle.m_color = m_color;
     particle.m_lifetime = Table[static_cast<int>(m_type)].m_lifetime;
 
     m_particles.emplace_back(particle);
@@ -106,4 +108,14 @@ void ParticleNode::ComputeVertices() const
         AddVertex(pos.x - half.x, pos.y + half.y, 0.f, size.y, color);
     }  
 
+}
+
+void ParticleNode::SetColor(sf::Color color)
+{
+	m_color = color;
+}
+
+bool ParticleNode::IsPlayerOne() const
+{
+    return m_is_player_one;
 }

@@ -1,8 +1,7 @@
 #pragma once
-enum class ParticleType
-{
-	kPropellant,
-	kSmoke,
-	kSnow,
-	kParticleCount,
+
+enum class ParticleType {
+	kSnowOne,
+	kSnowTwo,
+	kParticleCount
 };

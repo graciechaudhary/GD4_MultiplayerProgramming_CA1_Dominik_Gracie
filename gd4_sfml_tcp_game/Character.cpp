@@ -516,6 +516,12 @@ void Character::WalkDown()
 void Character::SetColour(sf::Color colour)
 {
 	m_sprite.setColor(colour);
+	m_colour = colour;
+}
+
+sf::Color Character::GetColour()
+{
+	return m_colour;
 }
 
 void Character::WalkRight()
