@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "DataTables.hpp"
 #include "CharacterType.hpp"
 #include "ProjectileType.hpp"
@@ -56,8 +58,15 @@ std::vector<ParticleData> InitializeParticleData()
 {
     std::vector<ParticleData> data(static_cast<int>(ParticleType::kParticleCount));
 
-    data[static_cast<int>(ParticleType::kSnow)].m_color = sf::Color(255,255,255);
-    data[static_cast<int>(ParticleType::kSnow)].m_lifetime = sf::seconds(1.f);
+    data[static_cast<int>(ParticleType::kSnowOne)].m_color = sf::Color(255, 255, 255);
+    data[static_cast<int>(ParticleType::kSnowOne)].m_lifetime = sf::seconds(1.f);
+
+    data[static_cast<int>(ParticleType::kSnowTwo)].m_color = sf::Color(255, 255, 255);
+    data[static_cast<int>(ParticleType::kSnowTwo)].m_lifetime = sf::seconds(1.f);
+
+
+
+
 
     return data;
 }

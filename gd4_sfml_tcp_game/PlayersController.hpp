@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #pragma once
 #include <SFML/Window/Event.hpp>
 #include "Action.hpp"
@@ -16,6 +18,8 @@ public:
 	PlayersController();
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
 	void HandleRealTimeInput(CommandQueue& command_queue);
+
+	void HandleControllerInput(CommandQueue& command_queue);
 
 	void AssignKey(Action action, sf::Keyboard::Key key);
 	sf::Keyboard::Key GetAssignedKey(Action action) const;

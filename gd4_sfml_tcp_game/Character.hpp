@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #pragma once
 #include "Entity.hpp"
 #include "CharacterType.hpp"
@@ -9,6 +11,7 @@
 #include "Animation.hpp"
 #include "CharacterAnimation.hpp"
 #include "FacingDirections.hpp"
+#include "ResourceNode.hpp"
 
 class Character : public Entity
 {
@@ -17,8 +20,6 @@ public:
 	unsigned int GetCategory() const override;
 
 	int GetMaxHitpoints() const;
-
-	void UpdateTexts();
 	float GetMaxSpeed() const;
 
 	void Throw();
@@ -50,6 +51,8 @@ public:
 	void Impacted();
 	void SetImpact(bool is_impacted);
 
+	sf::Color GetColour();
+
 
 private:
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -70,8 +73,9 @@ private:
 	CharacterAnimationType m_current_animation;
 	CharacterAnimation m_walking;
 	CharacterAnimation m_attacking;
-	
-	TextNode* m_health_display;
+
+	ResourceNode* m_health_display;
+	ResourceNode* m_snowball_display;
 
 	Command m_throw_command;
 
@@ -98,5 +102,7 @@ private:
 	sf::Time m_impact_duration;
 
 	bool m_is_player_one;
+
+	sf::Color m_colour;
 };
 

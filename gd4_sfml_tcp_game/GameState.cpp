@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "GameState.hpp"
 #include "PlayersController.hpp"
 #include "GameStatus.hpp"
@@ -21,6 +23,7 @@ void GameState::Draw()
 bool GameState::Update(sf::Time dt)
 {
 	m_world.Update(dt);
+	//If one of the players is dead, then the other player wins
 	if (!m_world.HasAlivePlayerOne())
 	{
 		m_players_controller.SetGameStatus(GameStatus::kPlayerTwoWin);
@@ -33,6 +36,7 @@ bool GameState::Update(sf::Time dt)
 	}
 	CommandQueue& commands = m_world.GetCommandQueue();
 	m_players_controller.HandleRealTimeInput(commands);
+	m_players_controller.HandleControllerInput(commands);
 	m_players_controller.UpdateColours(commands);
 	return true;
 }

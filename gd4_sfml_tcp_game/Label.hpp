@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #pragma once
 #include "Component.hpp"
 #include "ResourceIdentifiers.hpp"
@@ -16,6 +18,8 @@ namespace gui
 		void HandleEvent(const sf::Event& event) override;
 
 		void SetColor(sf::Color color) { m_text.setFillColor(color); }
+
+		void SetSize(int size) { m_text.setCharacterSize(size); }
 
 	private:
 		void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

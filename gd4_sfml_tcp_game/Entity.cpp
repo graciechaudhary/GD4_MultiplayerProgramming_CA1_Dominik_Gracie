@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "Entity.hpp"
 
 Entity::Entity(int hitpoints)
@@ -44,6 +46,8 @@ void Entity::Repair(int points)
     m_hitpoints += points;
 }
 
+//Dominik Hampejs D00250604
+//Repair function with max hitpoins limit
 void Entity::Repair(int points, int limit)
 {
 	assert(points > 0);

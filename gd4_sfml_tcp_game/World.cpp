@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "World.hpp"
 #include "Pickup.hpp"
 #include "Projectile.hpp"
@@ -15,7 +17,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_scenegraph(ReceiverCategories::kNone)
 	,m_scene_layers()
 	,m_world_bounds(0.f,0.f, m_camera.getSize().x, m_camera.getSize().y)
-	,m_spawn_position(m_camera.getSize().x/2.f, m_camera.getSize().y/2.f)
+	,m_centre_position(m_camera.getSize().x/2.f, m_camera.getSize().y/2.f)
 	,m_scrollspeed(-50.f)
 	,m_character_one(nullptr)
 	, m_time_since_last_drop(sf::Time::Zero)
@@ -26,7 +28,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
 	BuildScene();
-	m_camera.setCenter(m_spawn_position);
+	m_camera.setCenter(m_centre_position);
 
 	m_create_pickup_command.category = static_cast<int>(ReceiverCategories::kScene);
 	m_create_pickup_command.action = [this](SceneNode& node, sf::Time)
@@ -130,14 +132,14 @@ void World::BuildScene()
 	//Add the player's aircraft
 	std::unique_ptr<Character> leader(new Character(CharacterType::kDefault, m_textures, m_fonts, true));
 	m_character_one = leader.get();
-	m_character_one->setPosition(m_spawn_position);
+	m_character_one->setPosition(m_centre_position.x - 230, m_centre_position.y);
 	m_character_one->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 	
 
 	std::unique_ptr<Character> second(new Character(CharacterType::kDefault, m_textures, m_fonts, false));
 	m_character_two = second.get();
-	m_character_two->setPosition(40.f,40.f);
+	m_character_two->setPosition(m_centre_position.x + 220, m_centre_position.y);
 	m_character_two->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(second));
 
@@ -148,8 +150,11 @@ void World::BuildScene()
 	std::unique_ptr<ParticleNode> propellantNode(new ParticleNode(ParticleType::kPropellant, m_textures));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(propellantNode));*/
 
-	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures));
+	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnowOne, m_textures,true));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
+
+	std::unique_ptr<ParticleNode> snowNodeTwo(new ParticleNode(ParticleType::kSnowTwo, m_textures, false));
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNodeTwo));
 
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
@@ -463,9 +468,6 @@ void World::AdaptPlayerVelocity()
 
 	m_character_one->HandleSliding();
 	m_character_two->HandleSliding();
-
-
-
 	////If they are moving diagonally divide by sqrt 2
 	//if (velocity.x != 0.f && velocity.y != 0.f)
 	//{
@@ -475,9 +477,12 @@ void World::AdaptPlayerVelocity()
 
 void World::CreatePickup(SceneNode& node, const TextureHolder& textures) const
 {
+	float border_distance = 65.f;
 	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
 	std::unique_ptr<Pickup> pickup(new Pickup(type, textures));
-	pickup->setPosition(Utility::RandomInt(GetViewBounds().width), Utility::RandomInt(GetViewBounds().height));
+	float x = Utility::RandomInt(GetViewBounds().width - border_distance * 2) + border_distance;
+	float y = Utility::RandomInt(GetViewBounds().height - border_distance * 2) + border_distance;
+	pickup->setPosition(x,y);
 	node.AttachChild(std::move(pickup));
 }
 
@@ -593,6 +598,8 @@ void World::UpdateSounds()
 
 void World::CheckPickupDrop(sf::Time dt)
 {
+
+
 	// Check if it's time to spawn a new pickup
 	if (m_time_since_last_drop > m_pickup_drop_interval)
 	{
@@ -600,8 +607,16 @@ void World::CheckPickupDrop(sf::Time dt)
 		m_pickups_spawned++;
 		m_command_queue.Push(m_create_pickup_command);
 	}
-	else if(m_pickups_spawned < m_max_pickups)
+
+	if (m_pickups_spawned == 0)
 	{
 		m_time_since_last_drop += dt;
 	}
+
+	if(m_pickups_spawned < m_max_pickups)
+	{
+		m_time_since_last_drop += dt;
+	}
+
+
 }

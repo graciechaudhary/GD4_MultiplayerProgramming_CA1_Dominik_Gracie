@@ -1,7 +1,10 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "PlayersController.hpp"
 #include "ReceiverCategories.hpp"
 #include "Character.hpp"
 #include <iostream>
+#include "ParticleNode.hpp"
 
 
 enum class Direction
@@ -12,12 +15,14 @@ enum class Direction
 	kDown
 };
 
+//Dominik Hampejs D00250604
 struct CharacterMover
 {
     CharacterMover(Direction dir) : direction(dir)
     {}
     void operator()(Character& aircraft, sf::Time) const
     {
+		//Set flags for the direction the player is moving in
         switch (direction)
         {
         case Direction::kLeft:
@@ -36,6 +41,7 @@ struct CharacterMover
             break;
         }
 
+		//Get the number of flags set (buttons pressed)
         int sum = aircraft.GetWalkingFlagsCount();
 
         sf::Vector2f current_velocity = aircraft.GetVelocity();
@@ -44,6 +50,7 @@ struct CharacterMover
 		float acceleration = 10.f;
 
 
+		//If the player is moving diagonally, reduce the speed and acceleration
         if (sum == 2)
         {
             max_speed /= std::sqrt(2.f);
@@ -54,6 +61,7 @@ struct CharacterMover
             max_speed /= std::sqrt(2.f);
         }
 
+		//Set the velocity based on the direction the player is moving in
         switch (direction)
         {
         case Direction::kLeft: 
@@ -125,7 +133,8 @@ PlayersController::PlayersController() : m_current_game_status(GameStatus::kGame
 
 
 	bool first_player = true;
-    //Assign all categories to a player's aircraft
+
+	//Assign categories to the actions for the players
     for (auto& pair : m_action_binding)
     {
         if (pair.first == Action::kMoveLeft2) first_player = false;
@@ -162,6 +171,55 @@ void PlayersController::HandleRealTimeInput(CommandQueue& command_queue)
         if (sf::Keyboard::isKeyPressed(pair.first) && IsRealTimeAction(pair.second))
         {
             command_queue.Push(m_action_binding[pair.second]);
+        }
+    }
+}
+
+//Dominik Hampejs D00250604
+//Handle controller input for both players
+void PlayersController::HandleControllerInput(CommandQueue& command_queue) {
+    if (sf::Joystick::isConnected(0)) {
+		if (sf::Joystick::isButtonPressed(0, 0)) //If button A is pressed
+        {
+			command_queue.Push(m_action_binding[Action::kBulletFire]);
+        }
+		if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) < -50) //If stick is moved to the left
+        {
+            command_queue.Push(m_action_binding[Action::kMoveLeft]);
+        }
+		if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) > 50) //If stick is moved to the right
+		{
+			command_queue.Push(m_action_binding[Action::kMoveRight]);
+		}
+		if (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) < -50) //If stick is moved up
+        {
+            command_queue.Push(m_action_binding[Action::kMoveUp]);
+        }
+		if (sf::Joystick::getAxisPosition(0, sf::Joystick::Y) > 50) //If stick is moved down
+		{
+			command_queue.Push(m_action_binding[Action::kMoveDown]);
+		}
+    }
+    if (sf::Joystick::isConnected(1)) {
+		if (sf::Joystick::isButtonPressed(1, 0)) //If button A is pressed
+        {
+            command_queue.Push(m_action_binding[Action::kThrow2]);
+        }
+		if (sf::Joystick::getAxisPosition(1, sf::Joystick::X) < -50) //If stick is moved to the left
+        {
+            command_queue.Push(m_action_binding[Action::kMoveLeft2]);
+        }
+		if (sf::Joystick::getAxisPosition(1, sf::Joystick::X) > 50) //If stick is moved to the right
+        {
+            command_queue.Push(m_action_binding[Action::kMoveRight2]);
+        }
+		if (sf::Joystick::getAxisPosition(1, sf::Joystick::Y) < -50) //If stick is moved up
+        {
+            command_queue.Push(m_action_binding[Action::kMoveUp2]);
+        }
+		if (sf::Joystick::getAxisPosition(1, sf::Joystick::Y) > 50) //If stick is moved down
+        {
+            command_queue.Push(m_action_binding[Action::kMoveDown2]);
         }
     }
 }
@@ -205,6 +263,7 @@ GameStatus PlayersController::GetGameStatus() const
     return m_current_game_status;
 }
 
+//Dominik Hampejs D00250604
 void PlayersController::SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two)
 {
 	m_colour_one = std::move(colour_one);
@@ -257,13 +316,15 @@ bool PlayersController::IsRealTimeAction(Action action)
     }
 }
 
+//Dominik Hampejs D00250604
+//Update the colours of the players based on the colour pickers
 void PlayersController::UpdateColours(CommandQueue& command_queue)
 {
     if (!m_should_update_colours)
     {
         return;
     }
-
+	//Player one colour
     Command set_colour_one;
     set_colour_one.category = static_cast<int>(ReceiverCategories::kPlayerOne);
     set_colour_one.action = [this](SceneNode& node, sf::Time)
@@ -272,6 +333,7 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
             character.SetColour(m_colour_one->GetColour());
         };
 
+	//Player two colour
     Command set_colour_two;
     set_colour_two.category = static_cast<int>(ReceiverCategories::kPlayerTwo);
     set_colour_two.action = [this](SceneNode& node, sf::Time)
@@ -280,7 +342,33 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
             character.SetColour(m_colour_two->GetColour());
         };
 
+	//Particle colour for player one snowball particles
+	Command set_particle_colour_one;
+	set_particle_colour_one.category = static_cast<int>(ReceiverCategories::kParticleSystem);
+	set_particle_colour_one.action = [this](SceneNode& node, sf::Time)
+		{
+			ParticleNode& particle = static_cast<ParticleNode&>(node);
+            if (particle.IsPlayerOne())
+            {
+                particle.SetColor(m_colour_one->GetColour());
+            }
+		};
+
+	//Particle colour for player two snowball particles
+	Command set_particle_colour_two;
+	set_particle_colour_two.category = static_cast<int>(ReceiverCategories::kParticleSystem);
+	set_particle_colour_two.action = [this](SceneNode& node, sf::Time)
+		{
+			ParticleNode& particle = static_cast<ParticleNode&>(node);
+			if (!particle.IsPlayerOne())
+			{
+				particle.SetColor(m_colour_two->GetColour());
+			}
+		};
+
     command_queue.Push(set_colour_one);
     command_queue.Push(set_colour_two);
+	command_queue.Push(set_particle_colour_one);
+	command_queue.Push(set_particle_colour_two);
 	m_should_update_colours = false;
 }

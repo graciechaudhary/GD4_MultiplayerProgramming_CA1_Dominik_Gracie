@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "Character.hpp"
 #include "TextureID.hpp"
 #include "ResourceHolder.hpp"
@@ -65,12 +67,16 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 			CreateSnowball(node, textures);
 		};
 
-	std::string* health = new std::string("");
-	std::unique_ptr<TextNode> health_display(new TextNode(fonts, *health));
+	std::unique_ptr<ResourceNode> health_display(new ResourceNode(textures, TextureID::kHealthRefill ,GetHitPoints(), 14.f, 0.3f));
 	m_health_display = health_display.get();
+	m_health_display->setPosition(-20.f, 25.f);
 	AttachChild(std::move(health_display));
 
-	UpdateTexts();
+	std::unique_ptr<ResourceNode> snowball_display(new ResourceNode(textures, TextureID::kSnowball, m_snowball_count, 12.f, 0.4f));
+	m_snowball_display = snowball_display.get();
+	m_snowball_display->setPosition(-28.f, -34.f);
+	AttachChild(std::move(snowball_display));
+
 }
 
 unsigned int Character::GetCategory() const
@@ -89,12 +95,6 @@ int Character::GetMaxHitpoints() const
 }
 
 
-void Character::UpdateTexts()
-{
-	m_health_display->SetString(std::to_string(GetHitPoints()) + "HP");
-	m_health_display->setPosition(0.f, 50.f);
-	m_health_display->setRotation(-getRotation());
-}
 
 float Character::GetMaxSpeed() const
 {
@@ -216,7 +216,15 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	}
 
 	Entity::UpdateCurrent(dt, commands);
-	UpdateTexts();
+
+
+	m_health_display->SetResource(GetHitPoints());
+	m_snowball_display->SetResource(m_snowball_count);
+
+	//UpdateMovementPattern(dt);
+
+	//UpdateRollAnimation();
+	UpdateWalkAnimation(dt);
 
 	//Check if bullets or misiles are fired
 	CheckProjectileLaunch(dt, commands);
@@ -476,13 +484,13 @@ void Character::HandleSliding()
 
 void Character::HandleBorderInteraction(sf::FloatRect view_bounds)
 {
-	const float border_distance = 40.f;
+	const float border_distance = 70.f;
 
 	sf::Vector2f position = getPosition();
 	position.x = std::max(position.x, view_bounds.left + border_distance);
 	position.x = std::min(position.x, view_bounds.left + view_bounds.width - border_distance);
-	position.y = std::max(position.y, view_bounds.top + border_distance);
-	position.y = std::min(position.y, view_bounds.top + view_bounds.height - border_distance);
+	position.y = std::max(position.y, view_bounds.top + border_distance - 10);
+	position.y = std::min(position.y, view_bounds.top + view_bounds.height - border_distance - 5);
 
 	if (position != getPosition())
 	{
@@ -512,6 +520,12 @@ void Character::WalkDown()
 void Character::SetColour(sf::Color colour)
 {
 	m_sprite.setColor(colour);
+	m_colour = colour;
+}
+
+sf::Color Character::GetColour()
+{
+	return m_colour;
 }
 
 
