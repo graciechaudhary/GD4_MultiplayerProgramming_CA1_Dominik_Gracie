@@ -23,6 +23,10 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, bool 
     std::unique_ptr<EmitterNode> snow(new EmitterNode(particle_type));
     snow->setPosition(0.f, GetBoundingRect().height / 2.f);
     AttachChild(std::move(snow));
+
+    /*std::unique_ptr<EmitterNode> snowExplosion(new EmitterNode(ParticleType::kSnowExplosion));
+    snowExplosion->setPosition(GetWorldPosition());
+    AttachChild(std::move(snowExplosion));*/
 }
 
 unsigned int Projectile::GetCategory() const
@@ -62,3 +66,5 @@ void Projectile::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) 
     target.draw(m_sprite, states);
         
 }
+
+

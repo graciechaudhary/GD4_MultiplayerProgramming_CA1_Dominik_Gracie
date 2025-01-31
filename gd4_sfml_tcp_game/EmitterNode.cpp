@@ -1,6 +1,7 @@
 //Gracie Chaudhary D00251769  
 //Dominik Hampejs D00250604  
 #include "EmitterNode.hpp"
+#include <iostream>
 
 EmitterNode::EmitterNode(ParticleType type)
 	:SceneNode()
@@ -14,8 +15,16 @@ void EmitterNode::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	if (m_particle_system)
 	{
-		EmitParticles(dt);
+		if (m_type == ParticleType::kSnowExplosion) {
+			EmitExplosionParticles(dt);
+			//std::cout << "EmitExplosionParticles is being called!" << std::endl;
+		}
+		else {
+			EmitRadialParticles(dt);
+			//std::cout << "EmitParticles is being called!" << std::endl;
+		}
 	}
+	
 	else
 	{
 		// Find particle node with the same type as the emitter
@@ -47,7 +56,7 @@ void EmitterNode::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 
 //setting new emission pattern - Gracie Chaudhary
-void EmitterNode::EmitParticles(sf::Time dt)
+void EmitterNode::EmitRadialParticles(sf::Time dt)
 {
 	const float emissionRate = 50.f; 
 	const sf::Time interval = sf::seconds(1.f) / emissionRate;
@@ -64,4 +73,30 @@ void EmitterNode::EmitParticles(sf::Time dt)
 		// Add particle at offset position
 		m_particle_system->AddParticle(GetWorldPosition() + offset);
 	}
+}
+
+void EmitterNode::EmitExplosionParticles(sf::Time dt){
+
+	int num_particles = 30;
+	const float minSpeed = 50.f, maxSpeed = 150.f; // Particle speed range
+	const float minLifetime = 0.3f, maxLifetime = 1.0f; // Particle lifetime range
+
+	for (int i = 0; i < num_particles; ++i)
+	{
+		// Generate a random angle in radians
+		float angle = static_cast<float>(std::rand()) / RAND_MAX * 2 * 3.14159f;
+
+		// Generate a random speed for variation
+		float speed = minSpeed + static_cast<float>(std::rand()) / RAND_MAX * (maxSpeed - minSpeed);
+
+		// Compute velocity based on angle and speed
+		sf::Vector2f velocity(speed * std::cos(angle), speed * std::sin(angle));
+
+		// Randomize particle lifetime
+		sf::Time lifetime = sf::seconds(minLifetime + static_cast<float>(std::rand()) / RAND_MAX * (maxLifetime - minLifetime));
+
+		// Emit a particle at the given position
+		m_particle_system->AddParticle(GetWorldPosition());
+	}
+
 }

@@ -14,6 +14,7 @@ public:
 	sf::FloatRect GetBoundingRect() const override;
 	float GetMaxSpeed() const;
 	float GetDamage() const;
+	
 
 private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
@@ -24,5 +25,6 @@ private:
 	sf::Sprite m_sprite;
 	bool m_is_player_one;
 	sf::Vector2f m_target_direction;
+	
 };
 

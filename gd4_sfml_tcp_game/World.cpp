@@ -7,6 +7,7 @@
 #include "SoundNode.hpp"
 #include <set> 
 #include <iostream> 
+#include "EmitterNode.hpp"
 
 World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
 	:m_target(output_target)
@@ -44,8 +45,7 @@ void World::Update(sf::Time dt)
 
 	DestroyEntitiesOutsideView();
 	CheckPickupDrop(dt);
-	//GuideMissiles();
-
+	
 	//Forward commands to the scenegraph
 	while (!m_command_queue.IsEmpty())
 	{
@@ -143,30 +143,20 @@ void World::BuildScene()
 	m_character_two->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(second));
 
-	//Add the particle nodes to the scene
-	/*std::unique_ptr<ParticleNode> smokeNode(new ParticleNode(ParticleType::kSmoke, m_textures));
-	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(smokeNode));
-
-	std::unique_ptr<ParticleNode> propellantNode(new ParticleNode(ParticleType::kPropellant, m_textures));
-	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(propellantNode));*/
-
+	
 	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnowOne, m_textures,true));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
 
 	std::unique_ptr<ParticleNode> snowNodeTwo(new ParticleNode(ParticleType::kSnowTwo, m_textures, false));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNodeTwo));
 
+	std::unique_ptr<ParticleNode> snowExplosion(new ParticleNode(ParticleType::kSnowExplosion, m_textures, false));
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowExplosion));
+
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
 	m_scenegraph.AttachChild(std::move(soundNode));
-
-	/*std::unique_ptr<Aircraft> left_escort(new Aircraft(AircraftType::kRaptor, m_textures, m_fonts));
-	left_escort->setPosition(-80.f, 50.f);
-	m_player_aircraft->AttachChild(std::move(left_escort));
-
-	std::unique_ptr<Aircraft> right_escort(new Aircraft(AircraftType::kRaptor, m_textures, m_fonts));
-	right_escort->setPosition(80.f, 50.f);
-	m_player_aircraft->AttachChild(std::move(right_escort));*/
+		
 }
 
 //cleaning up the code - GracieChaudhary
@@ -580,9 +570,14 @@ void World::HandleCollisions()
 			character.Damage(projectile.GetDamage());
 			character.Impacted();
 			character.SetVelocity(0.f, 0.f);
-			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));
-
+			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));	
+			
+			/*std::unique_ptr<EmitterNode> snowExplosion(new EmitterNode(ParticleType::kSnowExplosion));
+			snowExplosion->setPosition(projectile.getPosition());
+			projectile.AttachChild(std::move(snowExplosion));*/
+			//projectile.OnDestruction();
 			projectile.Destroy();
+
 		}
 	}
 }

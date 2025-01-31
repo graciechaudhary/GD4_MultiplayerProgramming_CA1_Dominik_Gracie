@@ -196,6 +196,7 @@ void Character::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) c
 	else
 	{
 		target.draw(m_sprite, states);
+		
 	}
 }
 
