@@ -9,6 +9,7 @@
 #include "ProjectileType.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 #include "Animation.hpp"
+#include "CharacterAnimation.hpp"
 #include "FacingDirections.hpp"
 #include "ResourceNode.hpp"
 
@@ -47,6 +48,8 @@ public:
 	void WalkDown();
 
 	void SetColour(sf::Color colour);
+	void Impacted();
+	void SetImpact(bool is_impacted);
 
 	sf::Color GetColour();
 
@@ -56,7 +59,10 @@ private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands) override;
 	void CheckProjectileLaunch(sf::Time dt, CommandQueue& commands);
 
-	void UpdateWalkAnimation(sf::Time dt);
+	void UpdateAnimation(sf::Time dt);
+	void UpdateWalkingAnimation(sf::Time dt);
+	void UpdateAttackingAnimation(sf::Time dt);
+	void UpdateImpactAnimation(sf::Time dt);
 
 	void UpdateCurrentDirection();
 
@@ -64,15 +70,17 @@ private:
 	CharacterType m_type;
 	sf::Sprite m_sprite;
 	Animation m_explosion;
-	Animation m_walk;
+	CharacterAnimationType m_current_animation;
+	CharacterAnimation m_walking;
+	CharacterAnimation m_attacking;
 
 	ResourceNode* m_health_display;
 	ResourceNode* m_snowball_display;
 
-
 	Command m_throw_command;
 
 	bool m_is_throwing;
+	bool m_is_impacted;
 	sf::Time m_throw_countdown;
 	int m_snowball_count;
 
@@ -89,6 +97,9 @@ private:
 	FacingDirections m_current_direction;
 
 	sf::Time m_clear_flags_time;
+	sf::Time m_blink_timer;
+	sf::Time m_impact_timer;
+	sf::Time m_impact_duration;
 
 	bool m_is_player_one;
 

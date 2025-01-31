@@ -18,7 +18,9 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	m_is_player_two_ready(false),
 	m_textures()
 {
-	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
+	sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
+	m_background_sprite.setTexture(texture);
+	m_background_sprite.setScale(2.f, 2.38f);
 
 	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
 

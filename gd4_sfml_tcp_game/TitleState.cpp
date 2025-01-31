@@ -7,7 +7,9 @@
 
 TitleState::TitleState(StateStack& stack, Context context) : State(stack, context), m_show_text(true), m_text_effect_time(sf::Time::Zero)
 {
-    m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
+    sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
+    m_background_sprite.setTexture(texture);
+    m_background_sprite.setScale(2.f, 2.38f);
     m_text.setFont(context.fonts->Get(Font::kMain));
     m_text.setString("Press any key to continue");
     Utility::CentreOrigin(m_text);

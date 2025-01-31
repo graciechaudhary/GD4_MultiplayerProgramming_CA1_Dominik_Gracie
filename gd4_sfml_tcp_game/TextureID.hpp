@@ -17,7 +17,6 @@ enum class TextureID
 	kParticle,
 	//new additions for the game
 	kCharacterMovement,
-	kCharacterAttack,
 	kSnowball,
 	kSnowTile,
 	kLakeTile,

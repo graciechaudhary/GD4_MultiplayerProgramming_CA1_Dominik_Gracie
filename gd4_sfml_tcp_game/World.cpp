@@ -106,14 +106,13 @@ void World::LoadTextures()
 	m_textures.Load(TextureID::kSnowballRefill, "Media/Textures/MissileRefill.png");
 
 	m_textures.Load(TextureID::kEntities, "Media/Textures/Entities.png");
-	m_textures.Load(TextureID::kExplosion, "Media/Textures/Explosion.png");
+	m_textures.Load(TextureID::kExplosion, "MediaFiles/Textures/Explosion/Explosion.png");
 
 	//edited texture for the snow particle effect - GracieChaudhary
 	m_textures.Load(TextureID::kParticle, "MediaFiles/Textures/Particles/SnowBits.png");
 
 	//reloading textures for game assets - GracieChaudhary
 	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
-	m_textures.Load(TextureID::kCharacterAttack, "MediaFiles/Textures/Character/CharacterAttackSheet.png");
 	m_textures.Load(TextureID::kSnowball, "MediaFiles/Textures/Weapon/Snowball.png");
 	m_textures.Load(TextureID::kSnowTile, "MediaFiles/Textures/Environment/SnowTile_64x64.png");
 	m_textures.Load(TextureID::kLakeTile, "MediaFiles/Textures/Environment/LakeTile_64x64.png");
@@ -579,6 +578,7 @@ void World::HandleCollisions()
 			auto& projectile = static_cast<Projectile&>(*pair.second);
 			//Collision response
 			character.Damage(projectile.GetDamage());
+			character.Impacted();
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));
 

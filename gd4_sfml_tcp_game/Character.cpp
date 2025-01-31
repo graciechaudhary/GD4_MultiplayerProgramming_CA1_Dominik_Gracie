@@ -17,12 +17,14 @@ namespace
 	const std::vector<CharacterData> Table = InitializeCharacterData();	
 }
 
-Character::Character(CharacterType type, const TextureHolder& textures, const FontHolder& fonts, bool is_player_one)  
+Character::Character(CharacterType type, const TextureHolder& textures, const FontHolder& fonts, bool is_player_one)
 	: Entity(Table[static_cast<int>(type)].m_hitpoints)
 	, m_type(type)
 	, m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
 	, m_explosion(textures.Get(TextureID::kExplosion))
-	, m_walk(textures.Get(TextureID::kCharacterMovement))
+	, m_current_animation(CharacterAnimationType::kWalk)
+	, m_walking(CharacterAnimationType::kWalk, textures.Get(TextureID::kCharacterMovement))
+	, m_attacking(CharacterAnimationType::kAttack, textures.Get(TextureID::kCharacterMovement))
 	, m_health_display(nullptr)
 	, m_is_throwing(false)
 	, m_throw_countdown(sf::Time::Zero)
@@ -37,15 +39,25 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 	, m_current_direction(FacingDirections::kDown)
 	, m_snowball_count(Table[static_cast<int>(type)].max_snowballs)
 	, m_is_player_one(is_player_one)
-{
-	m_walk.SetFrameSize(sf::Vector2i(38, 42));
-	m_walk.SetNumFrames(4);
-	m_walk.SetDuration(sf::seconds(1));
-	m_walk.SetRepeating(true);
+	, m_impact_duration(sf::seconds(0.5f))
+	, m_blink_timer(sf::Time::Zero)
+	{
+	//Walking Animation Setup
+	m_walking.SetFrameSize(sf::Vector2i(38, 42));
+	m_walking.SetNumFrames(4);
+	m_walking.SetDuration(sf::seconds(1.f));
+	m_walking.SetRepeating(true);
 
-	m_explosion.SetFrameSize(sf::Vector2i(256, 256));
-	m_explosion.SetNumFrames(16);
-	m_explosion.SetDuration(sf::seconds(1));
+	//Attacking Animation Setup
+	m_attacking.SetFrameSize(sf::Vector2i(38, 42));
+	m_attacking.SetNumFrames(4);
+	m_attacking.SetDuration(sf::seconds(0.75f));
+	m_attacking.SetRepeating(false);
+
+	m_explosion.SetFrameSize(sf::Vector2i(100, 100));
+	m_explosion.SetNumFrames(81);
+	m_explosion.SetDuration(sf::seconds(1.5f));
+	m_explosion.scale(2, 2);
 	Utility::CentreOrigin(m_sprite);
 	Utility::CentreOrigin(m_explosion);
 
@@ -91,7 +103,7 @@ float Character::GetMaxSpeed() const
 
 void Character::Throw()
 {
-	m_is_throwing = true;
+	m_is_throwing = true;	
 }
 
 void Character::RechargeSnowballs()
@@ -195,8 +207,8 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		// Play explosion sound only once
 		if (!m_played_explosion_sound)
 		{
-			SoundEffect soundEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
-			PlayLocalSound(commands, soundEffect);
+			SoundEffect explosionEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
+			PlayLocalSound(commands, explosionEffect);
 
 			m_played_explosion_sound = true;
 		}
@@ -204,7 +216,7 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	}
 
 	Entity::UpdateCurrent(dt, commands);
-	//UpdateTexts();
+
 
 	m_health_display->SetResource(GetHitPoints());
 	m_snowball_display->SetResource(m_snowball_count);
@@ -216,138 +228,128 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 	//Check if bullets or misiles are fired
 	CheckProjectileLaunch(dt, commands);
+		
+	UpdateAnimation(dt);
+	
 }
 
 void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 {
-	//if (!IsAllied())
-	//{
-	//	Fire();
-	//}
-
+	
 	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
 	{
+		m_current_animation = CharacterAnimationType::kAttack;
 		PlayLocalSound(commands, SoundEffect::kSnowballThrow);
 		commands.Push(m_throw_command);
-		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval /  1.f;
-		m_is_throwing = false;
+		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval /  1.f;		
 		--m_snowball_count;
+		m_is_throwing = false;
 	}
 	else if (m_throw_countdown > sf::Time::Zero)
 	{
 		//Wait, can't fire
 		m_throw_countdown -= dt;
 		m_is_throwing = false;
+		
 	}
+
+	
 }
 
+void Character::UpdateAnimation(sf::Time dt) {
 
-void Character::UpdateWalkAnimation(sf::Time dt)
-{
-	
-	sf::IntRect textureRect = Table[static_cast<int>(m_type)].m_texture_rect;
-
-	const int frame_count = 4;
-	static int current_frame = 0;
-	static sf::Time elapsed_time = sf::Time::Zero;
-	sf::Time frame_duration = sf::milliseconds(1500); 
-
-	elapsed_time += sf::seconds(1.f / 60.f); 
-
-	if (GetVelocity() == sf::Vector2f(0.f, 0.f))
-	{
-		current_frame = 0;
+	if (m_current_animation == CharacterAnimationType::kAttack) {
+		
+		UpdateAttackingAnimation(dt);
+	}
+	else if(m_current_animation == CharacterAnimationType::kImpact){
+		UpdateImpactAnimation(dt);
 	}
 	else
 	{
-		elapsed_time += dt; // Use actual delta time
+		UpdateWalkingAnimation(dt);
+	}
+}
 
-		if (elapsed_time >= frame_duration)
-		{
-			current_frame = (current_frame + 1) % frame_count;
-			elapsed_time -= frame_duration; // Subtract instead of resetting to avoid frame skipping
-		}
+void Character::UpdateWalkingAnimation(sf::Time dt)
+{
+	if (GetVelocity() == sf::Vector2f(0.f, 0.f))
+	{
+		m_walking.Restart();  
+	}
+	else
+	{
+		m_walking.Update(dt);
 	}
 
 	switch (m_current_direction)
 	{
-	case FacingDirections::kDown:
-		textureRect.top = textureRect.height * 0;
-		break;
-	case FacingDirections::kDownLeft:
-		textureRect.top = textureRect.height * 1;
-		break;
-	case FacingDirections::kDownRight:
-		textureRect.top = textureRect.height * 2;
-		break;
-	case FacingDirections::kLeft:
-		textureRect.top = textureRect.height * 3;
-		break;
-	case FacingDirections::kRight:
-		textureRect.top = textureRect.height * 4;
-		break;
-	case FacingDirections::kUp:
-		textureRect.top = textureRect.height * 5;
-		break;
-	case FacingDirections::kUpLeft:
-		textureRect.top = textureRect.height * 6;
-		break;
-	case FacingDirections::kUpRight:
-		textureRect.top = textureRect.height * 7;
-		break;
+		case FacingDirections::kDown: 		m_walking.SetRow(0);		break;
+		case FacingDirections::kDownLeft:		m_walking.SetRow(1);		break;
+		case FacingDirections::kDownRight:		m_walking.SetRow(2);		break;
+		case FacingDirections::kLeft:		m_walking.SetRow(3);		break;
+		case FacingDirections::kRight:		m_walking.SetRow(4);		break;
+		case FacingDirections::kUp:		m_walking.SetRow(5);		break;
+		case FacingDirections::kUpLeft:		m_walking.SetRow(6);		break;
+		case FacingDirections::kUpRight:		m_walking.SetRow(7);		break;
 	}
-
-	 
-	textureRect.left = textureRect.width * current_frame;
-
-	 
-	m_sprite.setTextureRect(textureRect);
+	m_sprite.setTextureRect(m_walking.GetCurrentTextureRect());
 }
 
-//void Character::UpdateWalkAnimation(sf::Time dt) {
-//	if (GetVelocity() == sf::Vector2f(0.f, 0.f))
-//	{
-//		m_walk.Restart();
-//	}
-//	else
-//	{
-//		sf::IntRect texture_rect = m_sprite.getTextureRect();
-//
-//		switch (m_current_direction)
-//		{
-//		case FacingDirections::kDown:
-//			texture_rect.top = texture_rect.height * 0;
-//			break;
-//		case FacingDirections::kDownLeft:
-//			texture_rect.top = texture_rect.height * 1;
-//			break;
-//		case FacingDirections::kDownRight:
-//			texture_rect.top = texture_rect.height * 2;
-//			break;
-//		case FacingDirections::kLeft:
-//			texture_rect.top = texture_rect.height * 3;
-//			break;
-//		case FacingDirections::kRight:
-//			texture_rect.top = texture_rect.height * 4;
-//			break;
-//		case FacingDirections::kUp:
-//			texture_rect.top = texture_rect.height * 5;
-//			break;
-//		case FacingDirections::kUpLeft:
-//			texture_rect.top = texture_rect.height * 6;
-//			break;
-//		case FacingDirections::kUpRight:
-//			texture_rect.top = texture_rect.height * 7;
-//			break;
-//		}
-//
-//		texture_rect.left = texture_rect.width * m_walk.GetCurrentFrame();
-//		m_walk.
-//		m_walk.Update(dt);
-//		
-//	}
-//
-//}
+void Character::UpdateAttackingAnimation(sf::Time dt)
+{	
+	m_attacking.Update(dt);	
+	switch (m_current_direction)
+	{
+	case FacingDirections::kDown:      m_attacking.SetRow(8); break;
+	case FacingDirections::kDownLeft:  m_attacking.SetRow(10); break;
+	case FacingDirections::kDownRight: m_attacking.SetRow(8); break;
+	case FacingDirections::kLeft:      m_attacking.SetRow(10); break;
+	case FacingDirections::kRight:     m_attacking.SetRow(9); break;
+	case FacingDirections::kUp:        m_attacking.SetRow(11); break;
+	case FacingDirections::kUpLeft:    m_attacking.SetRow(11); break;
+	case FacingDirections::kUpRight:   m_attacking.SetRow(9); break;
+	}
+
+	m_sprite.setTextureRect(m_attacking.GetCurrentTextureRect());
+	
+	if (m_attacking.GetCurrentFrame() == 3) {
+		m_current_animation = CharacterAnimationType::kWalk;
+		m_attacking.Restart();
+	}
+}
+
+//this method affects the UpdateWalkingAnimation with a blinking effect to display that the character has been hit by a snowball
+void Character::UpdateImpactAnimation(sf::Time dt)
+{
+	
+	sf::Color original_color = m_sprite.getColor();
+	if (m_current_animation != CharacterAnimationType::kImpact)
+	{
+		m_walking.Update(dt); 
+	}
+
+	m_blink_timer += dt;
+	m_impact_timer += dt;
+
+	if (m_blink_timer >= sf::seconds(0.1f))
+	{
+		m_sprite.setColor(m_sprite.getColor() == sf::Color::Transparent ? original_color : sf::Color::Transparent);
+		m_blink_timer = sf::Time::Zero;
+	}
+
+	if (m_impact_timer >= m_impact_duration)
+	{
+		m_current_animation = CharacterAnimationType::kWalk; 
+		m_sprite.setColor(original_color);
+		m_impact_timer = sf::Time::Zero;  
+	}
+
+	m_sprite.setTextureRect(m_walking.GetCurrentTextureRect());
+	
+}
+
+
 
 void Character::UpdateCurrentDirection()
 {
@@ -525,6 +527,17 @@ sf::Color Character::GetColour()
 {
 	return m_colour;
 }
+
+
+void Character::Impacted()
+{
+	m_current_animation = CharacterAnimationType::kImpact;
+	m_impact_duration = sf::seconds(0.5f);
+	m_blink_timer = sf::Time::Zero;
+	m_impact_timer = sf::Time::Zero;
+}
+
+
 
 void Character::WalkRight()
 {
