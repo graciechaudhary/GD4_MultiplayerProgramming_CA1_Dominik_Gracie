@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "ParticleNode.hpp"
 #include "DataTables.hpp"
 #include "ResourceHolder.hpp"
@@ -110,11 +112,13 @@ void ParticleNode::ComputeVertices() const
 
 }
 
+//Dominik Hampejs D00250604
 void ParticleNode::SetColor(sf::Color color)
 {
 	m_color = color;
 }
 
+//Dominik Hampejs D00250604
 bool ParticleNode::IsPlayerOne() const
 {
     return m_is_player_one;

@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "Animation.hpp"
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>

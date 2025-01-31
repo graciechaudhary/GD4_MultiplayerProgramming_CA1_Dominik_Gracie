@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "TitleState.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "ResourceHolder.hpp"

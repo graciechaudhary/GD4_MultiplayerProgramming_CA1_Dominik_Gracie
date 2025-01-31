@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "PreGameState.hpp"
 #include "Command.hpp"
 #include "ReceiverCategories.hpp"
@@ -5,6 +7,7 @@
 
 #include "PlayersController.hpp"
 
+//Dominik Hampejs D00250604
 PreGameState::PreGameState(StateStack& stack, Context context) : 
     State(stack, context),
 	m_gui_container_one(true),
@@ -19,6 +22,7 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 
 	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
 
+	//Set up the sprites of the characters to be coloured
 	m_sprite_one.setTexture(m_textures.Get(TextureID::kCharacterMovement));
 	m_sprite_one.setPosition(context.window->getSize().x / 2.f - 249, context.window->getSize().y / 2.f - 21);
 	m_sprite_one.setTextureRect(sf::IntRect(0, 0, 38, 42));
@@ -27,6 +31,8 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	m_sprite_two.setPosition(context.window->getSize().x / 2.f + 201, context.window->getSize().y / 2.f - 21);
 	m_sprite_two.setTextureRect(sf::IntRect(0, 0, 38, 42));
 
+
+	//Set up the buttons for the players to select their colours
 	std::string color_text = "220";
 
 	auto red_button_one = std::make_shared<gui::Button>(context);
@@ -59,6 +65,8 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	blue_button_two->SetText(color_text);
 	blue_button_two->SetToggle(true);
 
+
+	//Set up the ready buttons for the players to confirm their colours
 	auto ready_button_one = std::make_shared<gui::Button>(context);
 	ready_button_one->setPosition(175, 650);
 	ready_button_one->SetText("Confirm");
@@ -96,6 +104,7 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 
 		});
 
+
 	m_buttons_one.push_back(red_button_one);
 	m_buttons_one.push_back(green_button_one);
 	m_buttons_one.push_back(blue_button_one);
@@ -106,14 +115,17 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	m_buttons_two.push_back(blue_button_two);
 	m_buttons_two.push_back(ready_button_two);
 
+	//Place the buttons in the container for player one
 	for (auto& button : m_buttons_one) {
 		m_gui_container_one.Pack(button);
 	}
 
+	//Place the buttons in the container for player two
 	for (auto& button : m_buttons_two) {
 		m_gui_container_two.Pack(button);
 	}
 
+	//Set up the labels for the colours
 	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
 	red_label->setPosition(475, 465);
 	red_label->SetColor(sf::Color::Red);
@@ -133,6 +145,7 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	m_gui_container_one.Pack(green_label);
 	m_gui_container_one.Pack(blue_label);
 
+	//Set up the labels for the players
 	auto player_one_label = std::make_shared<gui::Label>("Player One", *context.fonts);
 	player_one_label->setPosition(222, 315);
 	player_one_label->SetColor(sf::Color::Red);
@@ -146,6 +159,7 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	m_gui_container_one.Pack(player_one_label);
 	m_gui_container_two.Pack(player_two_label);
 
+	//Set up the title label
 	auto title_label = std::make_shared<gui::Label>("Colour Selection", *context.fonts);
 	title_label->setPosition(280, 100);
 	title_label->SetColor(sf::Color::Red);
@@ -154,7 +168,7 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	m_gui_container_one.Pack(title_label);
 
 }
-
+//Dominik Hampejs D00250604
 void PreGameState::Draw()
 {
 	sf::RenderWindow& window = *GetContext().window;
@@ -165,10 +179,11 @@ void PreGameState::Draw()
 	window.draw(m_sprite_one);
 	window.draw(m_sprite_two);
 }
-
+//Dominik Hampejs D00250604
 bool PreGameState::Update(sf::Time dt)
 {
-	if (m_is_player_one_ready && m_is_player_two_ready) {
+	//If both players are ready, set the colours and move to the game state
+	if (m_is_player_one_ready && m_is_player_two_ready) { 
 
 		GetContext().players_controller->SetPlayersColours(std::move(m_colour_one), std::move(m_colour_two));
 
@@ -177,32 +192,38 @@ bool PreGameState::Update(sf::Time dt)
     return false;
 }
 
+//Dominik Hampejs D00250604
 bool PreGameState::HandleEvent(const sf::Event& event)
 {
 	bool is_one_colour_selecting = false;
 	bool is_two_colour_selecting = false;
 
+	//If the players are not ready, allow them to select their colours
 	if (!(m_is_player_one_ready && m_is_player_two_ready))
 	{
+		//If the escape key is pressed, go to the pause state
 		if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 		{
 			RequestStackPush(StateID::kPause);
 		}
 
-		
+		//Check if the players are selecting their colours
 		for (int i = 0; i < 3; i++)
 		{
 			is_one_colour_selecting = m_buttons_one[i]->IsActive();
 			is_two_colour_selecting = m_buttons_two[i]->IsActive();
 
+			//If the player one is selecting their colour, allow them to change it
 			if (is_one_colour_selecting)
 			{
 				if (event.type == sf::Event::KeyPressed) {
+					//Pressing W or S will deactivate the button
 					if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::S)
 					{
 						m_buttons_one[i]->Deactivate();
 					}
 					int add = 0;
+					//Pressing D or A will change the colour
 					if (event.key.code == sf::Keyboard::D)
 					{
 						add = 20;
@@ -211,6 +232,7 @@ bool PreGameState::HandleEvent(const sf::Event& event)
 					{
 						add = -20;
 					}
+					//Change the colour based on the button pressed
 					switch (i)
 					{
 					case 0:
@@ -229,17 +251,20 @@ bool PreGameState::HandleEvent(const sf::Event& event)
 						break;
 					}
 				}
-				m_sprite_one.setColor(m_colour_one->GetColour());
+				m_sprite_one.setColor(m_colour_one->GetColour()); //Set the colour of the sprite
 			}
 
+			//If the player two is selecting their colour, allow them to change it
 			if (is_two_colour_selecting)
 			{
 				if (event.type == sf::Event::KeyPressed) {
+					//Pressing Up or Down will deactivate the button
 					if (event.key.code == sf::Keyboard::Down || event.key.code == sf::Keyboard::Up)
 					{
 						m_buttons_two[i]->Deactivate();
 					}
 					int add = 0;
+					//Pressing Right or Left will change the colour
 					if (event.key.code == sf::Keyboard::Right)
 					{
 						add = 20;
@@ -248,6 +273,7 @@ bool PreGameState::HandleEvent(const sf::Event& event)
 					{
 						add = -20;
 					}
+					//Change the colour based on the button pressed
 					switch (i)
 					{
 					case 0:
@@ -266,7 +292,7 @@ bool PreGameState::HandleEvent(const sf::Event& event)
 						break;
 					}
 				}
-				m_sprite_two.setColor(m_colour_two->GetColour());
+				m_sprite_two.setColor(m_colour_two->GetColour()); //Set the colour of the sprite
 			}
 		}
 

@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "Character.hpp"
 #include "TextureID.hpp"
 #include "ResourceHolder.hpp"

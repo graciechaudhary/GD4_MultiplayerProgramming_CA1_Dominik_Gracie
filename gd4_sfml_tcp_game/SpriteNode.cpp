@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604  
 #include "SpriteNode.hpp"
 
 SpriteNode::SpriteNode(const sf::Texture& texture):m_sprite(texture)
