@@ -102,7 +102,7 @@ bool World::HasAlivePlayerTwo() const
 
 void World::LoadTextures()
 {
-	m_textures.Load(TextureID::kHealthRefill, "MediaFiles/Textures/UI/HealthPickup.png");
+	m_textures.Load(TextureID::kHealthRefill, "MediaFiles/Textures/UI/HealthPickupV2.png");
 	m_textures.Load(TextureID::kSnowballRefill, "MediaFiles/Textures/UI/SnowballPickup.png");
 
 	//m_textures.Load(TextureID::kEntities, "MediaFiles/Textures/Entities.png");
