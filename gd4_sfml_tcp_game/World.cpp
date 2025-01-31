@@ -149,8 +149,11 @@ void World::BuildScene()
 	std::unique_ptr<ParticleNode> propellantNode(new ParticleNode(ParticleType::kPropellant, m_textures));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(propellantNode));*/
 
-	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures));
+	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnowOne, m_textures,true));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
+
+	std::unique_ptr<ParticleNode> snowNodeTwo(new ParticleNode(ParticleType::kSnowTwo, m_textures, false));
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNodeTwo));
 
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
@@ -464,9 +467,6 @@ void World::AdaptPlayerVelocity()
 
 	m_character_one->HandleSliding();
 	m_character_two->HandleSliding();
-
-
-
 	////If they are moving diagonally divide by sqrt 2
 	//if (velocity.x != 0.f && velocity.y != 0.f)
 	//{
@@ -476,9 +476,12 @@ void World::AdaptPlayerVelocity()
 
 void World::CreatePickup(SceneNode& node, const TextureHolder& textures) const
 {
+	float border_distance = 65.f;
 	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
 	std::unique_ptr<Pickup> pickup(new Pickup(type, textures));
-	pickup->setPosition(Utility::RandomInt(GetViewBounds().width), Utility::RandomInt(GetViewBounds().height));
+	float x = Utility::RandomInt(GetViewBounds().width - border_distance * 2) + border_distance;
+	float y = Utility::RandomInt(GetViewBounds().height - border_distance * 2) + border_distance;
+	pickup->setPosition(x,y);
 	node.AttachChild(std::move(pickup));
 }
 
@@ -593,6 +596,8 @@ void World::UpdateSounds()
 
 void World::CheckPickupDrop(sf::Time dt)
 {
+
+
 	// Check if it's time to spawn a new pickup
 	if (m_time_since_last_drop > m_pickup_drop_interval)
 	{
@@ -600,8 +605,16 @@ void World::CheckPickupDrop(sf::Time dt)
 		m_pickups_spawned++;
 		m_command_queue.Push(m_create_pickup_command);
 	}
-	else if(m_pickups_spawned < m_max_pickups)
+
+	if (m_pickups_spawned == 0)
 	{
 		m_time_since_last_drop += dt;
 	}
+
+	if(m_pickups_spawned < m_max_pickups)
+	{
+		m_time_since_last_drop += dt;
+	}
+
+
 }

@@ -15,9 +15,10 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, bool 
 {
     Utility::CentreOrigin(m_sprite);    
 
+	ParticleType particle_type = is_player_one ? ParticleType::kSnowOne : ParticleType::kSnowTwo;
 
     //particle system for snow
-    std::unique_ptr<EmitterNode> snow(new EmitterNode(ParticleType::kSnow));
+    std::unique_ptr<EmitterNode> snow(new EmitterNode(particle_type));
     snow->setPosition(0.f, GetBoundingRect().height / 2.f);
     AttachChild(std::move(snow));
 }

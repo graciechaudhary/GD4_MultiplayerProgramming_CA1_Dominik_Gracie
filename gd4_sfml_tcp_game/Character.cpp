@@ -480,13 +480,13 @@ void Character::HandleSliding()
 
 void Character::HandleBorderInteraction(sf::FloatRect view_bounds)
 {
-	const float border_distance = 40.f;
+	const float border_distance = 70.f;
 
 	sf::Vector2f position = getPosition();
 	position.x = std::max(position.x, view_bounds.left + border_distance);
 	position.x = std::min(position.x, view_bounds.left + view_bounds.width - border_distance);
-	position.y = std::max(position.y, view_bounds.top + border_distance);
-	position.y = std::min(position.y, view_bounds.top + view_bounds.height - border_distance);
+	position.y = std::max(position.y, view_bounds.top + border_distance - 10);
+	position.y = std::min(position.y, view_bounds.top + view_bounds.height - border_distance - 5);
 
 	if (position != getPosition())
 	{
@@ -516,6 +516,12 @@ void Character::WalkDown()
 void Character::SetColour(sf::Color colour)
 {
 	m_sprite.setColor(colour);
+	m_colour = colour;
+}
+
+sf::Color Character::GetColour()
+{
+	return m_colour;
 }
 
 void Character::WalkRight()
