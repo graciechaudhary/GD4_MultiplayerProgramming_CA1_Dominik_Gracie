@@ -10,6 +10,7 @@ MenuState::MenuState(StateStack& stack, Context context)
     sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
     m_background_sprite.setTexture(texture);
     m_background_sprite.setScale(2.f,2.38f);
+   // m_background_sprite.setColor()
 
     auto play_button = std::make_shared<gui::Button>(context);
     play_button->setPosition((context.window->getSize().x - 200)/2, 489);

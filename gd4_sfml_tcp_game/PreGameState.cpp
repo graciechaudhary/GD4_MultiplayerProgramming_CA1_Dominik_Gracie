@@ -14,7 +14,9 @@ PreGameState::PreGameState(StateStack& stack, Context context) :
 	m_is_player_one_ready(false),
 	m_is_player_two_ready(false)
 {
-	m_background_sprite.setTexture(context.textures->Get(TextureID::kTitleScreen));
+	sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
+	m_background_sprite.setTexture(texture);
+	m_background_sprite.setScale(2.f, 2.38f);
 
 	auto red_button_one = std::make_shared<gui::Button>(context);
 	red_button_one->setPosition(100, 250);
