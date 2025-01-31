@@ -37,15 +37,15 @@ bool TitleState::Update(sf::Time dt)
         m_show_text = !m_show_text;
         m_text_effect_time = sf::Time::Zero;
     }
-    return true;
+    return false;
 }
 
 bool TitleState::HandleEvent(const sf::Event& event)
 {
-    if (event.type == sf::Event::KeyPressed)
+    if (event.type == sf::Event::KeyReleased)
     {
         RequestStackPop();
         RequestStackPush(StateID::kMenu);
     }
-    return true;
+    return false;
 }
