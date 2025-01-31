@@ -53,12 +53,16 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 			CreateSnowball(node, textures);
 		};
 
-	std::string* health = new std::string("");
-	std::unique_ptr<TextNode> health_display(new TextNode(fonts, *health));
+	std::unique_ptr<ResourceNode> health_display(new ResourceNode(textures, TextureID::kHealthRefill ,GetHitPoints(), 14.f, 0.3f));
 	m_health_display = health_display.get();
+	m_health_display->setPosition(-20.f, 25.f);
 	AttachChild(std::move(health_display));
 
-	UpdateTexts();
+	std::unique_ptr<ResourceNode> snowball_display(new ResourceNode(textures, TextureID::kSnowball, m_snowball_count, 12.f, 0.4f));
+	m_snowball_display = snowball_display.get();
+	m_snowball_display->setPosition(-28.f, -34.f);
+	AttachChild(std::move(snowball_display));
+
 }
 
 unsigned int Character::GetCategory() const
@@ -77,12 +81,6 @@ int Character::GetMaxHitpoints() const
 }
 
 
-void Character::UpdateTexts()
-{
-	m_health_display->SetString(std::to_string(GetHitPoints()) + "HP");
-	m_health_display->setPosition(0.f, 50.f);
-	m_health_display->setRotation(-getRotation());
-}
 
 float Character::GetMaxSpeed() const
 {
@@ -204,7 +202,11 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 	}
 
 	Entity::UpdateCurrent(dt, commands);
-	UpdateTexts();
+	//UpdateTexts();
+
+	m_health_display->SetResource(GetHitPoints());
+	m_snowball_display->SetResource(m_snowball_count);
+
 	//UpdateMovementPattern(dt);
 
 	//UpdateRollAnimation();
