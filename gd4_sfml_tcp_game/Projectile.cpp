@@ -57,4 +57,5 @@ void Projectile::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 void Projectile::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(m_sprite, states);
+        
 }

@@ -15,7 +15,7 @@ namespace
 	const std::vector<CharacterData> Table = InitializeCharacterData();	
 }
 
-Character::Character(CharacterType type, const TextureHolder& textures, const FontHolder& fonts, bool is_player_one)  
+Character::Character(CharacterType type, const TextureHolder& textures, const FontHolder& fonts, bool is_player_one)
 	: Entity(Table[static_cast<int>(type)].m_hitpoints)
 	, m_type(type)
 	, m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
@@ -37,7 +37,9 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 	, m_current_direction(FacingDirections::kDown)
 	, m_snowball_count(Table[static_cast<int>(type)].max_snowballs)
 	, m_is_player_one(is_player_one)
-{
+	, m_impact_duration(sf::seconds(0.5f))
+	, m_blink_timer(sf::Time::Zero)
+	{
 	//Walking Animation Setup
 	m_walking.SetFrameSize(sf::Vector2i(38, 42));
 	m_walking.SetNumFrames(4);
@@ -252,11 +254,13 @@ void Character::UpdateAnimation(sf::Time dt) {
 		
 		UpdateAttackingAnimation(dt);
 	}
+	else if(m_current_animation == CharacterAnimationType::kImpact){
+		UpdateImpactAnimation(dt);
+	}
 	else
 	{
 		UpdateWalkingAnimation(dt);
 	}
-
 }
 
 void Character::UpdateWalkingAnimation(sf::Time dt)
@@ -307,8 +311,34 @@ void Character::UpdateAttackingAnimation(sf::Time dt)
 	}
 }
 
+//this method affects the UpdateWalkingAnimation with a blinking effect to display that the character has been hit by a snowball
 void Character::UpdateImpactAnimation(sf::Time dt)
 {
+	
+	sf::Color original_color = m_sprite.getColor();
+	if (m_current_animation != CharacterAnimationType::kImpact)
+	{
+		m_walking.Update(dt); 
+	}
+
+	m_blink_timer += dt;
+	m_impact_timer += dt;
+
+	if (m_blink_timer >= sf::seconds(0.1f))
+	{
+		m_sprite.setColor(m_sprite.getColor() == sf::Color::Transparent ? original_color : sf::Color::Transparent);
+		m_blink_timer = sf::Time::Zero;
+	}
+
+	if (m_impact_timer >= m_impact_duration)
+	{
+		m_current_animation = CharacterAnimationType::kWalk; 
+		m_sprite.setColor(original_color);
+		m_impact_timer = sf::Time::Zero;  
+	}
+
+	m_sprite.setTextureRect(m_walking.GetCurrentTextureRect());
+	
 }
 
 
@@ -483,6 +513,17 @@ void Character::SetColour(sf::Color colour)
 {
 	m_sprite.setColor(colour);
 }
+
+
+void Character::Impacted()
+{
+	m_current_animation = CharacterAnimationType::kImpact;
+	m_impact_duration = sf::seconds(0.5f);
+	m_blink_timer = sf::Time::Zero;
+	m_impact_timer = sf::Time::Zero;
+}
+
+
 
 void Character::WalkRight()
 {

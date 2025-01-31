@@ -573,6 +573,7 @@ void World::HandleCollisions()
 			auto& projectile = static_cast<Projectile&>(*pair.second);
 			//Collision response
 			character.Damage(projectile.GetDamage());
+			character.Impacted();
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));
 

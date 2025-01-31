@@ -47,6 +47,8 @@ public:
 	void WalkDown();
 
 	void SetColour(sf::Color colour);
+	void Impacted();
+	void SetImpact(bool is_impacted);
 
 
 private:
@@ -74,6 +76,7 @@ private:
 	Command m_throw_command;
 
 	bool m_is_throwing;
+	bool m_is_impacted;
 	sf::Time m_throw_countdown;
 	int m_snowball_count;
 
@@ -90,6 +93,9 @@ private:
 	FacingDirections m_current_direction;
 
 	sf::Time m_clear_flags_time;
+	sf::Time m_blink_timer;
+	sf::Time m_impact_timer;
+	sf::Time m_impact_duration;
 
 	bool m_is_player_one;
 };
