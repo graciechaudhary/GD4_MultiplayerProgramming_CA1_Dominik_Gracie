@@ -22,6 +22,8 @@ bool gui::Container::IsSelectable() const
     return false;
 }
 
+//Dominik Hampejs D00250604
+//Handle action on seperate key bindings for player one and player two
 void gui::Container::HandleEvent(const sf::Event& event)
 {
 
@@ -105,15 +107,20 @@ void gui::Container::SelectPrevious()
     Select(prev);
 }
 
-
+//Dominik Hampejs D00250604
+//Provides separate key bindings for player one and player two for Up
 sf::Keyboard::Key gui::Container::GetUpKey(bool is_player_one) const {
     return is_player_one ? sf::Keyboard::W : sf::Keyboard::Up;
 }
 
+//Dominik Hampejs D00250604
+//Provides separate key bindings for player one and player two for Down
 sf::Keyboard::Key gui::Container::GetDownKey(bool is_player_one) const {
     return is_player_one ? sf::Keyboard::S : sf::Keyboard::Down;
 }
 
+//Dominik Hampejs D00250604
+//Provides separate key bindings for player one and player two for Return
 sf::Keyboard::Key gui::Container::GetReturnKey(bool is_player_one) const {
     return is_player_one ? sf::Keyboard::Space : sf::Keyboard::RShift;
 }

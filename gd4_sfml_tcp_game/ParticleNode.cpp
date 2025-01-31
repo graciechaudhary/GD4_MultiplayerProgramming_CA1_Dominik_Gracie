@@ -112,11 +112,13 @@ void ParticleNode::ComputeVertices() const
 
 }
 
+//Dominik Hampejs D00250604
 void ParticleNode::SetColor(sf::Color color)
 {
 	m_color = color;
 }
 
+//Dominik Hampejs D00250604
 bool ParticleNode::IsPlayerOne() const
 {
     return m_is_player_one;

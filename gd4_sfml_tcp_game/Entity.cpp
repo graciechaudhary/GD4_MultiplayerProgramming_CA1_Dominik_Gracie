@@ -46,6 +46,8 @@ void Entity::Repair(int points)
     m_hitpoints += points;
 }
 
+//Dominik Hampejs D00250604
+//Repair function with max hitpoins limit
 void Entity::Repair(int points, int limit)
 {
 	assert(points > 0);

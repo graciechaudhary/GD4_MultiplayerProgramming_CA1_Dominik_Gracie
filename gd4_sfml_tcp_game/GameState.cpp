@@ -23,6 +23,7 @@ void GameState::Draw()
 bool GameState::Update(sf::Time dt)
 {
 	m_world.Update(dt);
+	//If one of the players is dead, then the other player wins
 	if (!m_world.HasAlivePlayerOne())
 	{
 		m_players_controller.SetGameStatus(GameStatus::kPlayerTwoWin);
