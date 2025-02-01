@@ -12,9 +12,11 @@ TitleState::TitleState(StateStack& stack, Context context) : State(stack, contex
     m_background_sprite.setScale(2.f, 2.38f);
     m_text.setFont(context.fonts->Get(Font::kMain));
     m_text.setString("Press any key to continue");
-    m_text.setCharacterSize(40);
+    m_text.setCharacterSize(60);
+    m_text.setOutlineColor(sf::Color::Red);
+    m_text.setOutlineThickness(2.5f);
     Utility::CentreOrigin(m_text);
-    m_text.setPosition(context.window->getView().getSize() / 2.f);
+    m_text.setPosition(context.window->getView().getSize().x/2.f,context.window->getView().getSize().y * 0.75f);
 }
 
 

@@ -549,6 +549,8 @@ void World::HandleCollisions()
 
 			player_one.Accelerate(velocity_two);
 			playuer_two.Accelerate(velocity_one);
+
+			player_one.PlayLocalSound(m_command_queue, SoundEffect::kExplosion2);
 		}
 
 		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPickup) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPickup))
@@ -574,6 +576,7 @@ void World::HandleCollisions()
 			projectile.Destroy();
 
 		}
+		
 	}
 }
 

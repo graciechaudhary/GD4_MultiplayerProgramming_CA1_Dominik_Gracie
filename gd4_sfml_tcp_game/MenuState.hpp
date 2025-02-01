@@ -20,5 +20,6 @@ public:
 private:
 	sf::Sprite m_background_sprite;
 	gui::Container m_gui_container;
+	sf::Text m_game_name;
 };
 

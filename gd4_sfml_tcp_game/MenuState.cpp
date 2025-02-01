@@ -14,6 +14,15 @@ MenuState::MenuState(StateStack& stack, Context context)
     m_background_sprite.setScale(2.f,2.38f);
    // m_background_sprite.setColor()
 
+    m_game_name.setFont(context.fonts->Get(Font::kMain));
+    m_game_name.setString("Snowballed");
+    m_game_name.setCharacterSize(150);
+    m_game_name.setOutlineColor(sf::Color::Red);
+    m_game_name.setOutlineThickness(4.f);
+    m_game_name.setLetterSpacing(1.5f);
+    Utility::CentreOrigin(m_game_name);
+    m_game_name.setPosition(context.window->getView().getSize().x / 2.f, context.window->getView().getSize().y * 0.35f);
+
     auto play_button = std::make_shared<gui::Button>(context);
     play_button->setPosition((context.window->getSize().x - 200)/2, 489);
     play_button->SetText("Play");
@@ -54,6 +63,7 @@ void MenuState::Draw()
     window.setView(window.getDefaultView());
     window.draw(m_background_sprite);
     window.draw(m_gui_container);
+    window.draw(m_game_name);
 }
 
 bool MenuState::Update(sf::Time dt)
