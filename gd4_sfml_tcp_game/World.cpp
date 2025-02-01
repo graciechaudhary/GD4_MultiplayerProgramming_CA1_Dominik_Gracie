@@ -41,6 +41,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 
 void World::Update(sf::Time dt)
 {
+	//Clear buttons pressed to handle SMFL issue with detecting what buttons are actually pressed
 	m_character_one->ClearWalkingFlags(dt);
 	m_character_two->ClearWalkingFlags(dt);
 
@@ -91,16 +92,20 @@ CommandQueue& World::GetCommandQueue()
 	return m_command_queue;
 }
 
+//Dominik Hampejs D00250604
 bool World::HasAlivePlayerOne() const
 {
 	return !m_character_one->IsMarkedForRemoval();
 }
 
+//Dominik Hampejs D00250604
 bool World::HasAlivePlayerTwo() const
 {
 	return !m_character_two->IsMarkedForRemoval();
 }
 
+//Dominik Hampejs D00250604
+//Return statistic about the game
 GameRecords World::GetGameRecords() const
 {
 	GameRecords records;
@@ -309,6 +314,8 @@ void World::AdaptPlayerVelocity()
 	//}
 }
 
+//Dominik Hampejs D00250604
+//Creates random pickup on a random location on the lake
 void World::CreatePickup(SceneNode& node, const TextureHolder& textures) const
 {
 	float border_distance = 65.f;
@@ -372,6 +379,7 @@ void World::HandleCollisions()
 	m_scenegraph.CheckSceneCollision(m_scenegraph, collision_pairs);
 	for (SceneNode::Pair pair : collision_pairs)
 	{
+		//On player on player collision make them bounce of each other
 		if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPlayerTwo))
 		{
 			auto& player_one = static_cast<Character&>(*pair.first);
@@ -380,9 +388,11 @@ void World::HandleCollisions()
 			sf::Vector2f velocity_one = player_one.GetVelocity();
 			sf::Vector2f velocity_two = playuer_two.GetVelocity();
 
+			//Reset velocity
 			player_one.SetVelocity(0.f, 0.f);
 			playuer_two.SetVelocity(0.f, 0.f);
 
+			//If one player was stationery bounce the moving player of the stationary player
 			if (velocity_one == sf::Vector2f(0.f, 0.f))
 			{
 				velocity_one = -velocity_two;
@@ -392,12 +402,13 @@ void World::HandleCollisions()
 				velocity_two = -velocity_one;
 			}
 
+			//Exchange velocities to bounce/push each other
 			player_one.Accelerate(velocity_two);
 			playuer_two.Accelerate(velocity_one);
 
 			player_one.PlayLocalSound(m_command_queue, SoundEffect::kExplosion2);
 		}
-
+		//Pickup and apply pickup
 		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPickup) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPickup))
 		{
 			auto& player = static_cast<Character&>(*pair.first);
@@ -409,6 +420,7 @@ void World::HandleCollisions()
 			pickup.Destroy();
 			player.PlayLocalSound(m_command_queue, pickupSoundEffect);
 		}
+		//On player snowball collision do damage and push player, and destroy snowball
 		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPlayerTwoProjectile) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPlayerOneProjectile))
 		{
 			auto& character = static_cast<Character&>(*pair.first);
@@ -434,10 +446,10 @@ void World::UpdateSounds()
 	m_sounds.RemoveStoppedSounds();
 }
 
+//Dominik Hampejs D00250604
+//Create a pickup every time it is time
 void World::CheckPickupDrop(sf::Time dt)
 {
-
-
 	// Check if it's time to spawn a new pickup
 	if (m_time_since_last_drop > m_pickup_drop_interval)
 	{
@@ -446,6 +458,7 @@ void World::CheckPickupDrop(sf::Time dt)
 		m_command_queue.Push(m_create_pickup_command);
 	}
 
+	//When no pickup on the lake speed up spawn
 	if (m_pickups_spawned == 0)
 	{
 		m_time_since_last_drop += dt;
@@ -455,6 +468,4 @@ void World::CheckPickupDrop(sf::Time dt)
 	{
 		m_time_since_last_drop += dt;
 	}
-
-
 }

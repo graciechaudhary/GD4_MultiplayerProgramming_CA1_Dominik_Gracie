@@ -324,7 +324,7 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
     {
         return;
     }
-	//Player one colour
+	//Player one colour command
     Command set_colour_one;
     set_colour_one.category = static_cast<int>(ReceiverCategories::kPlayerOne);
     set_colour_one.action = [this](SceneNode& node, sf::Time)
@@ -333,7 +333,7 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
             character.SetColour(m_colour_one->GetColour());
         };
 
-	//Player two colour
+	//Player two colour command
     Command set_colour_two;
     set_colour_two.category = static_cast<int>(ReceiverCategories::kPlayerTwo);
     set_colour_two.action = [this](SceneNode& node, sf::Time)
@@ -342,7 +342,7 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
             character.SetColour(m_colour_two->GetColour());
         };
 
-	//Particle colour for player one snowball particles
+	//Particle colour for player one snowball particles command
 	Command set_particle_colour_one;
 	set_particle_colour_one.category = static_cast<int>(ReceiverCategories::kParticleSystem);
 	set_particle_colour_one.action = [this](SceneNode& node, sf::Time)
@@ -354,7 +354,7 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
             }
 		};
 
-	//Particle colour for player two snowball particles
+	//Particle colour for player two snowball particles command
 	Command set_particle_colour_two;
 	set_particle_colour_two.category = static_cast<int>(ReceiverCategories::kParticleSystem);
 	set_particle_colour_two.action = [this](SceneNode& node, sf::Time)

@@ -19,6 +19,7 @@ GameOverState::GameOverState(StateStack& stack, Context context)
 
     m_records = context.players_controller->m_game_records;
 
+    //Set up title messsage
     m_game_over_text.setFont(font);
     switch (context.players_controller->GetGameStatus()) {
     case GameStatus::kPlayerOneWin:
@@ -33,7 +34,7 @@ GameOverState::GameOverState(StateStack& stack, Context context)
     Utility::CentreOrigin(m_game_over_text);
     m_game_over_text.setPosition(0.49f * window_size.x, 0.33 * window_size.y);
 
-
+    //Set up player one statistics
     m_player_one_records_text.setFont(font);
     std::ostringstream oss; 
     oss << "Player One Throws:\t" << m_records.player_one_throw << "\n";
@@ -46,6 +47,7 @@ GameOverState::GameOverState(StateStack& stack, Context context)
     Utility::CentreOrigin(m_player_one_records_text);
     m_player_one_records_text.setPosition(0.27f * window_size.x, 0.63 * window_size.y);
 
+    //Set up player two statistics
     m_player_two_records_text.setFont(font);
     std::ostringstream os;
     os << "Player Two Throws:\t" << m_records.player_two_throw << "\n";
