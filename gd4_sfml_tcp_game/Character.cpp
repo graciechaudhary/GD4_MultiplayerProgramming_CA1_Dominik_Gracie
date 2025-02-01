@@ -109,6 +109,7 @@ void Character::Throw()
 	m_is_throwing = true;	
 }
 
+//Dominik Hampejs D00250604
 void Character::RechargeSnowballs()
 {
 	m_snowball_count = Table[static_cast<int>(m_type)].max_snowballs;
@@ -126,6 +127,7 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 
 	float snowball_speed = projectile->GetMaxSpeed();
 
+	//Set the projectile velocity and offset based on the direction the player faces 
 	switch (GetFacingDirection())
 	{
 	case FacingDirections::kUp:
@@ -180,6 +182,8 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 	
 }
 
+//Dominik Hampejs D00250604
+//Override to include got hit count
 void Character::Damage(int damage)
 {
 	Entity::Damage(damage);
@@ -227,7 +231,7 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 
 	Entity::UpdateCurrent(dt, commands);
 
-
+	//Update resource indicators
 	m_health_display->SetResource(GetHitPoints());
 	m_snowball_display->SetResource(m_snowball_count);
 
@@ -358,10 +362,14 @@ void Character::UpdateImpactAnimation(sf::Time dt)
 
 
 
+//Dominik Hampejs D00250604
+//Set the currention direction that the character is facing
 void Character::UpdateCurrentDirection()
 {
+	//Get buttons pressed
 	int walking_flags = GetWalkingFlagsCount();
 
+	//One button pressed = the 4 cardinal directions
 	if (walking_flags == 1)
 	{
 		if (m_is_walking_up)
@@ -381,6 +389,7 @@ void Character::UpdateCurrentDirection()
 			m_current_direction = FacingDirections::kRight;
 		}
 	}
+	//Two buttons pressed = diagonal movement
 	else if (walking_flags == 2)
 	{
 		if (m_is_walking_up && m_is_walking_left)
@@ -400,6 +409,7 @@ void Character::UpdateCurrentDirection()
 			m_current_direction = FacingDirections::kDownRight;
 		}
 	}
+	//Three button pressed = opposite buttons are ignored and the third decides direction
 	else if (walking_flags == 3)
 	{
 		if (!m_is_walking_up)
@@ -436,6 +446,8 @@ void Character::PlayLocalSound(CommandQueue& commands, SoundEffect effect)
 	commands.Push(command);
 }
 
+//Dominik Hampejs D00250604
+//SFML has trouble detecting what button are truly pressed this fixes the issue of button presenting as being pressed when it is not
 void Character::ClearWalkingFlags(sf::Time dt)
 {
 	if (m_clear_flags_time > sf::milliseconds(250))
@@ -453,11 +465,15 @@ void Character::ClearWalkingFlags(sf::Time dt)
 
 }
 
+//Dominik Hampejs D00250604
+//Return all the current walking direction (buttons pressed)
 int Character::GetWalkingFlagsCount() const
 {
 	return m_is_walking_up + m_is_walking_down + m_is_walking_left + m_is_walking_right;
 }
 
+//Dominik Hampejs D00250604
+//Decelerate the character
 void Character::HandleSliding()
 {
 	sf::Vector2f velocity = GetVelocity();
@@ -465,10 +481,12 @@ void Character::HandleSliding()
 	float y_reduce = 0.f;
 	float reduction_rate = 1.4f;
 
+	//If the player is not walking on the x axis reduce velocity towards 0
 	if (velocity.x != 0.f && !m_is_walking_left && !m_is_walking_right)
 	{
 		x_reduce = velocity.x > 0.f ? -reduction_rate : reduction_rate;
 	}
+	//If the player is not walking on the y axis reduce velocity towards 0
 	if (velocity.y != 0.f && !m_is_walking_down && !m_is_walking_up)
 	{
 		y_reduce = velocity.y > 0.f ? -reduction_rate : reduction_rate;
@@ -477,6 +495,7 @@ void Character::HandleSliding()
 	Accelerate(x_reduce, y_reduce);
 
 
+	//If velocity is low enough just stop the character
 	if (GetVelocity().x <= 4.f && GetVelocity().x >= -4.f)
 	{
 		SetVelocity(0.f, GetVelocity().y);
@@ -489,6 +508,8 @@ void Character::HandleSliding()
 
 }
 
+//Dominik Hampejs D00250604
+//Stop the player when the hit the border of the lake
 void Character::HandleBorderInteraction(sf::FloatRect view_bounds)
 {
 	const float border_distance = 70.f;
@@ -507,27 +528,32 @@ void Character::HandleBorderInteraction(sf::FloatRect view_bounds)
 	setPosition(position);
 }
 
+//Dominik Hampejs D00250604
 FacingDirections Character::GetFacingDirection() const
 {
 	return m_current_direction;
 }
 
+//Dominik Hampejs D00250604
 int Character::GetThrowCount()
 {
 	return m_throw_count;
 }
 
+//Dominik Hampejs D00250604
 int Character::GetGotHitCount()
 {
 	return m_got_hit_count;
 }
 
+//Dominik Hampejs D00250604
 void Character::WalkUp()
 {
 	m_is_walking_up = true;
 	UpdateCurrentDirection();
 }
 
+//Dominik Hampejs D00250604
 void Character::WalkDown()
 {
 	m_is_walking_down = true;
@@ -538,28 +564,27 @@ void Character::Impacted() {
 	m_current_animation = CharacterAnimationType::kImpact;
 }
 
+//Dominik Hampejs D00250604
 void Character::SetColour(sf::Color colour)
 {
 	m_sprite.setColor(colour);
 	m_colour = colour;
 }
 
+//Dominik Hampejs D00250604
 sf::Color Character::GetColour()
 {
 	return m_colour;
 }
 
-
-
-
-
-
+//Dominik Hampejs D00250604
 void Character::WalkRight()
 {
 	m_is_walking_right = true;
 	UpdateCurrentDirection();
 }
 
+//Dominik Hampejs D00250604
 void Character::WalkLeft()
 {
 	m_is_walking_left = true;
