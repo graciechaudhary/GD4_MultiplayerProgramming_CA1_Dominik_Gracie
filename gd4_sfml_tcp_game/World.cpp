@@ -573,6 +573,7 @@ void World::HandleCollisions()
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));
 			character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
+			character.Impacted();
 			projectile.Destroy();
 
 		}
