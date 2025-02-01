@@ -12,8 +12,7 @@ MenuState::MenuState(StateStack& stack, Context context)
     sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
     m_background_sprite.setTexture(texture);
     m_background_sprite.setScale(2.f,2.38f);
-   // m_background_sprite.setColor()
-
+   
     m_game_name.setFont(context.fonts->Get(Font::kMain));
     m_game_name.setString("Snowballed");
     m_game_name.setCharacterSize(150);

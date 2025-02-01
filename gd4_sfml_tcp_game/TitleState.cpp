@@ -10,13 +10,23 @@ TitleState::TitleState(StateStack& stack, Context context) : State(stack, contex
     sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
     m_background_sprite.setTexture(texture);
     m_background_sprite.setScale(2.f, 2.38f);
+
     m_text.setFont(context.fonts->Get(Font::kMain));
     m_text.setString("Press any key to continue");
-    m_text.setCharacterSize(60);
+    m_text.setCharacterSize(50);
     m_text.setOutlineColor(sf::Color::Red);
     m_text.setOutlineThickness(2.5f);
     Utility::CentreOrigin(m_text);
-    m_text.setPosition(context.window->getView().getSize().x/2.f,context.window->getView().getSize().y * 0.75f);
+    m_text.setPosition(context.window->getView().getSize().x/2.f,context.window->getView().getSize().y * 0.9f);
+
+    m_game_name.setFont(context.fonts->Get(Font::kMain));
+    m_game_name.setString("Snowballed");
+    m_game_name.setCharacterSize(150);
+    m_game_name.setOutlineColor(sf::Color::Red);
+    m_game_name.setOutlineThickness(4.f);
+    m_game_name.setLetterSpacing(1.5f);
+    Utility::CentreOrigin(m_game_name);
+    m_game_name.setPosition(context.window->getView().getSize().x / 2.f, context.window->getView().getSize().y * 0.35f);
 }
 
 
@@ -24,6 +34,7 @@ void TitleState::Draw()
 {
     sf::RenderWindow& window = *GetContext().window;
     window.draw(m_background_sprite);
+    window.draw(m_game_name);
 
     if (m_show_text)
     {

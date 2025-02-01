@@ -20,5 +20,6 @@ private:
 
 	bool m_show_text;
 	sf::Time m_text_effect_time;
+	sf::Text m_game_name;
 };
 
