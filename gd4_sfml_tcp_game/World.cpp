@@ -100,6 +100,16 @@ bool World::HasAlivePlayerTwo() const
 	return !m_character_two->IsMarkedForRemoval();
 }
 
+GameRecords World::GetGameRecords() const
+{
+	GameRecords records;
+	records.player_one_hit = m_character_two->GetGotHitCount();
+	records.player_one_throw = m_character_one->GetThrowCount();
+	records.player_two_hit = m_character_one->GetGotHitCount();
+	records.player_two_throw = m_character_two->GetThrowCount();
+	return records;
+}
+
 void World::LoadTextures()
 {
 	m_textures.Load(TextureID::kHealthRefill, "MediaFiles/Textures/UI/HealthPickupV2.png");
@@ -574,7 +584,6 @@ void World::HandleCollisions()
 			character.Accelerate(projectile.GetVelocity() / (3.f,3.f));
 			character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			projectile.Destroy();
-
 		}
 		
 	}

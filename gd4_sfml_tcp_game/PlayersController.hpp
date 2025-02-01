@@ -10,6 +10,13 @@
 
 class Command;
 
+struct GameRecords
+{
+	int player_one_throw;
+	int player_one_hit;
+	int player_two_throw;
+	int player_two_hit;
+};
 
 class PlayersController
 {
@@ -28,6 +35,8 @@ public:
 	void SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two);
 
 	void UpdateColours(CommandQueue& command_queue);
+
+	GameRecords m_game_records;
 
 private:
 	void InitialiseActions();

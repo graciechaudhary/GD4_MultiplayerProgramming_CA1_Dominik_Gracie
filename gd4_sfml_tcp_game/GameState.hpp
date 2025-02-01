@@ -15,5 +15,7 @@ public:
 private:
 	World m_world;
 	PlayersController& m_players_controller;
+	sf::Time m_time_till_end;
+	sf::Time m_time_counter;
 };
 

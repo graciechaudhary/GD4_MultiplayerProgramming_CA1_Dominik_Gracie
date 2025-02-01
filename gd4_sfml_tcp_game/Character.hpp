@@ -28,6 +28,8 @@ public:
 
 	void CreateSnowball(SceneNode& node, const TextureHolder& textures) const;
 
+	void Damage(int damage) override;
+
 	sf::FloatRect GetBoundingRect() const override;
 	bool IsMarkedForRemoval() const override;
 	void PlayLocalSound(CommandQueue& commands, SoundEffect effect);
@@ -41,6 +43,9 @@ public:
 	void HandleBorderInteraction(sf::FloatRect view_bounds);
 
 	FacingDirections GetFacingDirection() const;
+
+	int GetThrowCount();
+	int GetGotHitCount();
 
 	void WalkLeft();
 	void WalkRight();
@@ -104,5 +109,8 @@ private:
 	bool m_is_player_one;
 
 	sf::Color m_colour;
+
+	int m_got_hit_count;
+	int m_throw_count;
 };
 

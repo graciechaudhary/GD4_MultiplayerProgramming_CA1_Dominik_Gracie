@@ -42,6 +42,9 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 	, m_impact_duration(sf::seconds(0.5f))
 	, m_blink_timer(sf::Time::Zero)
 	{
+	m_got_hit_count = 0;
+	m_throw_count = 0;
+
 	//Walking Animation Setup
 	m_walking.SetFrameSize(sf::Vector2i(38, 42));
 	m_walking.SetNumFrames(4);
@@ -177,6 +180,12 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 	
 }
 
+void Character::Damage(int damage)
+{
+	Entity::Damage(damage);
+	m_got_hit_count++;
+}
+
 sf::FloatRect Character::GetBoundingRect() const
 {
 	return GetWorldTransform().transformRect(m_sprite.getGlobalBounds());
@@ -235,6 +244,7 @@ void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	
 	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
 	{
+		m_throw_count++;
 		m_current_animation = CharacterAnimationType::kAttack;
 		PlayLocalSound(commands, SoundEffect::kSnowballThrow);
 		commands.Push(m_throw_command);
@@ -500,6 +510,16 @@ void Character::HandleBorderInteraction(sf::FloatRect view_bounds)
 FacingDirections Character::GetFacingDirection() const
 {
 	return m_current_direction;
+}
+
+int Character::GetThrowCount()
+{
+	return m_throw_count;
+}
+
+int Character::GetGotHitCount()
+{
+	return m_got_hit_count;
 }
 
 void Character::WalkUp()

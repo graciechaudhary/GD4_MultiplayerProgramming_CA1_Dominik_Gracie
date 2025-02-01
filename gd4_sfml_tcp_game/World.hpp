@@ -15,6 +15,7 @@
 #include "SoundPlayer.hpp"
 
 #include <array>
+#include "PlayersController.hpp"
 
 class World : private sf::NonCopyable
 {
@@ -28,6 +29,7 @@ public:
 	bool HasAlivePlayerOne() const;
 	bool HasAlivePlayerTwo() const;
 
+	GameRecords GetGameRecords() const;
 private:
 	void LoadTextures();
 	void BuildScene();

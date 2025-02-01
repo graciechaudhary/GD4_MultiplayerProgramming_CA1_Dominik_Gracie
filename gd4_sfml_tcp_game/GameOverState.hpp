@@ -3,6 +3,7 @@
 #pragma once
 #include "State.hpp"
 #include <SFML/Graphics/Text.hpp>
+#include "PlayersController.hpp"
 
 class GameOverState : public State
 {
@@ -14,6 +15,9 @@ public:
 
 private:
 	sf::Text m_game_over_text;
+	sf::Text m_player_one_records_text;
+	sf::Text m_player_two_records_text;
 	sf::Time m_elapsed_time;
+	GameRecords m_records;
 };
 
