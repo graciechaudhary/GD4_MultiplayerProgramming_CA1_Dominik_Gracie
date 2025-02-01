@@ -8,6 +8,7 @@
 #include <set> 
 #include <iostream> 
 #include "EmitterNode.hpp"
+#include <cstdlib> 
 
 World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
 	:m_target(output_target)
@@ -201,254 +202,88 @@ void World::BuildSnowLandscape() {
 	lake_sprite->setPosition(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness);
 	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(lake_sprite));
 
-	//sf::FloatRect lake_bounds(m_world_bounds.left + 96, m_world_bounds.top + 96,	m_world_bounds.width * 0.8125, m_world_bounds.height * 0.75);
+	sf::FloatRect lake_bounds(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness,	m_world_bounds.width * 0.875, m_world_bounds.height * 0.834);
 		
-	//BuildTreesRandom(lake_bounds);
-	//BuildTreesFixed(lake_bounds);
-}
-
-//Building trees randomly - GracieChaudhary
-void World::BuildTreesRandom(sf::FloatRect lake_bounds) {
-
-	//Placing tree sprites
-	sf::Texture& purple_tree_texture = m_textures.Get(TextureID::kPurpleTree);
-	sf::Texture& green_tree_texture = m_textures.Get(TextureID::kGreenTree);
-	sf::Texture& dead_tree_texture = m_textures.Get(TextureID::kDeadTree);
-
-	/*std::unique_ptr<SpriteNode> purpleTreeSprite(new SpriteNode(purpleTreeTexture));
-	std::unique_ptr<SpriteNode> greenTreeSprite(new SpriteNode(greenTreeTexture));
-	std::unique_ptr<SpriteNode> deadTreeSprite(new SpriteNode(deadTreeTexture));*/
-
-	
-	// Dimensions and border rules
-	const int tree_size = 64;
-	const sf::Vector2f screen_size(1024, 768);
-	const int border_thickness = 96;
-
-	// Define placement bounds
-	std::vector<sf::FloatRect> allowed_areas = {
-		{0.f, 0.f, screen_size.x, border_thickness},                            // Top border
-		{0.f, screen_size.y - border_thickness, screen_size.x, border_thickness}, // Bottom border
-		{0.f, border_thickness, border_thickness, screen_size.y - 2 * border_thickness}, // Left border
-		{screen_size.x - border_thickness, border_thickness, border_thickness, screen_size.y - 2 * border_thickness} // Right border
-	};
-
-	std::set<std::pair<int, int>> occupied_positions;
-
-	auto place_trees = [&](sf::Texture& tree_texture, int count) {
-		std::mt19937 rng(static_cast<unsigned>(std::time(nullptr))); // Random number generator
-
-		for (int i = 0; i < count; ++i) {
-			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(tree_texture));
-
-			bool is_valid = false;
-			sf::Vector2f position;
-
-			while (!is_valid) {
-				// Randomly select one of the allowed areas
-				int area_index = rng() % allowed_areas.size();
-				const sf::FloatRect& area = allowed_areas[area_index];
-
-				// Generate a random position within the selected area
-				std::uniform_real_distribution<float> x_dist(area.left, area.left + area.width - tree_size);
-				std::uniform_real_distribution<float> y_dist(area.top, area.top + area.height - tree_size);
-
-				position = { x_dist(rng), y_dist(rng) };
-
-				// Round position to the nearest integer to avoid floating-point imprecision
-				std::pair<int, int> rounded_position = {
-					static_cast<int>(std::round(position.x / tree_size)) * tree_size,
-					static_cast<int>(std::round(position.y / tree_size)) * tree_size
-				};
-
-				// Ensure the position is not already occupied and does not overlap the lake
-				sf::FloatRect tree_bounds(rounded_position.first, rounded_position.second, tree_size, tree_size);
-				if (!lake_bounds.intersects(tree_bounds) && occupied_positions.find(rounded_position) == occupied_positions.end()) {
-					is_valid = true;
-					occupied_positions.insert(rounded_position);
-				}
-			}
-
-			// Place the tree
-			tree_sprite->setPosition(position);
-			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-		}
-		};
-
-	
-	place_trees(purple_tree_texture, 15);
-	place_trees(green_tree_texture, 15);
-	place_trees(dead_tree_texture, 15);
-
+	BuildTreesFixed(lake_bounds);
 }
 
 //Building trees in a fixed manner - GracieChaudhary
 void World::BuildTreesFixed(sf::FloatRect lake_bounds) {
 
-	//Placing tree sprites
-	sf::Texture& purple_tree_texture = m_textures.Get(TextureID::kPurpleTree);
 	sf::Texture& green_tree_texture = m_textures.Get(TextureID::kGreenTree);
-	sf::Texture& dead_tree_texture = m_textures.Get(TextureID::kDeadTree);
+	const float border_thickness = 64.f;
+	// Tree size and spacing ranges
+	const float min_tree_size = 32.f;  // Minimum tree size
+	const float max_tree_size = 72.f;  // Maximum tree size
+	const float min_tree_spacing = -16.f;  // Minimum spacing between trees
+	const float max_tree_spacing = 4.f;  // Maximum spacing between trees
+	const float max_offset = 10.f;  // Max offset range for natural placement
 
-	// Tree size and spacing
-	const float tree_size = 64.f;
-	const float tree_spacing = -24.f; // Negative for overlapping
-	const float clearing_gap =32.f; // Distance between forest and lake
-	const float border_thickness = 96.f; // Border thickness
+	std::srand(static_cast<unsigned int>(std::time(0)));
 
 	// Lake boundaries
-	float lake_left = lake_bounds.left;
-	float lake_top = lake_bounds.top;
-	float lake_right = lake_bounds.left + lake_bounds.width;
-	float lake_bottom = lake_bounds.top + lake_bounds.height;
+	float lake_left = lake_bounds.left-10;
+	float lake_top = lake_bounds.top-10;
+	float lake_right = lake_bounds.left + lake_bounds.width+10;
+	float lake_bottom = lake_bounds.top + lake_bounds.height+10;
 
-	// Screen boundaries
-	float screen_left = m_world_bounds.left;
-	float screen_top = m_world_bounds.top;
-	float screen_right = m_world_bounds.left + m_world_bounds.width;
-	float screen_bottom = m_world_bounds.top + m_world_bounds.height;
+	//  to generate random offset between -max_offset and +max_offset
+	auto randomOffset = [max_offset]() {
+		return (std::rand() % (static_cast<int>(max_offset * 2 + 1))) - max_offset;
+		};
 
-	// Alternating tree placement
-	bool place_green_tree = true; // Start with a green tree
+	// to generate random tree size between min_tree_size and max_tree_size
+	auto randomTreeSize = [min_tree_size,max_tree_size]() {
+		return min_tree_size + std::rand() % static_cast<int>(max_tree_size - min_tree_size + 1);
+		};
 
+	// to generate random tree spacing between min_tree_spacing and max_tree_spacing
+	auto randomTreeSpacing = [min_tree_spacing, max_tree_spacing]() {
+		return min_tree_spacing + std::rand() % static_cast<int>(max_tree_spacing - min_tree_spacing + 1);
+		};
 
-	//// Top and bottom rows (fill left to right and right to left)
-	//for (float x = lake_left - clearing_gap; x < lake_right + clearing_gap; x += (tree_size + tree_spacing)) {
-	//	// Place top row
-	//	if (x >= m_world_bounds.left && x <= m_world_bounds.left + m_world_bounds.width) {
-	//		std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-	//		tree_sprite->setPosition(x, lake_top - clearing_gap);
-	//		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-	//		// Alternate tree type
-	//		place_green_tree = !place_green_tree;
-	//	}
-	//}
-	//for (float x = lake_left - clearing_gap; x < lake_right + clearing_gap; x += (tree_size + tree_spacing)) {
-	//	// Place bottom row
-	//	if (x >= m_world_bounds.left && x <= m_world_bounds.left + m_world_bounds.width) {
-	//		std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-	//		tree_sprite->setPosition(x, lake_bottom + clearing_gap);
-	//		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-	//		// Alternate tree type
-	//		place_green_tree = !place_green_tree;
-	//	}
-	//}
-	//// Left and right columns (fill top to bottom and bottom to top)
-	//for (float y = lake_top - clearing_gap; y < lake_bottom + clearing_gap; y += (tree_size + tree_spacing)) {
-	//	// Place left column
-	//	if (y >= m_world_bounds.top && y <= m_world_bounds.top + m_world_bounds.height) {
-	//		std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-	//		tree_sprite->setPosition(lake_left - clearing_gap, y);
-	//		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-	//		// Alternate tree type
-	//		place_green_tree = !place_green_tree;
-	//	}
-	//}
-	//for (float y = lake_top - clearing_gap; y < lake_bottom + clearing_gap; y += (tree_size + tree_spacing)) {
-	//	// Place right column
-	//	if (y >= m_world_bounds.top && y <= m_world_bounds.top + m_world_bounds.height) {
-	//		std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-	//		tree_sprite->setPosition(lake_right + clearing_gap, y);
-	//		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-	//		// Alternate tree type
-	//		place_green_tree = !place_green_tree;
-	//	}
-	//}
+	for (float x = lake_left + randomTreeSpacing(); x <= lake_right; x += (randomTreeSize() + randomTreeSpacing())) {
+		float offsetY = randomOffset(); 
+		float tree_size = randomTreeSize(); 
 
-	//// Top and bottom rows (multiple rows with overlapping)
-	//for (float y = -32; y < lake_top + clearing_gap + (tree_size * 4); y += (tree_size + tree_spacing)) {
-	//	for (float x = lake_left - clearing_gap; x < lake_right + clearing_gap; x += (tree_size + tree_spacing)) {
-	//		// Place top row of trees
-	//		if (x >= m_world_bounds.left && x <= m_world_bounds.left + m_world_bounds.width) {
-	//			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-	//			tree_sprite->setPosition(x, y);
-	//			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-	//			// Alternate tree type
-	//			place_green_tree = !place_green_tree;
-	//		}
-	//	}
-	//}
-	//for (float y = lake_bottom + clearing_gap; y < lake_bottom + clearing_gap + (tree_size * 4); y += (tree_size + tree_spacing)) {
-	//	for (float x = lake_left - clearing_gap; x < lake_right + clearing_gap; x += (tree_size + tree_spacing)) {
-	//		// Place bottom row of trees
-	//		if (x >= m_world_bounds.left && x <= m_world_bounds.left + m_world_bounds.width) {
-	//			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-	//			tree_sprite->setPosition(x, y);
-	//			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-	//			// Alternate tree type
-	//			place_green_tree = !place_green_tree;
-	//		}
-	//	}
-	//}
-	//// Left and right columns (multiple columns with overlapping)
-	//for (float x = lake_left - clearing_gap; x < lake_left - clearing_gap + (tree_size * 4); x += (tree_size + tree_spacing)) {
-	//	for (float y = lake_top - clearing_gap; y < lake_bottom + clearing_gap; y += (tree_size + tree_spacing)) {
-	//		// Place left column of trees
-	//		if (y >= m_world_bounds.top && y <= m_world_bounds.top + m_world_bounds.height) {
-	//			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-	//			tree_sprite->setPosition(x, y);
-	//			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-	//			// Alternate tree type
-	//			place_green_tree = !place_green_tree;
-	//		}
-	//	}
-	//}
-	//for (float x = lake_right + clearing_gap; x < lake_right + clearing_gap + (tree_size * 4); x += (tree_size + tree_spacing)) {
-	//	for (float y = lake_top - clearing_gap; y < lake_bottom + clearing_gap; y += (tree_size + tree_spacing)) {
-	//		// Place right column of trees
-	//		if (y >= m_world_bounds.top && y <= m_world_bounds.top + m_world_bounds.height) {
-	//			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-	//			tree_sprite->setPosition(x, y);
-	//			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-	//			// Alternate tree type
-	//			place_green_tree = !place_green_tree;
-	//		}
-	//	}
-	//}
-
-	// Top and bottom rows (multiple rows with overlapping)
-	for (float y = m_world_bounds.top - clearing_gap; y < lake_top - clearing_gap; y += (tree_size + tree_spacing)) {
-		for (float x = m_world_bounds.left + border_thickness; x < m_world_bounds.left + m_world_bounds.width - border_thickness; x += (tree_size + tree_spacing)) {
-			// Place top row of trees (stop just before the lake)
-			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-			tree_sprite->setPosition(x, y);
-			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-			// Alternate tree type
-			place_green_tree = !place_green_tree;
-		}
+		std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(green_tree_texture));
+		tree_sprite->setPosition(x, lake_top - border_thickness + offsetY);
+		tree_sprite->setScale(tree_size / 64.f, tree_size / 64.f);
+		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
 	}
-	for (float y = m_world_bounds.top + m_world_bounds.height; y > lake_bottom + clearing_gap; y -= (tree_size + tree_spacing)) {
-		for (float x = m_world_bounds.left + border_thickness; x < m_world_bounds.left + m_world_bounds.width - border_thickness; x += (tree_size + tree_spacing)) {
-			// Place bottom row of trees (stop just before the lake)
-			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-			tree_sprite->setPosition(x, y);
-			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-			// Alternate tree type
-			place_green_tree = !place_green_tree;
-		}
-	}
-	// Left and right columns (multiple columns with overlapping)
-	for (float x = m_world_bounds.left; x < lake_left - clearing_gap; x += (tree_size + tree_spacing)) {
-		for (float y = m_world_bounds.top; y < m_world_bounds.top + m_world_bounds.height; y += (tree_size + tree_spacing)) {
-			// Place left column of trees (stop just before the lake)
-			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-			tree_sprite->setPosition(x, y);
-			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-			// Alternate tree type
-			place_green_tree = !place_green_tree;
-		}
-	}
-	for (float x = m_world_bounds.left + m_world_bounds.width; x > lake_right + clearing_gap; x -= (tree_size + tree_spacing)) {
-		for (float y = m_world_bounds.top; y < m_world_bounds.top + m_world_bounds.height; y += (tree_size + tree_spacing)) {
-			// Place right column of trees (stop just before the lake)
-			std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(place_green_tree ? green_tree_texture : purple_tree_texture));
-			tree_sprite->setPosition(x, y);
-			m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
-			// Alternate tree type
-			place_green_tree = !place_green_tree;
-		}
-	}
+
 	
+	for (float x = lake_left + randomTreeSpacing(); x <= lake_right; x += (randomTreeSize() + randomTreeSpacing())) {
+		float offsetY = randomOffset(); 
+		float tree_size = randomTreeSize(); 
+
+		std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(green_tree_texture));
+		tree_sprite->setPosition(x, lake_bottom + offsetY);
+		tree_sprite->setScale(tree_size / 64.f, tree_size / 64.f); 
+		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
+	}
+
+	
+	for (float y = lake_top - border_thickness; y <= lake_bottom + border_thickness; y += (randomTreeSize() + randomTreeSpacing())) {
+		float offsetX = randomOffset(); 
+		float tree_size = randomTreeSize(); 
+
+		std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(green_tree_texture));
+		tree_sprite->setPosition(lake_left - border_thickness + offsetX, y);
+		tree_sprite->setScale(tree_size / 64.f, tree_size / 64.f);
+		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
+	}
+
+	
+	for (float y = lake_top - border_thickness; y <= lake_bottom + border_thickness; y += (randomTreeSize() + randomTreeSpacing())) {
+		float offsetX = randomOffset(); 
+		float tree_size = randomTreeSize();  
+
+		std::unique_ptr<SpriteNode> tree_sprite(new SpriteNode(green_tree_texture));
+		tree_sprite->setPosition(lake_right + offsetX, y);
+		tree_sprite->setScale(tree_size / 64.f, tree_size / 64.f); 
+		m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(tree_sprite));
+	}	
 }
 
 
