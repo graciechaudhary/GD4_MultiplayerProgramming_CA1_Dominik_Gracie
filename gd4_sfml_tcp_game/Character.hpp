@@ -54,7 +54,7 @@ public:
 
 	void SetColour(sf::Color colour);
 	
-	void SetImpact(bool is_impacted);
+	void Impacted();
 
 	sf::Color GetColour();
 

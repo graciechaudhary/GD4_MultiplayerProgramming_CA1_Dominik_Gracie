@@ -534,6 +534,10 @@ void Character::WalkDown()
 	UpdateCurrentDirection();
 }
 
+void Character::Impacted() {
+	m_current_animation = CharacterAnimationType::kImpact;
+}
+
 void Character::SetColour(sf::Color colour)
 {
 	m_sprite.setColor(colour);
