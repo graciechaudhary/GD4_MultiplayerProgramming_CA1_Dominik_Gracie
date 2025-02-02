@@ -11,6 +11,7 @@ BloomEffect::BloomEffect()
 	m_shaders.Load(ShaderTypes::kAddPass, "Media/Shaders/Fullpass.vert", "Media/Shaders/Add.frag");
 }
 
+//GracieChaudhary - readjusting bloom affect to suit our game
 void BloomEffect::Apply(const sf::RenderTexture& input, sf::RenderTarget& output)
 {
 	PrepareTextures(input.getSize());

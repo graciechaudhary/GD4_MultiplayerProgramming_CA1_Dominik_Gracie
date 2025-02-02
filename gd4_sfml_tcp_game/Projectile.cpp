@@ -28,6 +28,8 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, bool 
     snow->setPosition(0.f, GetBoundingRect().height / 2.f);
     AttachChild(std::move(snow));
 
+
+    //GracieChaudhary - impact animation for when projectile hits character
     m_impact_animation.SetFrameSize(sf::Vector2i(100, 100));
     m_impact_animation.SetNumFrames(74);
     m_impact_animation.SetDuration(sf::seconds(0.75f));

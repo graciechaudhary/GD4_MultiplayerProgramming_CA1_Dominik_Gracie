@@ -7,6 +7,7 @@
 #include "Character.hpp"
 #include "ParticleType.hpp"
 
+//GracieChaudhary - alloting new textures
 std::vector<CharacterData> InitializeCharacterData()
 {
     std::vector<CharacterData> data(static_cast<int>(CharacterType::kCharacterCount));
@@ -21,7 +22,7 @@ std::vector<CharacterData> InitializeCharacterData()
     return data;
 }
 
-
+//GracieChaudhary - alloting new textures
 std::vector<ProjectileData> InitializeProjectileData()
 {
     std::vector<ProjectileData> data(static_cast<int>(ProjectileType::kProjectileCount));
@@ -32,12 +33,12 @@ std::vector<ProjectileData> InitializeProjectileData()
     return data;
 }
 
+//GracieChaudhary - alloting new textures
 std::vector<PickupData> InitializePickupData()
 {
     std::vector<PickupData> data(static_cast<int>(PickupType::kPickupCount));
 
     data[static_cast<int>(PickupType::kHealthRefill)].m_texture = TextureID::kHealthRefill;
-    //data[static_cast<int>(PickupType::kHealthRefill)].m_texture_rect = sf::IntRect(0, 64, 40, 40);
     data[static_cast<int>(PickupType::kHealthRefill)].m_action = [](Character& a)
         {
             a.Repair(1, a.GetMaxHitpoints());
@@ -52,7 +53,7 @@ std::vector<PickupData> InitializePickupData()
     return data;
 }
 
-//setting up new particle data - GracieChaudhary
+//GracieChaudhary - setting up new particle data
 std::vector<ParticleData> InitializeParticleData()
 {
     std::vector<ParticleData> data(static_cast<int>(ParticleType::kParticleCount));

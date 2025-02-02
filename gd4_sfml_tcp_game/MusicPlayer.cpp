@@ -8,7 +8,7 @@ MusicPlayer::MusicPlayer()
 	m_filenames[MusicThemes::kMenuTheme] = "Media/Music/MenuTheme.ogg";
 	m_filenames[MusicThemes::kMissionTheme] = "Media/Music/MissionTheme.ogg";
 
-	//sfml doesnt support mp3, use audacity to convert if necessary
+	//GracieChaudhary - uploading new music
 	m_filenames[MusicThemes::kMenu] = "MediaFiles/Music/MenuMusic.ogg";
 	m_filenames[MusicThemes::kGame] = "MediaFiles/Music/GameplayMusic.ogg";
 	m_filenames[MusicThemes::kGameOver] = "MediaFiles/Music/GameOverMusic.wav";

@@ -23,8 +23,7 @@ Application::Application() : m_window(sf::VideoMode(1024, 768), "States", sf::St
 	m_textures.Load(TextureID::kButtonActivated, "Media/Textures/ButtonPressed.png");
 	m_textures.Load(TextureID::kButtons, "Media/Textures/Buttons.png");
 
-	//new
-	m_textures.Load(TextureID::kMenuButton, "MediaFiles/Textures/UI/MenuButton.png");
+	//GracieChaudhary - new menu screen
 	m_textures.Load(TextureID::kMenuScreen, "MediaFiles/Textures/Menu/5.png");
 
 	RegisterStates();

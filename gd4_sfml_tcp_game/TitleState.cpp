@@ -7,6 +7,7 @@
 
 TitleState::TitleState(StateStack& stack, Context context) : State(stack, context), m_show_text(true), m_text_effect_time(sf::Time::Zero)
 {
+    //GracieChaudhary - setting up text boxes and background
     sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
     m_background_sprite.setTexture(texture);
     m_background_sprite.setScale(2.f, 2.38f);

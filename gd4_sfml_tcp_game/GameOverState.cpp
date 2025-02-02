@@ -60,6 +60,7 @@ GameOverState::GameOverState(StateStack& stack, Context context)
     Utility::CentreOrigin(m_player_two_records_text);
     m_player_two_records_text.setPosition(0.74f * window_size.x, 0.63 * window_size.y);
    
+    //GracieChaudhary - setting game over music
     context.music->Play(MusicThemes::kGameOver);
 }
 

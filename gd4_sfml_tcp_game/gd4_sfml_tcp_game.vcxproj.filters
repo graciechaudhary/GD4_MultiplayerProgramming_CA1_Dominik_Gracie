@@ -30,7 +30,6 @@
     <ClCompile Include="RGBColour.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="SettingsState.cpp" />
-    <ClCompile Include="ShadowEffect.cpp" />
     <ClCompile Include="SoundNode.cpp" />
     <ClCompile Include="SoundPlayer.cpp" />
     <ClCompile Include="SpriteNode.cpp" />
@@ -42,6 +41,7 @@
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="World.cpp" />
     <ClCompile Include="ResourceNode.cpp" />
+    <ClCompile Include="CharacterAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.hpp" />
@@ -90,7 +90,6 @@
     <ClInclude Include="SceneNode.hpp" />
     <ClInclude Include="SettingsState.hpp" />
     <ClInclude Include="ShaderTypes.hpp" />
-    <ClInclude Include="ShadowEffect.hpp" />
     <ClInclude Include="SoundEffect.hpp" />
     <ClInclude Include="SoundNode.hpp" />
     <ClInclude Include="SoundPlayer.hpp" />
@@ -106,6 +105,8 @@
     <ClInclude Include="Utility.hpp" />
     <ClInclude Include="World.hpp" />
     <ClInclude Include="ResourceNode.hpp" />
+    <ClInclude Include="CharacterAnimationType.hpp" />
+    <ClInclude Include="CharacterAnimation.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ResourceHolder.inl" />

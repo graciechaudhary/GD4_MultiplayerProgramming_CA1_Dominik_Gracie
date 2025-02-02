@@ -28,6 +28,8 @@ private:
 	sf::Sprite m_sprite;
 	bool m_is_player_one;
 	sf::Vector2f m_target_direction;
+
+	//GracieChaudhary
 	Animation m_impact_animation;
 	
 };

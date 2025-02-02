@@ -13,6 +13,7 @@ MenuState::MenuState(StateStack& stack, Context context)
     m_background_sprite.setTexture(texture);
     m_background_sprite.setScale(2.f,2.38f);
    
+    //GracieChaudhary - menu decoration
     m_game_name.setFont(context.fonts->Get(Font::kMain));
     m_game_name.setString("Snowballed");
     m_game_name.setCharacterSize(150);
@@ -52,7 +53,7 @@ MenuState::MenuState(StateStack& stack, Context context)
     m_gui_container.Pack(settings_button);
     m_gui_container.Pack(exit_button);
 
-   
+    //GracieChaudhary - setting new menu music
     context.music->Play(MusicThemes::kMenu);
 }
 

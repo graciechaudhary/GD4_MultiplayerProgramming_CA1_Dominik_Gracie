@@ -141,6 +141,7 @@ void World::LoadTextures()
 
 void World::BuildScene()
 {
+	//GracieChaudhary - cleaning the code
 	InitializeLayers();
 
 	//builds snow landsacpe, adds tree sprite - Gracie Chaudhary

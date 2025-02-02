@@ -11,12 +11,12 @@ enum class SoundEffect
 	kHealthPickup,
 	kButton,
 
-	//game sound effects
+	//GracieChaudhary - game sound effects
 	kSnowballThrow,
 	kSnowballHitPlayer,
 	
 
-	//ui sound effects
+	//GracieChaudhary - ui sound effects
 	kMenuButton,
 	kPauseButton
 

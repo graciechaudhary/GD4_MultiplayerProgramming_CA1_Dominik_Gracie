@@ -45,13 +45,13 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 	m_got_hit_count = 0;
 	m_throw_count = 0;
 
-	//Walking Animation Setup
+	//GracieChaudhary - Walking Animation Setup
 	m_walking.SetFrameSize(sf::Vector2i(38, 42));
 	m_walking.SetNumFrames(4);
 	m_walking.SetDuration(sf::seconds(1.f));
 	m_walking.SetRepeating(true);
 
-	//Attacking Animation Setup
+	//GracieChaudhary - Attacking Animation Setup
 	m_attacking.SetFrameSize(sf::Vector2i(38, 42));
 	m_attacking.SetNumFrames(4);
 	m_attacking.SetDuration(sf::seconds(0.75f));
@@ -249,7 +249,7 @@ void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
 	{
 		m_throw_count++;
-		m_current_animation = CharacterAnimationType::kAttack;
+		m_current_animation = CharacterAnimationType::kAttack; 
 		PlayLocalSound(commands, SoundEffect::kSnowballThrow);
 		commands.Push(m_throw_command);
 		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval /  1.f;		
@@ -267,6 +267,8 @@ void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 	
 }
 
+
+//GracieChaudhary - Implementation of different animations depending on animation type
 void Character::UpdateAnimation(sf::Time dt) {
 
 	if (m_current_animation == CharacterAnimationType::kAttack) {
@@ -282,6 +284,7 @@ void Character::UpdateAnimation(sf::Time dt) {
 	}
 }
 
+//GracieChaudhary - Walking animation being updated depending what way the character is facing
 void Character::UpdateWalkingAnimation(sf::Time dt)
 {
 	if (GetVelocity() == sf::Vector2f(0.f, 0.f))
@@ -293,6 +296,7 @@ void Character::UpdateWalkingAnimation(sf::Time dt)
 		m_walking.Update(dt);
 	}
 
+	//sets respective row of direction facing
 	switch (m_current_direction)
 	{
 		case FacingDirections::kDown: 		m_walking.SetRow(0);		break;
@@ -307,9 +311,12 @@ void Character::UpdateWalkingAnimation(sf::Time dt)
 	m_sprite.setTextureRect(m_walking.GetCurrentTextureRect());
 }
 
+//GracieChaudhary - gets called when character is attacking, varies with character direction
 void Character::UpdateAttackingAnimation(sf::Time dt)
 {	
 	m_attacking.Update(dt);	
+
+	//checks direction and sets appropriate row
 	switch (m_current_direction)
 	{
 	case FacingDirections::kDown:      m_attacking.SetRow(8); break;
@@ -324,17 +331,17 @@ void Character::UpdateAttackingAnimation(sf::Time dt)
 
 	m_sprite.setTextureRect(m_attacking.GetCurrentTextureRect());
 	
+	//sets back walking animation
 	if (m_attacking.GetCurrentFrame() == 3) {
 		m_current_animation = CharacterAnimationType::kWalk;
 		m_attacking.Restart();
 	}
 }
 
-//this method affects the UpdateWalkingAnimation with a blinking effect to display that the character has been hit by a snowball
+//GracieChaudhary - this method affects the UpdateWalkingAnimation with a blinking effect to display that the character has been hit by a snowball
 void Character::UpdateImpactAnimation(sf::Time dt)
 {
-	
-	
+	//Sets back walking animation
 	if (m_current_animation != CharacterAnimationType::kImpact)
 	{
 		m_walking.Update(dt); 
@@ -343,12 +350,14 @@ void Character::UpdateImpactAnimation(sf::Time dt)
 	m_blink_timer += dt;
 	m_impact_timer += dt;
 
+	//hanges between original colour and transparency
 	if (m_blink_timer >= sf::seconds(0.1f))
 	{
 		m_sprite.setColor(m_sprite.getColor() == sf::Color::Transparent ? m_colour : sf::Color::Transparent);
 		m_blink_timer = sf::Time::Zero;
 	}
 
+	//Sets back after impact duration
 	if (m_impact_timer >= m_impact_duration)
 	{
 		m_current_animation = CharacterAnimationType::kWalk; 
@@ -560,6 +569,7 @@ void Character::WalkDown()
 	UpdateCurrentDirection();
 }
 
+//GraacieChaudhary - sets current animation to impact
 void Character::Impacted() {
 	m_current_animation = CharacterAnimationType::kImpact;
 }

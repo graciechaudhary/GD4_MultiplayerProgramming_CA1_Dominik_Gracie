@@ -1,3 +1,5 @@
+//Gracie Chaudhary D00251769  
+//Dominik Hampejs D00250604 
 #include "CharacterAnimation.hpp"
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -96,6 +98,7 @@ sf::FloatRect CharacterAnimation::GetGlobalBounds() const
     return getTransform().transformRect(GetLocalBounds());
 }
 
+//GracieChaudhary - updated method to animate certain row based on our spritesheet
 void CharacterAnimation::Update(sf::Time dt)
 {
 
@@ -120,9 +123,10 @@ void CharacterAnimation::Update(sf::Time dt)
 
 }
 
+//GracieChaudhary - New function to update the current row (direction)
 void CharacterAnimation::SetRow(int row)
 {
-    m_row = row;  // New function to update the current row (direction)
+    m_row = row;  
 }
 
 sf::IntRect CharacterAnimation::GetCurrentTextureRect() const
@@ -141,6 +145,7 @@ void CharacterAnimation::draw(sf::RenderTarget& target, sf::RenderStates states)
     states.transform *= getTransform();
     target.draw(m_sprite, states);
 }
+
 
 std::size_t CharacterAnimation::GetCurrentFrame()
 {

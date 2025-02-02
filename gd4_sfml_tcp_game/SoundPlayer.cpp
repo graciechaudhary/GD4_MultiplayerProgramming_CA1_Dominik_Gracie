@@ -21,6 +21,7 @@ namespace
 
 SoundPlayer::SoundPlayer()
 {
+	//GracieChaudhary - alloting new sound files
 	m_sound_buffers.Load(SoundEffect::kExplosion1, "MediaFiles/Sound/ExplosionEffectV1.wav");
 	m_sound_buffers.Load(SoundEffect::kExplosion2, "MediaFiles/Sound/ExplosionEffectV2.wav");
 

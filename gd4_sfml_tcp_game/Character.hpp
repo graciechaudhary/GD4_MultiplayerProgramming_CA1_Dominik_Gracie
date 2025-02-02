@@ -65,6 +65,8 @@ private:
 	void CheckProjectileLaunch(sf::Time dt, CommandQueue& commands);
 
 	void UpdateAnimation(sf::Time dt);
+
+	//GracieChaudhary - methods to implement character animations
 	void UpdateWalkingAnimation(sf::Time dt);
 	void UpdateAttackingAnimation(sf::Time dt);
 	void UpdateImpactAnimation(sf::Time dt);
@@ -75,6 +77,8 @@ private:
 	CharacterType m_type;
 	sf::Sprite m_sprite;
 	Animation m_explosion;
+
+	//GracieChaudhary - new variables for character animation
 	CharacterAnimationType m_current_animation;
 	CharacterAnimation m_walking;
 	CharacterAnimation m_attacking;
@@ -100,8 +104,10 @@ private:
 	bool m_is_walking_down;
 
 	FacingDirections m_current_direction;
-
+		
 	sf::Time m_clear_flags_time;
+
+	//GracieChaudhary - new variables for impact animation
 	sf::Time m_blink_timer;
 	sf::Time m_impact_timer;
 	sf::Time m_impact_duration;
