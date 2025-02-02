@@ -8,23 +8,26 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 	: State(stack, context)
 	, m_gui_container(true)
 {
+	m_background_sprite.setTexture(context.textures->Get(TextureID::kMenuScreen));
+	m_background_sprite.setScale(2.f, 2.38f);
+
 	//Build key binding buttons and labels
-	AddButtonLabel(Action::kMoveUp, 50.f, "Move Up", context);
-	AddButtonLabel(Action::kMoveDown, 100.f, "Move Down", context);
-	AddButtonLabel(Action::kMoveRight, 150.f, "Move Right", context);
-	AddButtonLabel(Action::kMoveLeft, 200.f, "Move Left", context);
-	AddButtonLabel(Action::kBulletFire, 250.f, "Throw", context);
-	AddButtonLabel(Action::kMoveUp2, 300.f, "Move Up 2", context);
-	AddButtonLabel(Action::kMoveDown2, 350.f, "Move Down 2", context);
-	AddButtonLabel(Action::kMoveRight2, 400.f, "Move Right 2", context);
-	AddButtonLabel(Action::kMoveLeft2, 450.f, "Move Left 2", context);
-	AddButtonLabel(Action::kThrow2, 500.f, "Throw 2", context);
+	AddButtonLabel(Action::kMoveUp, 100.f, "Move Up", context);
+	AddButtonLabel(Action::kMoveDown, 150.f, "Move Down", context);
+	AddButtonLabel(Action::kMoveRight, 200.f, "Move Right", context);
+	AddButtonLabel(Action::kMoveLeft, 250.f, "Move Left", context);
+	AddButtonLabel(Action::kBulletFire, 300.f, "Throw", context);
+	AddButtonLabel(Action::kMoveUp2, 350.f, "Move Up 2", context);
+	AddButtonLabel(Action::kMoveDown2, 400.f, "Move Down 2", context);
+	AddButtonLabel(Action::kMoveRight2, 450.f, "Move Right 2", context);
+	AddButtonLabel(Action::kMoveLeft2, 500.f, "Move Left 2", context);
+	AddButtonLabel(Action::kThrow2, 550.f, "Throw 2", context);
 
 
 	UpdateLabels();
 
 	auto back_button = std::make_shared<gui::Button>(context);
-	back_button->setPosition(80.f, 550.f);
+	back_button->setPosition(390.f, 620.f);
 	back_button->SetText("Back");
 	back_button->SetCallback(std::bind(&SettingsState::RequestStackPop, this));
 	m_gui_container.Pack(back_button);
@@ -86,12 +89,12 @@ void SettingsState::UpdateLabels()
 void SettingsState::AddButtonLabel(Action action, float y, const std::string& text, Context context)
 {
 	m_binding_buttons[static_cast<int>(action)] = std::make_shared<gui::Button>(context);
-	m_binding_buttons[static_cast<int>(action)]->setPosition(80.f, y);
+	m_binding_buttons[static_cast<int>(action)]->setPosition(390.f, y);
 	m_binding_buttons[static_cast<int>(action)]->SetText(text);
 	m_binding_buttons[static_cast<int>(action)]->SetToggle(true);
 
 	m_binding_labels[static_cast<int>(action)] = std::make_shared<gui::Label>("", *context.fonts);
-	m_binding_labels[static_cast<int>(action)]->setPosition(300.f, y + 15.f);
+	m_binding_labels[static_cast<int>(action)]->setPosition(620.f, y + 15.f);
 
 	m_gui_container.Pack(m_binding_buttons[static_cast<int>(action)]);
 	m_gui_container.Pack(m_binding_labels[static_cast<int>(action)]);
