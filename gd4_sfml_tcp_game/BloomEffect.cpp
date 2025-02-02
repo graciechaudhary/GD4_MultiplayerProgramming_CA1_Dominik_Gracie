@@ -20,8 +20,8 @@ void BloomEffect::Apply(const sf::RenderTexture& input, sf::RenderTarget& output
 	Downsample(m_brightness_texture, m_firstpass_textures[0]);
 	BlurMultipass(m_firstpass_textures);
 
-	Downsample(m_firstpass_textures[0], m_secondpass_textures[0]);
-	BlurMultipass(m_secondpass_textures);
+	//Downsample(m_firstpass_textures[0], m_secondpass_textures[0]);
+	//BlurMultipass(m_secondpass_textures);
 
 	Add(m_firstpass_textures[0], m_secondpass_textures[0], m_firstpass_textures[1]);
 	m_firstpass_textures[1].display();

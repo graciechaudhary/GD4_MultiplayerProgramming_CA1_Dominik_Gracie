@@ -67,24 +67,24 @@ void World::Update(sf::Time dt)
 
 void World::Draw()
 {
-	//if (PostEffect::IsSupported())
-	//{
-	//	m_scene_texture.clear();
-	//	m_scene_texture.setView(m_camera);
-	//	m_scene_texture.draw(m_scenegraph);
-	//	m_scene_texture.display();
-	//	m_bloom_effect.Apply(m_scene_texture, m_target);
-	//	//m_shadow_effect.Apply(m_scene_texture, m_target);
+	if (PostEffect::IsSupported())
+	{
+		m_scene_texture.clear();
+		m_scene_texture.setView(m_camera);
+		m_scene_texture.draw(m_scenegraph);
+		m_scene_texture.display();
+		m_bloom_effect.Apply(m_scene_texture, m_target);
+		//m_shadow_effect.Apply(m_scene_texture, m_target);
 
-	//}
-	//else
-	//{
-	//	m_target.setView(m_camera);
-	//	m_target.draw(m_scenegraph);
-	//}
+	}
+	else
+	{
+		m_target.setView(m_camera);
+		m_target.draw(m_scenegraph);
+	}
 
-	m_target.setView(m_camera);
-	m_target.draw(m_scenegraph);
+	/*m_target.setView(m_camera);
+	m_target.draw(m_scenegraph);*/
 }
 
 CommandQueue& World::GetCommandQueue()
