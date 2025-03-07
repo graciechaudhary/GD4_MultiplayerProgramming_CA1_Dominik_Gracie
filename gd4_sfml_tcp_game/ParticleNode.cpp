@@ -12,7 +12,7 @@ namespace
     const std::vector<ParticleData> Table = InitializeParticleData();
 }
 
-ParticleNode::ParticleNode(ParticleType type, const TextureHolder& textures, bool is_player_one)
+ParticleNode::ParticleNode(ParticleType type, const TextureHolder& textures, int identifier)
     : SceneNode()
     , m_texture(textures.Get(TextureID::kParticle))
     , m_type(type)
@@ -20,7 +20,7 @@ ParticleNode::ParticleNode(ParticleType type, const TextureHolder& textures, boo
     /*fixed particle system glitch: as we were using four vertices in the ComputeVertices method but a triangular vertex array the fourth vertex 
     would attach to the first vertex of the next particle which was fixed with using quads - GracieChaudhary*/
     , m_needs_vertex_update(true)
-	, m_is_player_one(is_player_one)
+	, m_identifier(identifier)
 {
 	m_color = Table[static_cast<int>(type)].m_color;
 }
@@ -117,7 +117,9 @@ void ParticleNode::SetColor(sf::Color color)
 }
 
 //Dominik Hampejs D00250604
-bool ParticleNode::IsPlayerOne() const
+int ParticleNode::GetIdentifier() const
 {
-    return m_is_player_one;
+    return m_identifier;
 }
+
+

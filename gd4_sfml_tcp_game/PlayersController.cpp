@@ -141,11 +141,11 @@ PlayersController::PlayersController() : m_current_game_status(GameStatus::kGame
 
         if (first_player)
         {
-            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayerOne);
+            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayer);
 		}
         else
         {
-            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayerTwo);
+            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayer);
         }
 
     }
@@ -326,20 +326,26 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
     }
 	//Player one colour command
     Command set_colour_one;
-    set_colour_one.category = static_cast<int>(ReceiverCategories::kPlayerOne);
+    set_colour_one.category = static_cast<int>(ReceiverCategories::kPlayer);
     set_colour_one.action = [this](SceneNode& node, sf::Time)
         {
             Character& character = static_cast<Character&>(node);
-            character.SetColour(m_colour_one->GetColour());
+			if (character.GetIdentifier() == 1)
+			{
+				character.SetColour(m_colour_one->GetColour());
+			}
         };
 
 	//Player two colour command
     Command set_colour_two;
-    set_colour_two.category = static_cast<int>(ReceiverCategories::kPlayerTwo);
+    set_colour_two.category = static_cast<int>(ReceiverCategories::kPlayer);
     set_colour_two.action = [this](SceneNode& node, sf::Time)
         {
             Character& character = static_cast<Character&>(node);
-            character.SetColour(m_colour_two->GetColour());
+            if (character.GetIdentifier() == 2)
+            {
+                character.SetColour(m_colour_two->GetColour());
+            }
         };
 
 	//Particle colour for player one snowball particles command
@@ -348,7 +354,7 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
 	set_particle_colour_one.action = [this](SceneNode& node, sf::Time)
 		{
 			ParticleNode& particle = static_cast<ParticleNode&>(node);
-            if (particle.IsPlayerOne())
+            if (particle.GetIdentifier() == 2)
             {
                 particle.SetColor(m_colour_one->GetColour());
             }
@@ -360,7 +366,7 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
 	set_particle_colour_two.action = [this](SceneNode& node, sf::Time)
 		{
 			ParticleNode& particle = static_cast<ParticleNode&>(node);
-			if (!particle.IsPlayerOne())
+			if (particle.GetIdentifier() == 2)
 			{
 				particle.SetColor(m_colour_two->GetColour());
 			}

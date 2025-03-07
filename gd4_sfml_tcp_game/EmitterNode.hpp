@@ -8,7 +8,7 @@
 class EmitterNode : public SceneNode
 {
 public:
-	explicit EmitterNode(ParticleType type);
+	explicit EmitterNode(ParticleType type, int identifier);
 
 private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands);
@@ -18,5 +18,6 @@ private:
 	sf::Time m_accumulated_time;
 	ParticleType m_type;
 	ParticleNode* m_particle_system;
+	int m_identifier;
 };
 

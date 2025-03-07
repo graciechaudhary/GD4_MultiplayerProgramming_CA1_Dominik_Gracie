@@ -12,19 +12,19 @@ namespace
     const std::vector<ProjectileData> Table = InitializeProjectileData();
 }
 
-Projectile::Projectile(ProjectileType type, const TextureHolder& textures, bool is_player_one)
+Projectile::Projectile(ProjectileType type, const TextureHolder& textures, int identifier)
 	: Entity(1)
     , m_type(type)
     , m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
-    , m_is_player_one(is_player_one)
+	, m_identifier(identifier)
     , m_impact_animation(textures.Get(TextureID::kImpact))
 {
     Utility::CentreOrigin(m_sprite);    
 
-	ParticleType particle_type = is_player_one ? ParticleType::kSnowOne : ParticleType::kSnowTwo;
+    ParticleType particle_type = ParticleType::kSnow;
 
     //particle system for snow
-    std::unique_ptr<EmitterNode> snow(new EmitterNode(particle_type));
+    std::unique_ptr<EmitterNode> snow(new EmitterNode(particle_type, m_identifier));
     snow->setPosition(0.f, GetBoundingRect().height / 2.f);
     AttachChild(std::move(snow));
 
@@ -43,14 +43,7 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, bool 
 
 unsigned int Projectile::GetCategory() const
 {
-    if (m_is_player_one)
-    {
-        return static_cast<int>(ReceiverCategories::kPlayerOneProjectile);
-        
-    }
-    else
-        return static_cast<int>(ReceiverCategories::kPlayerTwoProjectile);
-        
+    return static_cast<int>(ReceiverCategories::kProjectile);       
 }
  
 sf::FloatRect Projectile::GetBoundingRect() const

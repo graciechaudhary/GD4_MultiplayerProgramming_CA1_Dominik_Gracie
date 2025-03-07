@@ -148,24 +148,24 @@ void World::BuildScene()
 	BuildSnowLandscape();	
 
 	//Add the player's aircraft
-	std::unique_ptr<Character> leader(new Character(CharacterType::kDefault, m_textures, m_fonts, true));
+	std::unique_ptr<Character> leader(new Character(false, 1 , m_textures, m_fonts));
 	m_character_one = leader.get();
 	m_character_one->setPosition(m_centre_position.x - 230, m_centre_position.y);
 	m_character_one->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 	
 
-	std::unique_ptr<Character> second(new Character(CharacterType::kDefault, m_textures, m_fonts, false));
+	std::unique_ptr<Character> second(new Character(false, 2, m_textures, m_fonts));
 	m_character_two = second.get();
 	m_character_two->setPosition(m_centre_position.x + 220, m_centre_position.y);
 	m_character_two->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(second));
 
 	
-	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnowOne, m_textures,true));
+	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures, 1));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
 
-	std::unique_ptr<ParticleNode> snowNodeTwo(new ParticleNode(ParticleType::kSnowTwo, m_textures, false));
+	std::unique_ptr<ParticleNode> snowNodeTwo(new ParticleNode(ParticleType::kSnow, m_textures, 2));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNodeTwo));
 
 
@@ -381,7 +381,7 @@ void World::HandleCollisions()
 	for (SceneNode::Pair pair : collision_pairs)
 	{
 		//On player on player collision make them bounce of each other
-		if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPlayerTwo))
+		if (MatchesCategories(pair, ReceiverCategories::kPlayer, ReceiverCategories::kPlayer))
 		{
 			auto& player_one = static_cast<Character&>(*pair.first);
 			auto& playuer_two = static_cast<Character&>(*pair.second);
@@ -410,7 +410,7 @@ void World::HandleCollisions()
 			player_one.PlayLocalSound(m_command_queue, SoundEffect::kExplosion2);
 		}
 		//Pickup and apply pickup
-		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPickup) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPickup))
+		else if (MatchesCategories(pair, ReceiverCategories::kPlayer, ReceiverCategories::kPickup))
 		{
 			auto& player = static_cast<Character&>(*pair.first);
 			auto& pickup = static_cast<Pickup&>(*pair.second);
@@ -422,7 +422,7 @@ void World::HandleCollisions()
 			player.PlayLocalSound(m_command_queue, pickupSoundEffect);
 		}
 		//On player snowball collision do damage and push player, and destroy snowball
-		else if (MatchesCategories(pair, ReceiverCategories::kPlayerOne, ReceiverCategories::kPlayerTwoProjectile) || MatchesCategories(pair, ReceiverCategories::kPlayerTwo, ReceiverCategories::kPlayerOneProjectile))
+		else if (MatchesCategories(pair, ReceiverCategories::kPlayer, ReceiverCategories::kProjectile))
 		{
 			auto& character = static_cast<Character&>(*pair.first);
 			auto& projectile = static_cast<Projectile&>(*pair.second);

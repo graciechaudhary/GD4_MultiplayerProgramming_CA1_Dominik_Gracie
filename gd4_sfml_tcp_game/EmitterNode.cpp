@@ -3,11 +3,12 @@
 #include "EmitterNode.hpp"
 #include <iostream>
 
-EmitterNode::EmitterNode(ParticleType type)
+EmitterNode::EmitterNode(ParticleType type, int identifier)
 	:SceneNode()
 	, m_accumulated_time(sf::Time::Zero)
 	, m_type(type)
 	, m_particle_system(nullptr)
+	, m_identifier(identifier)
 {
 }
 
@@ -23,7 +24,7 @@ void EmitterNode::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		// Find particle node with the same type as the emitter
 		auto finder = [this](ParticleNode& container, sf::Time)
 			{
-				if (container.GetParticleType() == m_type)
+				if (container.GetParticleType() == m_type && container.GetIdentifier() == m_identifier)
 					m_particle_system = &container;
 			};
 		Command command;
