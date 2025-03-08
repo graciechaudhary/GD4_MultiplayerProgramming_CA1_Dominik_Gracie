@@ -16,12 +16,7 @@ SettingsState::SettingsState(StateStack& stack, Context context)
 	AddButtonLabel(Action::kMoveDown, 150.f, "Move Down", context);
 	AddButtonLabel(Action::kMoveRight, 200.f, "Move Right", context);
 	AddButtonLabel(Action::kMoveLeft, 250.f, "Move Left", context);
-	AddButtonLabel(Action::kBulletFire, 300.f, "Throw", context);
-	AddButtonLabel(Action::kMoveUp2, 350.f, "Move Up 2", context);
-	AddButtonLabel(Action::kMoveDown2, 400.f, "Move Down 2", context);
-	AddButtonLabel(Action::kMoveRight2, 450.f, "Move Right 2", context);
-	AddButtonLabel(Action::kMoveLeft2, 500.f, "Move Left 2", context);
-	AddButtonLabel(Action::kThrow2, 550.f, "Throw 2", context);
+	AddButtonLabel(Action::kThrow, 300.f, "Throw", context);
 
 
 	UpdateLabels();

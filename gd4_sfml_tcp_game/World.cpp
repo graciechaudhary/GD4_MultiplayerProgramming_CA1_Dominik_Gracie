@@ -20,7 +20,6 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	,m_scene_layers()
 	,m_world_bounds(0.f,0.f, m_camera.getSize().x, m_camera.getSize().y)
 	,m_centre_position(m_camera.getSize().x/2.f, m_camera.getSize().y/2.f)
-	,m_scrollspeed(-50.f)
 	,m_character_one(nullptr)
 	, m_time_since_last_drop(sf::Time::Zero)
 	, m_pickup_drop_interval(sf::seconds(5.f))
@@ -41,10 +40,6 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 
 void World::Update(sf::Time dt)
 {
-	//Clear buttons pressed to handle SMFL issue with detecting what buttons are actually pressed
-	m_character_one->ClearWalkingFlags(dt);
-	m_character_two->ClearWalkingFlags(dt);
-
 	DestroyEntitiesOutsideView();
 	CheckPickupDrop(dt);
 	
@@ -101,18 +96,18 @@ bool World::HasAlivePlayerOne() const
 //Dominik Hampejs D00250604
 bool World::HasAlivePlayerTwo() const
 {
-	return !m_character_two->IsMarkedForRemoval();
+	return true;//!m_character_two->IsMarkedForRemoval();
 }
 
 //Dominik Hampejs D00250604
 //Return statistic about the game
 GameRecords World::GetGameRecords() const
 {
-	GameRecords records;
-	records.player_one_hit = m_character_two->GetGotHitCount();
-	records.player_one_throw = m_character_one->GetThrowCount();
-	records.player_two_hit = m_character_one->GetGotHitCount();
-	records.player_two_throw = m_character_two->GetThrowCount();
+	GameRecords records{};
+	records.player_one_hit = 1;
+	records.player_one_throw = 1;
+	records.player_two_hit = 1;
+	records.player_two_throw = 1;
 	return records;
 }
 
@@ -155,19 +150,15 @@ void World::BuildScene()
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 	
 
-	std::unique_ptr<Character> second(new Character(false, 2, m_textures, m_fonts));
+	/*std::unique_ptr<Character> second(new Character(false, 2, m_textures, m_fonts));
 	m_character_two = second.get();
 	m_character_two->setPosition(m_centre_position.x + 220, m_centre_position.y);
 	m_character_two->SetVelocity(0, 0);
-	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(second));
+	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(second));*/
 
 	
 	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures, 1));
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
-
-	std::unique_ptr<ParticleNode> snowNodeTwo(new ParticleNode(ParticleType::kSnow, m_textures, 2));
-	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNodeTwo));
-
 
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
@@ -299,15 +290,16 @@ void World::AdaptPlayerPosition()
 	sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
 
 	m_character_one->HandleBorderInteraction(view_bounds);
-	m_character_two->HandleBorderInteraction(view_bounds);
 
 }
 
 void World::AdaptPlayerVelocity()
 {
 
-	m_character_one->HandleSliding();
-	m_character_two->HandleSliding();
+	//m_character_one->HandleSliding();
+	//m_character_two->HandleSliding();
+	// 
+	// 
 	////If they are moving diagonally divide by sqrt 2
 	//if (velocity.x != 0.f && velocity.y != 0.f)
 	//{

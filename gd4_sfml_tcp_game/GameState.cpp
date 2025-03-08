@@ -30,12 +30,12 @@ bool GameState::Update(sf::Time dt)
 		m_players_controller.SetGameStatus(GameStatus::kPlayerTwoWin);
 		RequestStackPush(StateID::kGameOver);
 	}
-	else if(!m_world.HasAlivePlayerTwo())
-	{ 
-		m_players_controller.m_game_records = m_world.GetGameRecords();
-		m_players_controller.SetGameStatus(GameStatus::kPlayerOneWin);
-		RequestStackPush(StateID::kGameOver);
-	}
+	//else if(!m_world.HasAlivePlayerTwo())
+	//{ 
+	//	m_players_controller.m_game_records = m_world.GetGameRecords();
+	//	m_players_controller.SetGameStatus(GameStatus::kPlayerOneWin);
+	//	RequestStackPush(StateID::kGameOver);
+	//}
 	CommandQueue& commands = m_world.GetCommandQueue();
 	m_players_controller.HandleRealTimeInput(commands);
 	m_players_controller.HandleControllerInput(commands);

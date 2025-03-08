@@ -32,7 +32,7 @@ public:
 	sf::Keyboard::Key GetAssignedKey(Action action) const;
 	void SetGameStatus(GameStatus status);
 	GameStatus GetGameStatus() const;
-	void SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two);
+	void SetPlayersColours(RGBColourPtr colour_one);
 
 	void UpdateColours(CommandQueue& command_queue);
 
@@ -49,7 +49,6 @@ private:
 	GameStatus m_current_game_status;
 
 	std::unique_ptr<RGBColour> m_colour_one;
-	std::unique_ptr<RGBColour> m_colour_two;
 
 	bool m_should_update_colours;
 };

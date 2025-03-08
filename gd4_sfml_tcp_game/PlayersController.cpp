@@ -121,33 +121,15 @@ PlayersController::PlayersController() : m_current_game_status(GameStatus::kGame
     m_key_binding[sf::Keyboard::D] = Action::kMoveRight;
     m_key_binding[sf::Keyboard::W] = Action::kMoveUp;
     m_key_binding[sf::Keyboard::S] = Action::kMoveDown;
-    m_key_binding[sf::Keyboard::Space] = Action::kBulletFire;
-	m_key_binding[sf::Keyboard::Left] = Action::kMoveLeft2;
-	m_key_binding[sf::Keyboard::Right] = Action::kMoveRight2;
-	m_key_binding[sf::Keyboard::Up] = Action::kMoveUp2;
-	m_key_binding[sf::Keyboard::Down] = Action::kMoveDown2;
-	m_key_binding[sf::Keyboard::RShift] = Action::kThrow2;
+    m_key_binding[sf::Keyboard::Space] = Action::kThrow;
     
     //Set initial action bindings
     InitialiseActions();
 
-
-	bool first_player = true;
-
 	//Assign categories to the actions for the players
     for (auto& pair : m_action_binding)
     {
-        if (pair.first == Action::kMoveLeft2) first_player = false;
-
-        if (first_player)
-        {
-            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayer);
-		}
-        else
-        {
-            pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayer);
-        }
-
+        pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayer);
     }
 }
 
@@ -181,7 +163,7 @@ void PlayersController::HandleControllerInput(CommandQueue& command_queue) {
     if (sf::Joystick::isConnected(0)) {
 		if (sf::Joystick::isButtonPressed(0, 0)) //If button A is pressed
         {
-			command_queue.Push(m_action_binding[Action::kBulletFire]);
+			command_queue.Push(m_action_binding[Action::kThrow]);
         }
 		if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) < -50) //If stick is moved to the left
         {
@@ -199,28 +181,6 @@ void PlayersController::HandleControllerInput(CommandQueue& command_queue) {
 		{
 			command_queue.Push(m_action_binding[Action::kMoveDown]);
 		}
-    }
-    if (sf::Joystick::isConnected(1)) {
-		if (sf::Joystick::isButtonPressed(1, 0)) //If button A is pressed
-        {
-            command_queue.Push(m_action_binding[Action::kThrow2]);
-        }
-		if (sf::Joystick::getAxisPosition(1, sf::Joystick::X) < -50) //If stick is moved to the left
-        {
-            command_queue.Push(m_action_binding[Action::kMoveLeft2]);
-        }
-		if (sf::Joystick::getAxisPosition(1, sf::Joystick::X) > 50) //If stick is moved to the right
-        {
-            command_queue.Push(m_action_binding[Action::kMoveRight2]);
-        }
-		if (sf::Joystick::getAxisPosition(1, sf::Joystick::Y) < -50) //If stick is moved up
-        {
-            command_queue.Push(m_action_binding[Action::kMoveUp2]);
-        }
-		if (sf::Joystick::getAxisPosition(1, sf::Joystick::Y) > 50) //If stick is moved down
-        {
-            command_queue.Push(m_action_binding[Action::kMoveDown2]);
-        }
     }
 }
 
@@ -264,10 +224,9 @@ GameStatus PlayersController::GetGameStatus() const
 }
 
 //Dominik Hampejs D00250604
-void PlayersController::SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two)
+void PlayersController::SetPlayersColours(RGBColourPtr colour_one)
 {
 	m_colour_one = std::move(colour_one);
-	m_colour_two = std::move(colour_two);
 	m_should_update_colours = true;
 }
 
@@ -279,21 +238,11 @@ void PlayersController::InitialiseActions()
     m_action_binding[Action::kMoveRight].action = DerivedAction<Character>(CharacterMover(Direction::kRight));
     m_action_binding[Action::kMoveUp].action = DerivedAction<Character>(CharacterMover(Direction::kUp));
     m_action_binding[Action::kMoveDown].action = DerivedAction<Character>(CharacterMover(Direction::kDown));
-    m_action_binding[Action::kBulletFire].action = DerivedAction<Character>([](Character& a, sf::Time dt)
+    m_action_binding[Action::kThrow].action = DerivedAction<Character>([](Character& a, sf::Time dt)
         {
             a.Throw();
         }
     );
-
-	m_action_binding[Action::kMoveLeft2].action = DerivedAction<Character>(CharacterMover(Direction::kLeft));
-	m_action_binding[Action::kMoveRight2].action = DerivedAction<Character>(CharacterMover(Direction::kRight));
-	m_action_binding[Action::kMoveUp2].action = DerivedAction<Character>(CharacterMover(Direction::kUp));
-	m_action_binding[Action::kMoveDown2].action = DerivedAction<Character>(CharacterMover(Direction::kDown));
-	m_action_binding[Action::kThrow2].action = DerivedAction<Character>([](Character& a, sf::Time dt)
-		{
-			a.Throw();
-		}
-	);
 }
 
 bool PlayersController::IsRealTimeAction(Action action)
@@ -304,12 +253,7 @@ bool PlayersController::IsRealTimeAction(Action action)
     case Action::kMoveRight:
     case Action::kMoveDown:
     case Action::kMoveUp:
-    case Action::kBulletFire:
-	case Action::kMoveLeft2:
-	case Action::kMoveRight2:
-	case Action::kMoveDown2:
-	case Action::kMoveUp2:
-    case Action::kThrow2:
+    case Action::kThrow:
         return true;
     default:
         return false;
@@ -336,45 +280,19 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
 			}
         };
 
-	//Player two colour command
-    Command set_colour_two;
-    set_colour_two.category = static_cast<int>(ReceiverCategories::kPlayer);
-    set_colour_two.action = [this](SceneNode& node, sf::Time)
-        {
-            Character& character = static_cast<Character&>(node);
-            if (character.GetIdentifier() == 2)
-            {
-                character.SetColour(m_colour_two->GetColour());
-            }
-        };
-
 	//Particle colour for player one snowball particles command
 	Command set_particle_colour_one;
 	set_particle_colour_one.category = static_cast<int>(ReceiverCategories::kParticleSystem);
 	set_particle_colour_one.action = [this](SceneNode& node, sf::Time)
 		{
 			ParticleNode& particle = static_cast<ParticleNode&>(node);
-            if (particle.GetIdentifier() == 2)
+            if (particle.GetIdentifier() == 1)
             {
                 particle.SetColor(m_colour_one->GetColour());
             }
 		};
 
-	//Particle colour for player two snowball particles command
-	Command set_particle_colour_two;
-	set_particle_colour_two.category = static_cast<int>(ReceiverCategories::kParticleSystem);
-	set_particle_colour_two.action = [this](SceneNode& node, sf::Time)
-		{
-			ParticleNode& particle = static_cast<ParticleNode&>(node);
-			if (particle.GetIdentifier() == 2)
-			{
-				particle.SetColor(m_colour_two->GetColour());
-			}
-		};
-
     command_queue.Push(set_colour_one);
-    command_queue.Push(set_colour_two);
 	command_queue.Push(set_particle_colour_one);
-	command_queue.Push(set_particle_colour_two);
 	m_should_update_colours = false;
 }
