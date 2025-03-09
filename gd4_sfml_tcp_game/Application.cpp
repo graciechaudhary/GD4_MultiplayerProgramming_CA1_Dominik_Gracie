@@ -9,6 +9,8 @@
 #include "GameOverState.hpp"
 #include "PreGameState.hpp"
 
+#include "MultiplayerState.hpp"
+
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/60.f);
 
 Application::Application() : m_window(sf::VideoMode(1024, 768), "States", sf::Style::Close)
@@ -85,6 +87,8 @@ void Application::RegisterStates()
 	m_stack.RegisterState<MenuState>(StateID::kMenu);
 	m_stack.RegisterState<PreGameState>(StateID::kPreGame);
 	m_stack.RegisterState<GameState>(StateID::kGame);
+	m_stack.RegisterState<MultiplayerState>(StateID::kHostGame, true);
+	m_stack.RegisterState<MultiplayerState>(StateID::kJoinGame, false);
 	m_stack.RegisterState<PauseState>(StateID::kPause);
 	m_stack.RegisterState<SettingsState>(StateID::kSettings);
 	m_stack.RegisterState<GameOverState>(StateID::kGameOver);
