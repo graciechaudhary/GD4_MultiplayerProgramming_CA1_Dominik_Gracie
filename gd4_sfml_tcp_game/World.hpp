@@ -74,7 +74,7 @@ private:
 	std::array<SceneNode*, static_cast<int>(SceneLayers::kLayerCount)> m_scene_layers;
 	sf::FloatRect m_world_bounds;
 	sf::Vector2f m_centre_position;
-	Character* m_character_one;
+
 
 	CommandQueue m_command_queue;
 
@@ -89,6 +89,9 @@ private:
 
 	BloomEffect m_bloom_effect;
 
+	bool m_is_server;
+
+	Character* m_character_one;
 	
 };
 

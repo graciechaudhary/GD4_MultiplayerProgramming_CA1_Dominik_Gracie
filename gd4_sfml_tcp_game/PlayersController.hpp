@@ -37,7 +37,6 @@ public:
 	void UpdateColours(CommandQueue& command_queue);
 
 	GameRecords m_game_records;
-
 private:
 	void InitialiseActions();
 	static bool IsRealTimeAction(Action action);

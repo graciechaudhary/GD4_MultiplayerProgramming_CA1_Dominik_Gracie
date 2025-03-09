@@ -25,6 +25,7 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 	, m_pickup_drop_interval(sf::seconds(5.f))
 	, m_max_pickups(3)
 	, m_pickups_spawned(0)
+	, m_is_server(false)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -40,44 +41,49 @@ World::World(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sou
 
 void World::Update(sf::Time dt)
 {
-	DestroyEntitiesOutsideView();
-	CheckPickupDrop(dt);
-	
-	//Forward commands to the scenegraph
-	while (!m_command_queue.IsEmpty())
+	if (m_is_server)
 	{
-		m_scenegraph.OnCommand(m_command_queue.Pop(), dt);
+		DestroyEntitiesOutsideView();
+		CheckPickupDrop(dt);
+
+		//Forward commands to the scenegraph
+		while (!m_command_queue.IsEmpty())
+		{
+			m_scenegraph.OnCommand(m_command_queue.Pop(), dt);
+		}
+
+		AdaptPlayerVelocity();
+
+		HandleCollisions();
+
+		m_scenegraph.RemoveWrecks();
+
+
+		m_scenegraph.Update(dt, m_command_queue);
+		AdaptPlayerPosition();
 	}
-
-	AdaptPlayerVelocity();
-
-	HandleCollisions();
-
-	m_scenegraph.RemoveWrecks();
-
-
-	m_scenegraph.Update(dt, m_command_queue);
-	AdaptPlayerPosition();
 }
 
 void World::Draw()
 {
-	if (PostEffect::IsSupported())
+	if (!m_is_server)
 	{
-		m_scene_texture.clear();
-		m_scene_texture.setView(m_camera);
-		m_scene_texture.draw(m_scenegraph);
-		m_scene_texture.display();
-		m_bloom_effect.Apply(m_scene_texture, m_target);
-		//m_shadow_effect.Apply(m_scene_texture, m_target);
+		if (PostEffect::IsSupported())
+		{
+			m_scene_texture.clear();
+			m_scene_texture.setView(m_camera);
+			m_scene_texture.draw(m_scenegraph);
+			m_scene_texture.display();
+			m_bloom_effect.Apply(m_scene_texture, m_target);
+			//m_shadow_effect.Apply(m_scene_texture, m_target);
 
+		}
+		else
+		{
+			m_target.setView(m_camera);
+			m_target.draw(m_scenegraph);
+		}
 	}
-	else
-	{
-		m_target.setView(m_camera);
-		m_target.draw(m_scenegraph);
-	}
-
 	/*m_target.setView(m_camera);
 	m_target.draw(m_scenegraph);*/
 }

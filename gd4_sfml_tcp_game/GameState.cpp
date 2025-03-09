@@ -12,7 +12,6 @@ GameState::GameState(StateStack& stack, Context context) : State(stack, context)
 	context.music->Play(MusicThemes::kGame);
 	
 	HandleEvent(sf::Event());
-
 }
 
 void GameState::Draw()
