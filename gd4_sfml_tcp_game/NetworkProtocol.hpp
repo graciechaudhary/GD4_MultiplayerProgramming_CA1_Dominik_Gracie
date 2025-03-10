@@ -13,6 +13,7 @@ namespace Client
 	enum class PacketType
 	{
 		kBroadcastMessage,
+		kPlayerRealtimeChange,
 		kQuit
 	};
 }

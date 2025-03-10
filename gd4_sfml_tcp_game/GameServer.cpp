@@ -128,7 +128,7 @@ void GameServer::HandleIncomingPackets()
 
 void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving_peer, bool& detected_timeout)
 {
-    sf::Int32 packet_type;
+    sf::Int16 packet_type;
     packet >> packet_type;
 
     switch (static_cast<Client::PacketType> (packet_type))
@@ -196,7 +196,7 @@ void GameServer::HandleDisconnections()
 
 void GameServer::SendToAll(sf::Packet& packet)
 {
-    for (std::size_t i = 0; i < m_connected_players; ++i)
+    for (sf::Int16 i = 0; i < m_connected_players; ++i)
     {
         if (m_peers[i]->m_ready)
         {
@@ -208,7 +208,7 @@ void GameServer::SendToAll(sf::Packet& packet)
 void GameServer::BroadcastMessage(const std::string& message)
 {
 	sf::Packet packet;
-	packet << static_cast<sf::Int32>(Server::PacketType::kBroadcastMessage);
+	packet << static_cast<sf::Int16>(Server::PacketType::kBroadcastMessage);
 	packet << message;
 	SendToAll(packet);
 }

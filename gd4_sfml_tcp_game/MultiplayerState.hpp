@@ -16,7 +16,7 @@ public:
 
 private:
 	void UpdateBroadcastMessage(sf::Time elapsed_time);
-	void HandlePacket(sf::Int32 packet_type, sf::Packet& packet);
+	void HandlePacket(sf::Int16 packet_type, sf::Packet& packet);
 
 private:
 	sf::RenderWindow& m_window;
