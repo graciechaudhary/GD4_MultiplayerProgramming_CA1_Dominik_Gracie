@@ -42,6 +42,8 @@
     <ClCompile Include="World.cpp" />
     <ClCompile Include="ResourceNode.cpp" />
     <ClCompile Include="CharacterAnimation.cpp" />
+    <ClCompile Include="WorldClient.cpp" />
+    <ClCompile Include="WorldServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.hpp" />
@@ -107,6 +109,8 @@
     <ClInclude Include="ResourceNode.hpp" />
     <ClInclude Include="CharacterAnimationType.hpp" />
     <ClInclude Include="CharacterAnimation.hpp" />
+    <ClInclude Include="WorldClient.hpp" />
+    <ClInclude Include="WorldServer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ResourceHolder.inl" />

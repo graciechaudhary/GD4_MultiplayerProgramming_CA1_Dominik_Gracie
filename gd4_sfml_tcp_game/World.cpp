@@ -66,8 +66,7 @@ void World::Update(sf::Time dt)
 
 void World::Draw()
 {
-	if (!m_is_server)
-	{
+	
 		if (PostEffect::IsSupported())
 		{
 			m_scene_texture.clear();
@@ -83,7 +82,7 @@ void World::Draw()
 			m_target.setView(m_camera);
 			m_target.draw(m_scenegraph);
 		}
-	}
+	
 	/*m_target.setView(m_camera);
 	m_target.draw(m_scenegraph);*/
 }

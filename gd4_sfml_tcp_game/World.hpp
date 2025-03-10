@@ -84,8 +84,8 @@ private:
 	int m_pickups_spawned;
 	int m_max_pickups;
 
-	std::vector<SpawnPoint> m_enemy_spawn_points;
-	std::vector<Character*> m_active_enemies;
+	//std::vector<SpawnPoint> m_enemy_spawn_points;
+	//std::vector<Character*> m_active_enemies;
 
 	BloomEffect m_bloom_effect;
 
