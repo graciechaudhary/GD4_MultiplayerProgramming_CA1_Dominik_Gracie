@@ -109,7 +109,7 @@ bool MultiplayerState::Update(sf::Time dt)
 		if (m_socket.receive(packet) == sf::Socket::Done)
 		{
 			m_time_since_last_packet = sf::seconds(0.f);
-			sf::Int32 packet_type;
+			sf::Int16 packet_type;
 			packet >> packet_type;
 			HandlePacket(packet_type, packet);
 		}
@@ -146,7 +146,7 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 		if (event.key.code == sf::Keyboard::Return && m_connected)
 		{
 			sf::Packet packet;
-			packet << static_cast<sf::Int32>(Client::PacketType::kBroadcastMessage);
+			packet << static_cast<sf::Int16>(Client::PacketType::kBroadcastMessage);
 			packet << "Hi there!";
 			m_socket.send(packet);
 		}
@@ -165,7 +165,7 @@ void MultiplayerState::OnDestroy()
 	{
 		//Inform server this client is dying
 		sf::Packet packet;
-		packet << static_cast<sf::Int32>(Client::PacketType::kQuit);
+		packet << static_cast<sf::Int16>(Client::PacketType::kQuit);
 		m_socket.send(packet);
 	}
 }
@@ -194,7 +194,7 @@ void MultiplayerState::UpdateBroadcastMessage(sf::Time elapsed_time)
 	}
 }
 
-void MultiplayerState::HandlePacket(sf::Int32 packet_type, sf::Packet& packet)
+void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 {
 	switch (static_cast<Server::PacketType>(packet_type))
 	{

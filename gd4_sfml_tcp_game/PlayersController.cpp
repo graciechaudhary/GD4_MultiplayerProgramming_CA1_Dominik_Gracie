@@ -158,6 +158,12 @@ PlayersController::PlayersController(sf::TcpSocket* socket, sf::Int16 identifier
 	m_identifier = identifier;
 }
 
+void PlayersController::SetConnection(sf::TcpSocket* socket, sf::Int16 identifier)
+{
+	m_socket = socket;
+	m_identifier = identifier;
+}
+
 void PlayersController::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
 {
     if (event.type == sf::Event::KeyPressed)

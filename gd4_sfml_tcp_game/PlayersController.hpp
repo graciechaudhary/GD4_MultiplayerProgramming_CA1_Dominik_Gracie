@@ -25,6 +25,9 @@ class PlayersController
 public:
 	typedef std::unique_ptr<RGBColour> RGBColourPtr;
 	PlayersController();
+	PlayersController(sf::TcpSocket* socket, sf::Int16 identifier);
+
+	void SetConnection(sf::TcpSocket* socket, sf::Int16 identifier);
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
 	void HandleRealTimeInput(CommandQueue& command_queue);
 
