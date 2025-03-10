@@ -110,7 +110,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)/SFML-2.6.1/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-system-d.lib;sfml-window-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;sfml-network-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MultiplayerState.cpp" />
     <ClCompile Include="ResourceNode.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Animation.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="RGBColour.cpp" />
     <ClCompile Include="SceneNode.cpp" />
+    <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="SettingsState.cpp" />
     <ClCompile Include="SoundNode.cpp" />
     <ClCompile Include="SoundPlayer.cpp" />
@@ -176,6 +178,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.hpp" />
+    <ClInclude Include="MultiplayerState.hpp" />
+    <ClInclude Include="NetworkProtocol.hpp" />
     <ClInclude Include="ResourceNode.hpp" />
     <ClInclude Include="Character.hpp" />
     <ClInclude Include="CharacterAnimationType.hpp" />
@@ -221,6 +225,7 @@
     <ClInclude Include="RGBColour.hpp" />
     <ClInclude Include="SceneLayers.hpp" />
     <ClInclude Include="SceneNode.hpp" />
+    <ClInclude Include="GameServer.hpp" />
     <ClInclude Include="SettingsState.hpp" />
     <ClInclude Include="ShaderTypes.hpp" />
     <ClInclude Include="SoundEffect.hpp" />

@@ -38,7 +38,9 @@ MenuState::MenuState(StateStack& stack, Context context)
     settings_button->SetText("Settings");
     settings_button->SetCallback([this]()
     {
-        RequestStackPush(StateID::kSettings);
+            RequestStackPop();
+            RequestStackPush(StateID::kHostGame);
+        //RequestStackPush(StateID::kSettings);
     });
 
     auto exit_button = std::make_shared<gui::Button>(context);
