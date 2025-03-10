@@ -173,6 +173,8 @@
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="CharacterAnimation.cpp" />
     <ClCompile Include="World.cpp" />
+    <ClCompile Include="WorldClient.cpp" />
+    <ClCompile Include="WorldServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.hpp" />
@@ -241,6 +243,8 @@
     <ClInclude Include="Utility.hpp" />
     <ClInclude Include="CharacterAnimation.hpp" />
     <ClInclude Include="World.hpp" />
+    <ClInclude Include="WorldClient.hpp" />
+    <ClInclude Include="WorldServer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ResourceHolder.inl" />
