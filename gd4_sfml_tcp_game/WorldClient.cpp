@@ -108,6 +108,9 @@ void WorldClient::InitializeLayers()
 
 void WorldClient::BuildSnowLandscape()
 {
+	//const float screen_width = m_world_bounds.width;
+	//const float screen_height = m_world_bounds.height;
+
 	//Prepare the background - defining the area for the repeated texture, creating sprite using the repeating texture, setting position of the sprite to match the world bounds, and attaching the sprite to the background scene layer
 	sf::Texture& snow_texture = m_textures.Get(TextureID::kSnowTile);
 	snow_texture.setRepeated(true);
@@ -118,15 +121,18 @@ void WorldClient::BuildSnowLandscape()
 
 	//Building ice lake
 	const float border_thickness = 64.f;
+
 	sf::Texture& icy_lake_texture = m_textures.Get(TextureID::kLakeTile);
 	icy_lake_texture.setRepeated(true);
+
 	sf::IntRect lake_texture_rect(0, 0, static_cast<int>(m_world_bounds.width), static_cast<int>(m_world_bounds.height));
 	std::unique_ptr<SpriteNode> lake_sprite(new SpriteNode(icy_lake_texture, lake_texture_rect));
-	lake_sprite->setScale(0.875, 0.834);
+	lake_sprite->setScale((m_world_bounds.width-2*border_thickness)/ m_world_bounds.width, (m_world_bounds.height - 2 * border_thickness) / m_world_bounds.height);
+	//
 	lake_sprite->setPosition(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness);
 	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(lake_sprite));
 
-	sf::FloatRect lake_bounds(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness, m_world_bounds.width * 0.875, m_world_bounds.height * 0.834);
+	sf::FloatRect lake_bounds(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness, m_world_bounds.width - 2 * border_thickness, m_world_bounds.height - 2 * border_thickness);
 
 	BuildTreesFixed(lake_bounds);
 }
