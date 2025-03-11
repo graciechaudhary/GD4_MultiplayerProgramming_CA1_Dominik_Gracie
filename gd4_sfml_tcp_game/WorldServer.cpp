@@ -1,14 +1,38 @@
 #include "WorldServer.hpp"
+#include <iostream>
 
-WorldServer::WorldServer()
+WorldServer::WorldServer(std::map<sf::Int16, PlayersController*>& controllers) : m_scenegraph()
+, m_command_queue()
+, m_pickup_drop_interval(sf::seconds(5.f))
+, m_time_since_last_drop(sf::Time::Zero)
+, m_max_pickups(2)
+, m_pickups_spawned(0)
+, m_players_controller(controllers)
+,m_scene_layers()
 {
-   
+	InitializeLayers();
+}
+
+void WorldServer::InitializeLayers()
+{
+	for (std::size_t i = 0; i < static_cast<int>(SceneLayers::kLayerCount); ++i)
+	{
+		ReceiverCategories category = (i == static_cast<int>(SceneLayers::kParticles)) ? ReceiverCategories::kScene : ReceiverCategories::kNone;
+		SceneNode::Ptr layer(new SceneNode(category));
+		m_scene_layers[i] = layer.get();
+		m_scenegraph.AttachChild(std::move(layer));
+	}
 }
 
 void WorldServer::Update(sf::Time dt)
 {
 	DestroyEntitiesOutsideView();
 	CheckPickupDrop(dt);
+
+	for (auto& pair : m_players_controller)
+	{
+		pair.second->NetworkedRealTimeInputServer(m_command_queue);
+	}
 
 	//Forward commands to the scenegraph
 	while (!m_command_queue.IsEmpty())
@@ -155,7 +179,7 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 	if (m_time_since_last_drop > m_pickup_drop_interval)
 	{
 		m_time_since_last_drop = sf::Time::Zero;
-		SpawnPickup();
+		//SpawnPickup();
 		m_pickups_spawned++;
 		
 		//m_command_queue.Push(m_create_pickup_command);
@@ -173,18 +197,33 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 	}
 }
 
-
-
-void WorldServer::SpawnPickup()
+void WorldServer::AddCharacter(sf::Int16 identifier)
 {
-	float border_distance = 65.f;
-	float x = Utility::RandomInt(GetViewBounds().width - border_distance * 2) + border_distance;
-	float y = Utility::RandomInt(GetViewBounds().height - border_distance * 2) + border_distance;
-	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
+	std::unique_ptr<Character> leader(new Character(true, identifier));
+	Character* character = leader.get();
+	character->setPosition(100.f, 100.f);
+	character->SetVelocity(0, 0);
+	m_characters[identifier] = character;
+	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
-	PickupSpawnPoint spawnpoint{type,x,y};
-
+	std::cout << character->GetWorldPosition().x << "  " << character->GetWorldPosition().y << std::endl;
 }
+
+Character* WorldServer::GetCharacter(sf::Int16 identifier)
+{
+	return m_characters[identifier];
+}
+
+//void WorldServer::SpawnPickup()
+//{
+//	float border_distance = 65.f;
+//	float x = Utility::RandomInt(GetViewBounds().width - border_distance * 2) + border_distance;
+//	float y = Utility::RandomInt(GetViewBounds().height - border_distance * 2) + border_distance;
+//	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
+//
+//	PickupSpawnPoint spawnpoint{type,x,y};
+//
+//}
 
 
 void WorldServer::DestroyEntitiesOutsideView()

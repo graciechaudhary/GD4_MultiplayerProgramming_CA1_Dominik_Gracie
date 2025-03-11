@@ -4,7 +4,9 @@ namespace Server
 {
 	enum class PacketType
 	{
-		kBroadcastMessage
+		kBroadcastMessage,
+		kSpawnSelf,
+		kUpdateClientState,
 	};
 }
 

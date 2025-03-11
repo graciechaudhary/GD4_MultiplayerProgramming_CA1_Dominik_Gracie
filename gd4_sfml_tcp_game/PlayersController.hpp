@@ -29,11 +29,12 @@ public:
 
 	void SetConnection(sf::TcpSocket* socket, sf::Int16 identifier);
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
+	void HandleEvent(const sf::Event& event);
 	void HandleRealTimeInput(CommandQueue& command_queue);
 
 	void HandleControllerInput(const sf::Event& event);
 	void NetworkedRealTimeInputServer(CommandQueue& command_queue);
-	void RegisterRealTimeInputChange(Action action);
+	void RegisterRealTimeInputChange(Action action, bool state);
 
 	void AssignKey(Action action, sf::Keyboard::Key key);
 	sf::Keyboard::Key GetAssignedKey(Action action) const;

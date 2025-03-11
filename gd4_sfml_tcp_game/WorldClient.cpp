@@ -78,11 +78,6 @@ void WorldClient::BuildScene()
 	BuildSnowLandscape();
 
 	//Add the player's aircraft
-	std::unique_ptr<Character> leader(new Character(false, 1, m_textures, m_fonts));
-	m_character = leader.get();
-	m_character->setPosition(m_centre_position.x - 230, m_centre_position.y);
-	m_character->SetVelocity(0, 0);
-	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
 
 	/*std::unique_ptr<Character> second(new Character(false, 2, m_textures, m_fonts));
@@ -234,6 +229,22 @@ sf::FloatRect WorldClient::GetViewBounds() const
 sf::FloatRect WorldClient::GetBattleFieldBounds() const
 {
 	return GetViewBounds();
+}
+
+void WorldClient::AddCharacter(sf::Int16 identifier)
+{
+	std::unique_ptr<Character> leader(new Character(false, identifier, m_textures, m_fonts));
+	m_character = leader.get();
+	m_character->setPosition(m_centre_position.x - 230, m_centre_position.y);
+	m_character->SetVelocity(0, 0);
+	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
+
+	m_characters[identifier] = m_character;
+}
+
+Character* WorldClient::GetCharacter(sf::Int16 identifier)
+{
+	return m_characters[identifier];
 }
 
 void WorldClient::UpdateSounds()

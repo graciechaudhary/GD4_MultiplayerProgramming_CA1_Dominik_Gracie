@@ -164,16 +164,16 @@ void PlayersController::SetConnection(sf::TcpSocket* socket, sf::Int16 identifie
 	m_identifier = identifier;
 }
 
-void PlayersController::HandleEvent(const sf::Event& event, CommandQueue& command_queue)
+void PlayersController::HandleEvent(const sf::Event& event)
 {
-    if (event.type == sf::Event::KeyPressed)
-    {
-        auto found = m_key_binding.find(event.key.code);
-        if (found != m_key_binding.end() && !IsRealTimeAction(found->second))
-        {
-            command_queue.Push(m_action_binding[found->second]);
-        }
-    }
+    //if (event.type == sf::Event::KeyPressed)
+    //{
+    //    auto found = m_key_binding.find(event.key.code);
+    //    if (found != m_key_binding.end() && !IsRealTimeAction(found->second))
+    //    {
+    //        command_queue.Push(m_action_binding[found->second]);
+    //    }
+    //}
 
     if ((event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) && m_socket)
     {
@@ -209,7 +209,7 @@ void PlayersController::HandleRealTimeInput(CommandQueue& command_queue)
 //Handle controller input for both players
 void PlayersController::HandleControllerInput(const sf::Event& event) {
     if (sf::Joystick::isConnected(0)) {
-        Action action;
+        Action action = Action::kActionCount;
 		if (sf::Joystick::isButtonPressed(0, 0)) //If button A is pressed
         {
 			action = Action::kThrow;
@@ -252,13 +252,14 @@ void PlayersController::NetworkedRealTimeInputServer(CommandQueue& command_queue
 		if (pair.second)
 		{
 			command_queue.Push(m_action_binding[pair.first]);
+			std::cout << "Pushing action: " << static_cast<int>(pair.first) << std::endl;
 		}
 	}
 }
 
-void PlayersController::RegisterRealTimeInputChange(Action action)
+void PlayersController::RegisterRealTimeInputChange(Action action, bool state)
 {
-	m_action_proxy[action] = true;
+	m_action_proxy[action] = state;
 }
 
 

@@ -39,6 +39,8 @@ public:
 	explicit WorldClient(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds);	
 	void Draw();
 
+	void AddCharacter(sf::Int16 identifier);
+	Character* GetCharacter(sf::Int16 identifier);
 
 private:
 	void LoadTextures();
@@ -70,6 +72,7 @@ private:
 	BloomEffect m_bloom_effect;
 
 	Command m_create_pickup_command;
+	std::map<sf::Int16, Character*> m_characters;
 	Character* m_character;
 
 };

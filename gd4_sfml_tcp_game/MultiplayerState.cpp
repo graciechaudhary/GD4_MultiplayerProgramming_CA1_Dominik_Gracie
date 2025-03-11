@@ -22,15 +22,17 @@ sf::IpAddress GetAddressFromFile()
 
 	//If the open/read failed, create a new file
 	std::ofstream output_file("ip.txt");
-	std::string local_address = "192.168.0.2";
+	std::string local_address = "127.0.0.1";
 	output_file << local_address;
 	return local_address;
 
 }
 MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_host)
 	:State(stack, context)
+	, m_world(*context.window, *context.fonts, *context.sounds)
 	, m_window(*context.window)
 	, m_texture_holder(*context.textures)
+	, m_players_controller(*context.players_controller)
 	, m_connected(false)
 	, m_game_server(nullptr)
 	, m_active_state(true)
@@ -62,7 +64,7 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	if (m_host)
 	{
 		m_game_server.reset(new GameServer());
-		ip = "192.168.0.2";
+		ip = "127.0.0.1";
 	}
 	else
 	{
@@ -84,6 +86,7 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 
 void MultiplayerState::Draw()
 {
+	m_world.Draw();
 	if (m_connected)
 	{
 		//Show the broadcast message in default view
@@ -151,6 +154,8 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 			m_socket.send(packet);
 		}
 	}
+
+	m_players_controller.HandleEvent(event);
     return true;
 }
 
@@ -214,6 +219,34 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		}
 	}
 	break;
+
+		case Server::PacketType::kSpawnSelf:{
+			sf::Int16 identifier;
+			packet >> identifier;
+			m_identifier = identifier;
+			m_world.AddCharacter(identifier);
+			m_players_controller.SetConnection(&m_socket, identifier);
+		}
+									   break;
+
+		case Server::PacketType::kUpdateClientState: {
+
+			sf::Int16 character_count;
+			packet >> character_count;
+			for (sf::Int16 i = 0; i < character_count; ++i)
+			{
+				sf::Int16 character_identifier;
+				packet >> character_identifier;
+				Character* character = m_world.GetCharacter(character_identifier);
+				if (character)
+				{
+					float x, y;
+					packet >> x >> y;
+					character->setPosition(x, y);
+				}
+			}
+		}
+												   break;
 	default:
 		break;
 	}

@@ -3,8 +3,10 @@
 #include "NetworkProtocol.hpp"
 #include <SFML/System/Sleep.hpp>
 #include "Utility.hpp"
+#include <iostream>
 
 GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
+, m_world(m_player_controllers)
 , m_clock()
 , m_listener_socket()
 , m_listening_state(false)
@@ -69,7 +71,7 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (frame_time >= frame_rate)
         {
-            
+			m_world.Update(frame_rate);
             frame_time -= frame_rate;
         }
 
@@ -86,6 +88,24 @@ void GameServer::ExecutionThread()
 
 void GameServer::Tick()
 {
+	sf::Packet packet;
+	packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
+    packet << m_connected_players;
+	for (sf::Int16 i = 0; i < m_connected_players; ++i)
+	{
+		if (m_peers[i]->m_ready)
+		{
+			sf::Int16 identifier = m_peers[i]->m_identifier;
+			float x = m_world.GetCharacter(i)->GetWorldPosition().x;
+			float y = m_world.GetCharacter(i)->GetWorldPosition().y;
+
+			packet << identifier << x << y;
+
+
+		}
+	}
+
+	SendToAll(packet);
 }
 
 sf::Time GameServer::Now() const
@@ -140,6 +160,16 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 		    BroadcastMessage(message);
 		    break;
 	    }
+        case Client::PacketType::kPlayerRealtimeChange: {
+			sf::Int16 identifier;
+			sf::Int16 action;
+			bool action_enabled;
+
+			packet >> identifier >>action >> action_enabled;
+			m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
+
+			BroadcastMessage("Player action change: " + action);
+        }
     default:
         break;
     }
@@ -154,12 +184,20 @@ void GameServer::HandleIncomingConnections()
 
     if (m_listener_socket.accept(m_peers[m_connected_players]->m_socket) == sf::TcpListener::Done)
     {
+
+		sf::Packet packet;
+		packet << static_cast<sf::Int16>(Server::PacketType::kSpawnSelf);
+		packet << m_connected_players;
+		m_peers[m_connected_players]->m_socket.send(packet);
+
         m_peers[m_connected_players]->m_identifier = m_connected_players;
         m_peers[m_connected_players]->m_ready = true;
         m_peers[m_connected_players]->m_last_packet_time = Now();
 
-        m_connected_players++;
+		m_player_controllers[m_connected_players] = new PlayersController(&m_peers[m_connected_players]->m_socket, m_connected_players);
+		m_world.AddCharacter(m_connected_players);
 
+        m_connected_players++;
         if (m_connected_players >= m_max_connected_players)
         {
             SetListening(false);

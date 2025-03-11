@@ -84,6 +84,33 @@ Character::Character(bool is_on_server, int identifier, const TextureHolder& tex
 
 }
 
+Character::Character(bool is_on_server, int identifier)
+	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
+	, m_type(CharacterType::kDefault)
+	, m_current_animation(CharacterAnimationType::kWalk)
+	, m_health_display(nullptr)
+	, m_is_throwing(false)
+	, m_throw_countdown(sf::Time::Zero)
+	, m_is_marked_for_removal(false)
+	, m_show_explosion(true)
+	, m_spawned_pickup(false)
+	, m_played_explosion_sound(false)
+	, m_is_walking_up(false)
+	, m_is_walking_down(false)
+	, m_is_walking_left(false)
+	, m_is_walking_right(false)
+	, m_current_direction(FacingDirections::kDown)
+	, m_snowball_count(Table[static_cast<int>(CharacterType::kDefault)].max_snowballs)
+	, m_impact_duration(sf::seconds(0.5f))
+	, m_blink_timer(sf::Time::Zero)
+	, m_identifier(identifier)
+	, m_is_on_server(is_on_server)
+	, m_is_impacted(false)
+{
+		m_got_hit_count = 0;
+		m_throw_count = 0;
+}
+
 unsigned int Character::GetCategory() const
 {
 	return static_cast<unsigned int>(ReceiverCategories::kPlayer);
@@ -213,35 +240,37 @@ void Character::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) c
 
 void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
-	if (IsDestroyed())
+	if (m_is_on_server)
 	{
-		m_explosion.Update(dt);
-		// Play explosion sound only once
-		if (!m_played_explosion_sound)
-		{
-			SoundEffect explosionEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
-			PlayLocalSound(commands, explosionEffect);
+		Entity::UpdateCurrent(dt, commands);
 
-			m_played_explosion_sound = true;
-		}
-		return;
+		ClearWalkingFlags(dt);
+		HandleSliding();
+
+		CheckProjectileLaunch(dt, commands);
 	}
+	else
+	{
+		if (IsDestroyed())
+		{
+			m_explosion.Update(dt);
+			// Play explosion sound only once
+			if (!m_played_explosion_sound)
+			{
+				SoundEffect explosionEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
+				PlayLocalSound(commands, explosionEffect);
 
-	Entity::UpdateCurrent(dt, commands);
+				m_played_explosion_sound = true;
+			}
+			return;
+		}
 
-	//Update resource indicators
-	m_health_display->SetResource(GetHitPoints());
-	m_snowball_display->SetResource(m_snowball_count);
+		//Update resource indicators
+		m_health_display->SetResource(GetHitPoints());
+		m_snowball_display->SetResource(m_snowball_count);
 
-	
-	//Check if bullets or misiles are fired
-	CheckProjectileLaunch(dt, commands);
-	
-	ClearWalkingFlags(dt);
-	HandleSliding();
-
-	UpdateAnimation(dt);
-
+		UpdateAnimation(dt);
+	}
 }
 
 void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)

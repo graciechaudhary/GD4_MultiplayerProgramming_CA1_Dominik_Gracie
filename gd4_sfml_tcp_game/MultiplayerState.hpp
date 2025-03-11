@@ -1,8 +1,9 @@
 #pragma once
 #include "State.hpp"
-#include "World.hpp"
 #include "GameServer.hpp"
 #include "NetworkProtocol.hpp"
+#include "WorldClient.hpp"
+#include "PlayersController.hpp"
 
 class MultiplayerState : public State
 {
@@ -21,6 +22,7 @@ private:
 private:
 	sf::RenderWindow& m_window;
 	TextureHolder& m_texture_holder;
+	WorldClient m_world;
 
 	std::size_t m_identifier;
 	sf::TcpSocket m_socket;
@@ -39,5 +41,7 @@ private:
 	bool m_host;
 	sf::Time m_client_timeout;
 	sf::Time m_time_since_last_packet;
+
+	PlayersController& m_players_controller;
 };
 

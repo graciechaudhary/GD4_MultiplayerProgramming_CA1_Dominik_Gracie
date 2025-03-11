@@ -10,6 +10,8 @@
 #include <memory>
 #include <string>
 #include <SFML/Graphics/Rect.hpp> 
+#include "PlayersController.hpp"
+#include "WorldServer.hpp"
 
 class GameServer
 {
@@ -58,5 +60,8 @@ private:
 
 	std::vector<PeerPtr> m_peers;
 	bool m_waiting_thread_end;
+
+	WorldServer m_world;
+	std::map<sf::Int16, PlayersController*> m_player_controllers;
 };
 

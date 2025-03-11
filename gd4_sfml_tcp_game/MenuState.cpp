@@ -28,9 +28,11 @@ MenuState::MenuState(StateStack& stack, Context context)
     play_button->SetText("Play");
     play_button->SetCallback([this]()
     {
-        RequestStackPop();
-		RequestStackPush(StateID::kGame);
-        RequestStackPush(StateID::kPreGame);
+            RequestStackPop();
+            RequestStackPush(StateID::kHostGame);
+  //      RequestStackPop();
+		//RequestStackPush(StateID::kGame);
+  //      RequestStackPush(StateID::kPreGame);
     });
 
     auto settings_button = std::make_shared<gui::Button>(context);
@@ -39,7 +41,7 @@ MenuState::MenuState(StateStack& stack, Context context)
     settings_button->SetCallback([this]()
     {
             RequestStackPop();
-            RequestStackPush(StateID::kHostGame);
+            RequestStackPush(StateID::kJoinGame);
         //RequestStackPush(StateID::kSettings);
     });
 

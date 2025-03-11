@@ -4,15 +4,20 @@
 #include "Character.hpp"
 #include "Pickup.hpp"
 #include "Projectile.hpp"
+#include "SceneLayers.hpp"
+#include <array>
 
 class WorldServer : private sf::NonCopyable
 {
 public:
-	explicit WorldServer();
+	explicit WorldServer(std::map<sf::Int16, PlayersController*>& controllers);
 	void Update(sf::Time dt);
 
 	CommandQueue& GetCommandQueue();
 	GameRecords GetGameRecords() const;
+
+	void AddCharacter(sf::Int16 identifier);
+	Character* GetCharacter(sf::Int16 identifier);
 
 private:
 	struct SpawnPoint
@@ -39,7 +44,7 @@ private:
 
 
 private:	
-	
+	void InitializeLayers();
 	void AdaptPlayerPosition();
 	void AdaptPlayerVelocity();
 
@@ -52,8 +57,10 @@ private:
 
 	//pickup 
 	void CheckPickupDrop(sf::Time dt);
-	void SpawnPickup();
+	//void SpawnPickup();
 	//void SendPickupDataToClients(PickupSpawnPoint spawnpoint);
+
+
 	
 
 
@@ -64,15 +71,14 @@ private:
 	CommandQueue m_command_queue;
 
 	SceneNode m_scenegraph;
-
+	std::array<SceneNode*, static_cast<int>(SceneLayers::kLayerCount)> m_scene_layers;
 	
 	sf::Time m_pickup_drop_interval;
 	sf::Time m_time_since_last_drop;
 	int m_pickups_spawned;
 	int m_max_pickups;
 
-	std::map<std::size_t, Character*> m_characters;
-
-
+	std::map<sf::Int16, Character*> m_characters;
+	std::map<sf::Int16, PlayersController*>& m_players_controller;
 };
 
