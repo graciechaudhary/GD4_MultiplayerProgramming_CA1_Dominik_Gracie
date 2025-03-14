@@ -1,5 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "ResourceIdentifiers.hpp"
+#include "ResourceHolder.hpp"
 #include "PlayersController.hpp"
 #include "Character.hpp"
 #include "Pickup.hpp"
@@ -47,7 +49,10 @@ private:
 		float m_y;
 	};
 
-private:	
+private:
+
+	void LoadTextures();
+
 	void InitializeLayers();
 	void AdaptPlayerPosition();
 	void AdaptPlayerVelocity();
@@ -64,7 +69,7 @@ private:
 	//void SpawnPickup();
 	//void SendPickupDataToClients(PickupSpawnPoint spawnpoint);
 
-
+	
 	
 
 
@@ -77,6 +82,8 @@ private:
 	SceneNode m_scenegraph;
 	std::array<SceneNode*, static_cast<int>(SceneLayers::kLayerCount)> m_scene_layers;
 	
+	TextureHolder m_textures;
+
 	sf::Time m_pickup_drop_interval;
 	sf::Time m_time_since_last_drop;
 	int m_pickups_spawned;

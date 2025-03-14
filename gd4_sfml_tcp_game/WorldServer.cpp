@@ -17,6 +17,16 @@ WorldServer::WorldServer() : m_scenegraph()
 	InitializeLayers();
 }
 
+void WorldServer::LoadTextures()
+{
+	//edited texture for the snow particle effect - GracieChaudhary
+	m_textures.Load(TextureID::kParticle, "MediaFiles/Textures/Particles/SnowBits.png");
+
+	//reloading textures for game assets - GracieChaudhary
+	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
+	m_textures.Load(TextureID::kSnowball, "MediaFiles/Textures/Weapon/Snowball.png");
+}
+
 void WorldServer::InitializeLayers()
 {
 	for (std::size_t i = 0; i < static_cast<int>(SceneLayers::kLayerCount); ++i)
