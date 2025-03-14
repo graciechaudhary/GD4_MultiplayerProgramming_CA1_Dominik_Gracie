@@ -3,7 +3,7 @@
 #pragma once
 enum class Action
 {
-	kMoveLeft,
+	kMoveLeft = 1,
 	kMoveRight,
 	kMoveUp,
 	kMoveDown,

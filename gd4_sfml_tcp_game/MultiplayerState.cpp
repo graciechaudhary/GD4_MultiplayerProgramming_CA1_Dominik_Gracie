@@ -109,6 +109,8 @@ bool MultiplayerState::Update(sf::Time dt)
 {
 	if (m_connected)
 	{
+		m_world.Update(dt);
+
 		//Handle messages from the server that may have arrived
 		sf::Packet packet;
 		if (m_socket.receive(packet) == sf::Socket::Done)
@@ -130,6 +132,17 @@ bool MultiplayerState::Update(sf::Time dt)
 				m_failed_connection_clock.restart();
 			}
 		}
+
+		if (m_tick_clock.getElapsedTime() > sf::seconds(1.f / 20.f))
+		{
+			sf::Packet packetOut;
+			packetOut << static_cast<sf::Int16>(Client::PacketType::kBroadcastMessage);
+			packetOut << "Working!";
+			m_socket.send(packetOut);
+			m_tick_clock.restart();
+		}
+
+
 
 		UpdateBroadcastMessage(dt);
 		m_time_since_last_packet += dt;
@@ -245,6 +258,14 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 					float x, y;
 					packet >> x >> y;
 					character->setPosition(x, y);
+					
+					float vx, vy;
+					packet >> vx >> vy;
+					character->SetVelocity(vx, vy);
+
+					sf::Int16 dir;
+					packet >> dir;
+					character->SetCurrentDirection(static_cast<FacingDirections>(dir));
 				}
 			}
 		}

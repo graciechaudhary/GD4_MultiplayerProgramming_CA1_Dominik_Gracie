@@ -86,7 +86,7 @@ void GameServer::ExecutionThread()
             tick_time -= tick_rate;
         }
         //sleep
-        sf::sleep(sf::milliseconds(50));
+        //sf::sleep(sf::milliseconds(50));
     }
 }
 
@@ -102,8 +102,11 @@ void GameServer::Tick()
 			sf::Int16 identifier = m_peers[i]->m_identifier;
 			float x = m_world.GetCharacter(i)->GetWorldPosition().x;
 			float y = m_world.GetCharacter(i)->GetWorldPosition().y;
+			float vx = m_world.GetCharacter(i)->GetVelocity().x;
+			float vy = m_world.GetCharacter(i)->GetVelocity().y;
+            sf::Int16 facing_dir = static_cast<sf::Int16>(m_world.GetCharacter(i)->GetFacingDirection());
 
-			packet << identifier << x << y;
+			packet << identifier << x << y << vx << vy << facing_dir;
 
 
 		}

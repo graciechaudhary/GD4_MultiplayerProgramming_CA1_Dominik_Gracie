@@ -176,7 +176,7 @@ void PlayersController::HandleEvent(const sf::Event& event)
         }
     }
 
-	HandleControllerInput(event);
+	//HandleControllerInput(event);
 }
 
 void PlayersController::HandleRealTimeInput(CommandQueue& command_queue)
@@ -239,7 +239,6 @@ void PlayersController::NetworkedRealTimeInputServer(CommandQueue& command_queue
 		{
 			Action action = static_cast<Action>(pair.first);
 			command_queue.Push(m_action_binding[action]);
-			std::cout << "Pushing action: " << static_cast<int>(action) << std::endl;
 		}
 	}
 }

@@ -622,6 +622,29 @@ int Character::GetIdentifier() const
 	return m_identifier;
 }
 
+void Character::UpdateVisuals(sf::Time dt)
+{
+	if (IsDestroyed())
+	{
+		m_explosion.Update(dt);
+		// Play explosion sound only once
+		if (!m_played_explosion_sound)
+		{
+			SoundEffect explosionEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
+			//PlayLocalSound(commands, explosionEffect);
+
+			m_played_explosion_sound = true;
+		}
+		return;
+	}
+
+	//Update resource indicators
+	m_health_display->SetResource(GetHitPoints());
+	m_snowball_display->SetResource(m_snowball_count);
+
+	UpdateAnimation(dt);
+}
+
 //Dominik Hampejs D00250604
 void Character::WalkRight()
 {

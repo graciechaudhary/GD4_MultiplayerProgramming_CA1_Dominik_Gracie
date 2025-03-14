@@ -61,6 +61,10 @@ public:
 
 	int GetIdentifier() const;
 
+	void UpdateVisuals(sf::Time dt);
+
+	void SetCurrentDirection(FacingDirections dir) { m_current_direction = dir; };
+
 
 private:
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;

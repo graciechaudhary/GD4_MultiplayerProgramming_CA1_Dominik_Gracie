@@ -241,6 +241,14 @@ sf::FloatRect WorldClient::GetBattleFieldBounds() const
 	return m_world_bounds;
 }
 
+void WorldClient::Update(sf::Time dt)
+{
+	for (auto charMap : m_characters)
+	{
+		charMap.second->UpdateVisuals(dt);
+	}
+}
+
 void WorldClient::AddCharacter(sf::Int16 identifier)
 {
 	std::unique_ptr<Character> leader(new Character(false, identifier, m_textures, m_fonts));
