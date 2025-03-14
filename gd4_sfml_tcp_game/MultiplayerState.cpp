@@ -41,7 +41,9 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	, m_time_since_last_packet(sf::seconds(0.f))
 {
 	m_broadcast_text.setFont(context.fonts->Get(Font::kMain));
-	m_broadcast_text.setPosition(1024.f / 2, 100.f);
+	Utility::CentreOrigin(m_broadcast_text);
+	m_broadcast_text.setPosition(m_window.getSize().x / 2.f / 2, 100.f);
+	m_failed_connection_text.setFillColor(sf::Color::Black);
 
 	//Use this for "Attempt to connect" and "Failed to connect" messages
 	m_failed_connection_text.setFont(context.fonts->Get(Font::kMain));
@@ -133,7 +135,7 @@ bool MultiplayerState::Update(sf::Time dt)
 			}
 		}
 
-		if (m_tick_clock.getElapsedTime() > sf::seconds(1.f / 20.f))
+		if (m_tick_clock.getElapsedTime() > sf::seconds(1.f / TICK_RATE))
 		{
 			sf::Packet packetOut;
 			packetOut << static_cast<sf::Int16>(Client::PacketType::kBroadcastMessage);
@@ -243,6 +245,14 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			m_players_controller.SetConnection(&m_socket, identifier);
 		}
 									   break;
+		case Server::PacketType::kHealthChange: {
+			sf::Int16 identifer;
+			sf::Int16 hp;
+
+			packet >> identifer >> hp;
+
+			m_world.GetCharacter(identifer)->SetHitPoints(hp);
+		}
 
 		case Server::PacketType::kUpdateClientState: {
 

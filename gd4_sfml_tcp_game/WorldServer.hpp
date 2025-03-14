@@ -5,6 +5,7 @@
 #include "Pickup.hpp"
 #include "Projectile.hpp"
 #include "SceneLayers.hpp"
+#include "SFML/Network.hpp"
 #include <array>
 
 class WorldServer : private sf::NonCopyable
@@ -18,6 +19,10 @@ public:
 
 	void AddCharacter(sf::Int16 identifier);
 	Character* GetCharacter(sf::Int16 identifier);
+
+	typedef std::unique_ptr<sf::Packet> Packet_Ptr;
+
+	std::deque<Packet_Ptr>& GetEventQueue() { return m_event_queue; };
 
 private:
 	struct SpawnPoint
@@ -78,5 +83,6 @@ private:
 	int m_max_pickups;
 
 	std::map<sf::Int16, Character*> m_characters;
+	std::deque<Packet_Ptr> m_event_queue;
 };
 

@@ -1,4 +1,7 @@
 #include "WorldServer.hpp"
+#include "NetworkProtocol.hpp"
+
+
 #include <iostream>
 
 WorldServer::WorldServer() : m_scenegraph()
@@ -7,7 +10,9 @@ WorldServer::WorldServer() : m_scenegraph()
 , m_time_since_last_drop(sf::Time::Zero)
 , m_max_pickups(2)
 , m_pickups_spawned(0)
-,m_scene_layers()
+, m_scene_layers()
+, m_world_bounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
+, m_event_queue()
 {
 	InitializeLayers();
 }
@@ -61,12 +66,12 @@ GameRecords WorldServer::GetGameRecords() const
 
 void WorldServer::AdaptPlayerPosition()
 {
-    ////keep the player on the screen
-    //sf::FloatRect view_bounds(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
 
     //m_character_one->HandleBorderInteraction(view_bounds);
-
-
+	for (auto chars: m_characters)
+	{
+		chars.second->HandleBorderInteraction(m_world_bounds);
+	}
 	
 }
 
@@ -81,7 +86,7 @@ void WorldServer::AdaptPlayerVelocity()
 
 sf::FloatRect WorldServer::GetBattleFieldBounds() const
 {
-    return sf::FloatRect();
+	return m_world_bounds;
 }
 
 bool MatchesCategories(SceneNode::Pair& colliders, ReceiverCategories type1, ReceiverCategories type2)
@@ -162,6 +167,13 @@ void WorldServer::HandleCollisions()
 			character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			character.Impacted();
 			projectile.Destroy();
+
+			Packet_Ptr packet;
+			*packet << static_cast<sf::Int16>(Server::PacketType::kHealthChange);
+			*packet << character.GetIdentifier() << static_cast<sf::Int16>(character.GetHitPoints());
+			m_event_queue.push_back(std::move(packet));
+
+
 		}
 
 	}

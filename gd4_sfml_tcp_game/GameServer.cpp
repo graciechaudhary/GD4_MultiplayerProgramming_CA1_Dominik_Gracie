@@ -52,7 +52,7 @@ void GameServer::ExecutionThread()
 
     sf::Time frame_rate = sf::seconds(1.f / 60.f);
     sf::Time frame_time = sf::Time::Zero;
-    sf::Time tick_rate = sf::seconds(1.f / 20.f);
+    sf::Time tick_rate = sf::seconds(1.f / TICK_RATE);
     sf::Time tick_time = sf::Time::Zero;
     sf::Clock frame_clock, tick_clock;
 
@@ -85,6 +85,14 @@ void GameServer::ExecutionThread()
             Tick();
             tick_time -= tick_rate;
         }
+
+        while (!m_world.GetEventQueue().empty()) {
+            WorldServer::Packet_Ptr packet;
+            packet = std::move(m_world.GetEventQueue().front());
+            SendToAll(*packet);
+            m_world.GetEventQueue().pop_front();
+        }
+
         //sleep
         //sf::sleep(sf::milliseconds(50));
     }
