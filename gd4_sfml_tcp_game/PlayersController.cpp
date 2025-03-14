@@ -136,26 +136,12 @@ struct CharacterThrower
 
 PlayersController::PlayersController() : m_current_game_status(GameStatus::kGameRunning), m_should_update_colours(false), m_socket(nullptr), m_identifier(1)
 {
-    //Set initial key bindings
-    m_key_binding[sf::Keyboard::A] = Action::kMoveLeft;
-    m_key_binding[sf::Keyboard::D] = Action::kMoveRight;
-    m_key_binding[sf::Keyboard::W] = Action::kMoveUp;
-    m_key_binding[sf::Keyboard::S] = Action::kMoveDown;
-    m_key_binding[sf::Keyboard::Space] = Action::kThrow;
-
-    //Set initial action bindings
     InitialiseActions();
-    //Assign categories to the actions for the players
-    for (auto& pair : m_action_binding)
-    {
-        pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayer);
-    }
 }
 
-PlayersController::PlayersController(sf::TcpSocket* socket, sf::Int16 identifier) : PlayersController()
+PlayersController::PlayersController(sf::TcpSocket* socket, sf::Int16 identifier) : m_should_update_colours(false), m_socket(socket), m_identifier(identifier)
 {
-	m_socket = socket;
-	m_identifier = identifier;
+    InitialiseActions();
 }
 
 void PlayersController::SetConnection(sf::TcpSocket* socket, sf::Int16 identifier)
@@ -251,8 +237,9 @@ void PlayersController::NetworkedRealTimeInputServer(CommandQueue& command_queue
 	{
 		if (pair.second)
 		{
-			command_queue.Push(m_action_binding[pair.first]);
-			std::cout << "Pushing action: " << static_cast<int>(pair.first) << std::endl;
+			Action action = static_cast<Action>(pair.first);
+			command_queue.Push(m_action_binding[action]);
+			std::cout << "Pushing action: " << static_cast<int>(action) << std::endl;
 		}
 	}
 }
@@ -313,11 +300,22 @@ void PlayersController::SetPlayersColours(RGBColourPtr colour_one)
 
 void PlayersController::InitialiseActions()
 {
+    m_key_binding[sf::Keyboard::A] = Action::kMoveLeft;
+    m_key_binding[sf::Keyboard::D] = Action::kMoveRight;
+    m_key_binding[sf::Keyboard::W] = Action::kMoveUp;
+    m_key_binding[sf::Keyboard::S] = Action::kMoveDown;
+    m_key_binding[sf::Keyboard::Space] = Action::kThrow;
+
     m_action_binding[Action::kMoveLeft].action = DerivedAction<Character>(CharacterMover(Direction::kLeft, m_identifier));
     m_action_binding[Action::kMoveRight].action = DerivedAction<Character>(CharacterMover(Direction::kRight, m_identifier));
     m_action_binding[Action::kMoveUp].action = DerivedAction<Character>(CharacterMover(Direction::kUp, m_identifier));
     m_action_binding[Action::kMoveDown].action = DerivedAction<Character>(CharacterMover(Direction::kDown, m_identifier));
     m_action_binding[Action::kThrow].action = DerivedAction<Character>(CharacterThrower(m_identifier));
+
+    for (auto& pair : m_action_binding)
+    {
+        pair.second.category = static_cast<unsigned int>(ReceiverCategories::kPlayer);
+    }
 }
 
 bool PlayersController::IsRealTimeAction(Action action)

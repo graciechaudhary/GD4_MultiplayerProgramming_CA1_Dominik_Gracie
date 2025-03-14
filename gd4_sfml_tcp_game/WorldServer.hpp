@@ -10,7 +10,7 @@
 class WorldServer : private sf::NonCopyable
 {
 public:
-	explicit WorldServer(std::map<sf::Int16, PlayersController*>& controllers);
+	explicit WorldServer();
 	void Update(sf::Time dt);
 
 	CommandQueue& GetCommandQueue();
@@ -41,7 +41,6 @@ private:
 		float m_x;
 		float m_y;
 	};
-
 
 private:	
 	void InitializeLayers();
@@ -79,6 +78,5 @@ private:
 	int m_max_pickups;
 
 	std::map<sf::Int16, Character*> m_characters;
-	std::map<sf::Int16, PlayersController*>& m_players_controller;
 };
 

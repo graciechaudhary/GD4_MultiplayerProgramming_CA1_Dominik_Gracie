@@ -1,13 +1,12 @@
 #include "WorldServer.hpp"
 #include <iostream>
 
-WorldServer::WorldServer(std::map<sf::Int16, PlayersController*>& controllers) : m_scenegraph()
+WorldServer::WorldServer() : m_scenegraph()
 , m_command_queue()
 , m_pickup_drop_interval(sf::seconds(5.f))
 , m_time_since_last_drop(sf::Time::Zero)
 , m_max_pickups(2)
 , m_pickups_spawned(0)
-, m_players_controller(controllers)
 ,m_scene_layers()
 {
 	InitializeLayers();
@@ -28,11 +27,6 @@ void WorldServer::Update(sf::Time dt)
 {
 	DestroyEntitiesOutsideView();
 	CheckPickupDrop(dt);
-
-	for (auto& pair : m_players_controller)
-	{
-		pair.second->NetworkedRealTimeInputServer(m_command_queue);
-	}
 
 	//Forward commands to the scenegraph
 	while (!m_command_queue.IsEmpty())

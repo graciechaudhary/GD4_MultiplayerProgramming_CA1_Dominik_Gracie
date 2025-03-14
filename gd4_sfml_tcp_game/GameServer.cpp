@@ -6,7 +6,7 @@
 #include <iostream>
 
 GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
-, m_world(m_player_controllers)
+, m_world()
 , m_clock()
 , m_listener_socket()
 , m_listening_state(false)
@@ -72,6 +72,10 @@ void GameServer::ExecutionThread()
         while (frame_time >= frame_rate)
         {
 			m_world.Update(frame_rate);
+            for (auto controler : m_player_controllers)
+            {
+                controler.second->NetworkedRealTimeInputServer(m_world.GetCommandQueue());
+            }
             frame_time -= frame_rate;
         }
 
