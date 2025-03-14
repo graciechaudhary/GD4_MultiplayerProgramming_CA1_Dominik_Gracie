@@ -13,7 +13,7 @@
 
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/60.f);
 
-Application::Application() : m_window(sf::VideoMode::getDesktopMode(), "States", sf::Style::Fullscreen)
+Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::VideoMode(1920,1080), "States", sf::Style::Fullscreen)
 	, m_stack(State::Context(m_window, m_textures, m_fonts, m_players_controller, m_music, m_sound))
 {
 	m_window.setKeyRepeatEnabled(false);

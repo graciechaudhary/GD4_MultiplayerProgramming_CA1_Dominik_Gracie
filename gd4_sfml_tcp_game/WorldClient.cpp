@@ -7,19 +7,21 @@
 
 WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
 	:m_target(output_target)
-	, m_camera(output_target.getDefaultView())
+	//, m_camera(output_target.getDefaultView())
 	, m_textures()
 	, m_fonts(font)
 	, m_sounds(sounds)
 	, m_scenegraph(ReceiverCategories::kNone)
 	, m_scene_layers()
-	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, m_camera.getSize().y)
-	, m_centre_position(m_camera.getSize().x / 2.f, m_camera.getSize().y / 2.f)
+	//, m_world_bounds(0.f, 0.f, m_camera.getSize().x, m_camera.getSize().y)
+	//, m_centre_position(m_camera.getSize().x / 2.f, m_camera.getSize().y / 2.f)
+	, m_world_bounds(0.f, 0.f, output_target.getSize().x, output_target.getSize().y)
+	, m_centre_position(m_world_bounds.width / 2.f, m_world_bounds.height / 2.f)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
 	BuildScene();
-	m_camera.setCenter(m_centre_position);
+	//m_camera.setCenter(m_centre_position);
 
 	m_create_pickup_command.category = static_cast<int>(ReceiverCategories::kScene);
 	m_create_pickup_command.action = [this](SceneNode& node, sf::Time)
@@ -34,15 +36,17 @@ void WorldClient::Draw()
 	if (PostEffect::IsSupported())
 	{
 		m_scene_texture.clear();
-		m_scene_texture.setView(m_camera);
+		//m_scene_texture.setView(m_camera);
 		m_scene_texture.draw(m_scenegraph);
 		m_scene_texture.display();
 		m_bloom_effect.Apply(m_scene_texture, m_target);
+
 		
 	}
 	else
 	{
-		m_target.setView(m_camera);
+		m_target.setView(sf::View(sf::FloatRect(0.f, 0.f, m_world_bounds.width, m_world_bounds.height)));
+		//m_target.setView(m_camera);
 		m_target.draw(m_scenegraph);
 	}
 }
@@ -227,14 +231,14 @@ void WorldClient::CreatePickup(SceneNode& node, PickupSpawnPoint& spawnpoint, co
 	node.AttachChild(std::move(pickup));
 }
 
-sf::FloatRect WorldClient::GetViewBounds() const
-{
-	return sf::FloatRect(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
-}
+//sf::FloatRect WorldClient::GetViewBounds() const
+//{
+//	return sf::FloatRect(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
+//}
 
 sf::FloatRect WorldClient::GetBattleFieldBounds() const
 {
-	return GetViewBounds();
+	return m_world_bounds;
 }
 
 void WorldClient::AddCharacter(sf::Int16 identifier)

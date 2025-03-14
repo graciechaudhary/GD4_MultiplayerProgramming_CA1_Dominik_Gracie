@@ -50,7 +50,7 @@ private:
 	void BuildTreesRandom(sf::FloatRect lake_bounds);
 	void BuildTreesFixed(sf::FloatRect lake_bounds);
 	void CreatePickup(SceneNode& node, PickupSpawnPoint& spawnpoint, const TextureHolder& textures) const;
-	sf::FloatRect GetViewBounds() const;
+	//sf::FloatRect GetViewBounds() const;
 	sf::FloatRect GetBattleFieldBounds() const;
 
 	void UpdateSounds();
@@ -60,7 +60,7 @@ private:
 private:
 	sf::RenderTarget& m_target;
 	sf::RenderTexture m_scene_texture;
-	sf::View m_camera;
+	//sf::View m_camera;
 	TextureHolder m_textures;
 	FontHolder& m_fonts;
 	SoundPlayer& m_sounds;
