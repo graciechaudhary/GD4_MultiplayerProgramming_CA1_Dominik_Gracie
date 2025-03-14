@@ -74,9 +74,7 @@ private:
 	std::array<SceneNode*, static_cast<int>(SceneLayers::kLayerCount)> m_scene_layers;
 	sf::FloatRect m_world_bounds;
 	sf::Vector2f m_centre_position;
-	float m_scrollspeed;
-	Character* m_character_one;
-	Character* m_character_two;
+
 
 	CommandQueue m_command_queue;
 
@@ -86,11 +84,14 @@ private:
 	int m_pickups_spawned;
 	int m_max_pickups;
 
-	std::vector<SpawnPoint> m_enemy_spawn_points;
-	std::vector<Character*> m_active_enemies;
+	//std::vector<SpawnPoint> m_enemy_spawn_points;
+	//std::vector<Character*> m_active_enemies;
 
 	BloomEffect m_bloom_effect;
 
+	bool m_is_server;
+
+	Character* m_character_one;
 	
 };
 

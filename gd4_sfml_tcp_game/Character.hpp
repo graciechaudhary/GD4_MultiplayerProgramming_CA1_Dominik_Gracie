@@ -16,7 +16,8 @@
 class Character : public Entity
 {
 public:
-	Character(CharacterType type, const TextureHolder& textures, const FontHolder& fonts, bool is_player_one);
+	Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts);
+	Character(bool is_on_server, int identifier);
 	unsigned int GetCategory() const override;
 
 	int GetMaxHitpoints() const;
@@ -57,6 +58,8 @@ public:
 	void Impacted();
 
 	sf::Color GetColour();
+
+	int GetIdentifier() const;
 
 
 private:
@@ -112,11 +115,12 @@ private:
 	sf::Time m_impact_timer;
 	sf::Time m_impact_duration;
 
-	bool m_is_player_one;
-
 	sf::Color m_colour;
 
 	int m_got_hit_count;
 	int m_throw_count;
+
+	int m_identifier;
+	bool m_is_on_server;
 };
 

@@ -11,7 +11,8 @@ MenuState::MenuState(StateStack& stack, Context context)
 {
     sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
     m_background_sprite.setTexture(texture);
-    m_background_sprite.setScale(2.f,2.38f);
+    m_background_sprite.setScale(static_cast<float>(context.window->getSize().x) / texture.getSize().x,
+        static_cast<float>(context.window->getSize().y) / texture.getSize().y);
    
     //GracieChaudhary - menu decoration
     m_game_name.setFont(context.fonts->Get(Font::kMain));
@@ -28,9 +29,11 @@ MenuState::MenuState(StateStack& stack, Context context)
     play_button->SetText("Play");
     play_button->SetCallback([this]()
     {
-        RequestStackPop();
-		RequestStackPush(StateID::kGame);
-        RequestStackPush(StateID::kPreGame);
+            RequestStackPop();
+            RequestStackPush(StateID::kHostGame);
+  //      RequestStackPop();
+		//RequestStackPush(StateID::kGame);
+  //      RequestStackPush(StateID::kPreGame);
     });
 
     auto settings_button = std::make_shared<gui::Button>(context);
@@ -38,7 +41,9 @@ MenuState::MenuState(StateStack& stack, Context context)
     settings_button->SetText("Settings");
     settings_button->SetCallback([this]()
     {
-        RequestStackPush(StateID::kSettings);
+            RequestStackPop();
+            RequestStackPush(StateID::kJoinGame);
+        //RequestStackPush(StateID::kSettings);
     });
 
     auto exit_button = std::make_shared<gui::Button>(context);

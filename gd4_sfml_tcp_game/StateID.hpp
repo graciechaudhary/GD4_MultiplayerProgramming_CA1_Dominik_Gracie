@@ -8,6 +8,8 @@ enum class StateID
 	kMenu,
 	kPreGame,
 	kGame,
+	kJoinGame,
+	kHostGame,
 	kPause,
 	kSettings,
 	kGameOver,

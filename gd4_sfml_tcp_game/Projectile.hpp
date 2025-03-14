@@ -9,7 +9,7 @@
 class Projectile : public Entity
 {
 public:
-	Projectile(ProjectileType type, const TextureHolder& textures, bool is_player_one);
+	Projectile(ProjectileType type, const TextureHolder& textures, int identifier);
 
 	unsigned int GetCategory() const override;
 	sf::FloatRect GetBoundingRect() const override;
@@ -26,7 +26,7 @@ private:
 private:
 	ProjectileType m_type;
 	sf::Sprite m_sprite;
-	bool m_is_player_one;
+	int m_identifier;
 	sf::Vector2f m_target_direction;
 
 	//GracieChaudhary

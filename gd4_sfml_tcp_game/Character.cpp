@@ -17,10 +17,10 @@ namespace
 	const std::vector<CharacterData> Table = InitializeCharacterData();	
 }
 
-Character::Character(CharacterType type, const TextureHolder& textures, const FontHolder& fonts, bool is_player_one)
-	: Entity(Table[static_cast<int>(type)].m_hitpoints)
-	, m_type(type)
-	, m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
+Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts)
+	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
+	, m_type(CharacterType::kDefault)
+	, m_sprite(textures.Get(Table[static_cast<int>(CharacterType::kDefault)].m_texture), Table[static_cast<int>(CharacterType::kDefault)].m_texture_rect)
 	, m_explosion(textures.Get(TextureID::kExplosion))
 	, m_current_animation(CharacterAnimationType::kWalk)
 	, m_walking(CharacterAnimationType::kWalk, textures.Get(TextureID::kCharacterMovement))
@@ -37,10 +37,12 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 	, m_is_walking_left(false)
 	, m_is_walking_right(false)
 	, m_current_direction(FacingDirections::kDown)
-	, m_snowball_count(Table[static_cast<int>(type)].max_snowballs)
-	, m_is_player_one(is_player_one)
+	, m_snowball_count(Table[static_cast<int>(CharacterType::kDefault)].max_snowballs)
 	, m_impact_duration(sf::seconds(0.5f))
 	, m_blink_timer(sf::Time::Zero)
+	, m_identifier(identifier)
+	, m_is_on_server(is_on_server)
+	, m_is_impacted(false)
 	{
 	m_got_hit_count = 0;
 	m_throw_count = 0;
@@ -82,13 +84,36 @@ Character::Character(CharacterType type, const TextureHolder& textures, const Fo
 
 }
 
+Character::Character(bool is_on_server, int identifier)
+	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
+	, m_type(CharacterType::kDefault)
+	, m_current_animation(CharacterAnimationType::kWalk)
+	, m_health_display(nullptr)
+	, m_is_throwing(false)
+	, m_throw_countdown(sf::Time::Zero)
+	, m_is_marked_for_removal(false)
+	, m_show_explosion(true)
+	, m_spawned_pickup(false)
+	, m_played_explosion_sound(false)
+	, m_is_walking_up(false)
+	, m_is_walking_down(false)
+	, m_is_walking_left(false)
+	, m_is_walking_right(false)
+	, m_current_direction(FacingDirections::kDown)
+	, m_snowball_count(Table[static_cast<int>(CharacterType::kDefault)].max_snowballs)
+	, m_impact_duration(sf::seconds(0.5f))
+	, m_blink_timer(sf::Time::Zero)
+	, m_identifier(identifier)
+	, m_is_on_server(is_on_server)
+	, m_is_impacted(false)
+{
+		m_got_hit_count = 0;
+		m_throw_count = 0;
+}
+
 unsigned int Character::GetCategory() const
 {
-	if (m_is_player_one)
-	{
-		return static_cast<unsigned int>(ReceiverCategories::kPlayerOne);
-	}
-	return static_cast<unsigned int>(ReceiverCategories::kPlayerTwo);
+	return static_cast<unsigned int>(ReceiverCategories::kPlayer);
 
 }
 
@@ -123,7 +148,7 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 	float y_offset = 0.5f;
 	sf::Vector2f velocity(0.f,0.f);
 
-	std::unique_ptr<Projectile> projectile(new Projectile(type, textures, m_is_player_one));
+	std::unique_ptr<Projectile> projectile(new Projectile(type, textures, m_identifier));
 
 	float snowball_speed = projectile->GetMaxSpeed();
 
@@ -215,32 +240,37 @@ void Character::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) c
 
 void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
-	if (IsDestroyed())
+	if (m_is_on_server)
 	{
-		m_explosion.Update(dt);
-		// Play explosion sound only once
-		if (!m_played_explosion_sound)
-		{
-			SoundEffect explosionEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
-			PlayLocalSound(commands, explosionEffect);
+		Entity::UpdateCurrent(dt, commands);
 
-			m_played_explosion_sound = true;
-		}
-		return;
+		ClearWalkingFlags(dt);
+		HandleSliding();
+
+		CheckProjectileLaunch(dt, commands);
 	}
+	else
+	{
+		if (IsDestroyed())
+		{
+			m_explosion.Update(dt);
+			// Play explosion sound only once
+			if (!m_played_explosion_sound)
+			{
+				SoundEffect explosionEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
+				PlayLocalSound(commands, explosionEffect);
 
-	Entity::UpdateCurrent(dt, commands);
+				m_played_explosion_sound = true;
+			}
+			return;
+		}
 
-	//Update resource indicators
-	m_health_display->SetResource(GetHitPoints());
-	m_snowball_display->SetResource(m_snowball_count);
+		//Update resource indicators
+		m_health_display->SetResource(GetHitPoints());
+		m_snowball_display->SetResource(m_snowball_count);
 
-	
-	//Check if bullets or misiles are fired
-	CheckProjectileLaunch(dt, commands);
-		
-	UpdateAnimation(dt);
-	
+		UpdateAnimation(dt);
+	}
 }
 
 void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
@@ -585,6 +615,11 @@ void Character::SetColour(sf::Color colour)
 sf::Color Character::GetColour()
 {
 	return m_colour;
+}
+
+int Character::GetIdentifier() const
+{
+	return m_identifier;
 }
 
 //Dominik Hampejs D00250604

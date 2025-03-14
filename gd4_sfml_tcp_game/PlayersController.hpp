@@ -8,6 +8,8 @@
 #include "RGBColour.hpp"
 #include <map>
 
+#include <SFML/Network/TcpSocket.hpp>
+
 class Command;
 
 struct GameRecords
@@ -23,21 +25,26 @@ class PlayersController
 public:
 	typedef std::unique_ptr<RGBColour> RGBColourPtr;
 	PlayersController();
+	PlayersController(sf::TcpSocket* socket, sf::Int16 identifier);
+
+	void SetConnection(sf::TcpSocket* socket, sf::Int16 identifier);
 	void HandleEvent(const sf::Event& event, CommandQueue& command_queue);
+	void HandleEvent(const sf::Event& event);
 	void HandleRealTimeInput(CommandQueue& command_queue);
 
-	void HandleControllerInput(CommandQueue& command_queue);
+	void HandleControllerInput(const sf::Event& event);
+	void NetworkedRealTimeInputServer(CommandQueue& command_queue);
+	void RegisterRealTimeInputChange(Action action, bool state);
 
 	void AssignKey(Action action, sf::Keyboard::Key key);
 	sf::Keyboard::Key GetAssignedKey(Action action) const;
 	void SetGameStatus(GameStatus status);
 	GameStatus GetGameStatus() const;
-	void SetPlayersColours(RGBColourPtr colour_one, RGBColourPtr colour_two);
+	void SetPlayersColours(RGBColourPtr colour_one);
 
 	void UpdateColours(CommandQueue& command_queue);
 
 	GameRecords m_game_records;
-
 private:
 	void InitialiseActions();
 	static bool IsRealTimeAction(Action action);
@@ -45,12 +52,15 @@ private:
 private:
 	std::map<sf::Keyboard::Key, Action> m_key_binding;
 	std::map<Action, Command> m_action_binding;
+	std::map<Action, bool> m_action_proxy;
 
 	GameStatus m_current_game_status;
 
 	std::unique_ptr<RGBColour> m_colour_one;
-	std::unique_ptr<RGBColour> m_colour_two;
 
 	bool m_should_update_colours;
+
+	sf::TcpSocket* m_socket;
+	sf::Int16 m_identifier;
 };
 

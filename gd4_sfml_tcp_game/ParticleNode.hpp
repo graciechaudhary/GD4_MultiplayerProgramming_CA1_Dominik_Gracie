@@ -9,14 +9,14 @@
 class ParticleNode : public SceneNode
 {
 public:
-	ParticleNode(ParticleType type, const TextureHolder& textures, bool is_player_one);
+	ParticleNode(ParticleType type, const TextureHolder& textures, int identifier);
 
 	void AddParticle(sf::Vector2f position);
 	ParticleType GetParticleType() const;
 	virtual unsigned int GetCategory() const;
 	void SetColor(sf::Color color);
 
-	bool IsPlayerOne() const;
+	int GetIdentifier() const;
 
 private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands);
@@ -30,7 +30,7 @@ private:
 	ParticleType m_type;
 	sf::Color m_color;
 
-	bool m_is_player_one;
+	int m_identifier;
 
 	mutable sf::VertexArray m_vertex_array;
 	mutable bool m_needs_vertex_update;
