@@ -82,6 +82,8 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 
 	//Set socket to non-blocking
 	m_socket.setBlocking(false);
+
+	context.music->Play(MusicThemes::kGame);
 }
 
 void MultiplayerState::Draw()
