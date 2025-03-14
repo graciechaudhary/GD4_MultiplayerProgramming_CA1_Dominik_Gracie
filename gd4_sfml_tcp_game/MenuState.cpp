@@ -11,7 +11,8 @@ MenuState::MenuState(StateStack& stack, Context context)
 {
     sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
     m_background_sprite.setTexture(texture);
-    m_background_sprite.setScale(2.f,2.38f);
+    m_background_sprite.setScale(static_cast<float>(context.window->getSize().x) / texture.getSize().x,
+        static_cast<float>(context.window->getSize().y) / texture.getSize().y);
    
     //GracieChaudhary - menu decoration
     m_game_name.setFont(context.fonts->Get(Font::kMain));

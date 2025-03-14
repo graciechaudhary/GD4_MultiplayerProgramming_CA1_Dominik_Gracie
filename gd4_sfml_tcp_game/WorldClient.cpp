@@ -7,19 +7,21 @@
 
 WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
 	:m_target(output_target)
-	, m_camera(output_target.getDefaultView())
+	//, m_camera(output_target.getDefaultView())
 	, m_textures()
 	, m_fonts(font)
 	, m_sounds(sounds)
 	, m_scenegraph(ReceiverCategories::kNone)
 	, m_scene_layers()
-	, m_world_bounds(0.f, 0.f, m_camera.getSize().x, m_camera.getSize().y)
-	, m_centre_position(m_camera.getSize().x / 2.f, m_camera.getSize().y / 2.f)
+	//, m_world_bounds(0.f, 0.f, m_camera.getSize().x, m_camera.getSize().y)
+	//, m_centre_position(m_camera.getSize().x / 2.f, m_camera.getSize().y / 2.f)
+	, m_world_bounds(0.f, 0.f, output_target.getSize().x, output_target.getSize().y)
+	, m_centre_position(m_world_bounds.width / 2.f, m_world_bounds.height / 2.f)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
 	BuildScene();
-	m_camera.setCenter(m_centre_position);
+	//m_camera.setCenter(m_centre_position);
 
 	m_create_pickup_command.category = static_cast<int>(ReceiverCategories::kScene);
 	m_create_pickup_command.action = [this](SceneNode& node, sf::Time)
@@ -34,15 +36,17 @@ void WorldClient::Draw()
 	if (PostEffect::IsSupported())
 	{
 		m_scene_texture.clear();
-		m_scene_texture.setView(m_camera);
+		//m_scene_texture.setView(m_camera);
 		m_scene_texture.draw(m_scenegraph);
 		m_scene_texture.display();
 		m_bloom_effect.Apply(m_scene_texture, m_target);
+
 		
 	}
 	else
 	{
-		m_target.setView(m_camera);
+		m_target.setView(sf::View(sf::FloatRect(0.f, 0.f, m_world_bounds.width, m_world_bounds.height)));
+		//m_target.setView(m_camera);
 		m_target.draw(m_scenegraph);
 	}
 }
@@ -108,6 +112,9 @@ void WorldClient::InitializeLayers()
 
 void WorldClient::BuildSnowLandscape()
 {
+	//const float screen_width = m_world_bounds.width;
+	//const float screen_height = m_world_bounds.height;
+
 	//Prepare the background - defining the area for the repeated texture, creating sprite using the repeating texture, setting position of the sprite to match the world bounds, and attaching the sprite to the background scene layer
 	sf::Texture& snow_texture = m_textures.Get(TextureID::kSnowTile);
 	snow_texture.setRepeated(true);
@@ -118,15 +125,18 @@ void WorldClient::BuildSnowLandscape()
 
 	//Building ice lake
 	const float border_thickness = 64.f;
+
 	sf::Texture& icy_lake_texture = m_textures.Get(TextureID::kLakeTile);
 	icy_lake_texture.setRepeated(true);
+
 	sf::IntRect lake_texture_rect(0, 0, static_cast<int>(m_world_bounds.width), static_cast<int>(m_world_bounds.height));
 	std::unique_ptr<SpriteNode> lake_sprite(new SpriteNode(icy_lake_texture, lake_texture_rect));
-	lake_sprite->setScale(0.875, 0.834);
+	lake_sprite->setScale((m_world_bounds.width-2*border_thickness)/ m_world_bounds.width, (m_world_bounds.height - 2 * border_thickness) / m_world_bounds.height);
+	//
 	lake_sprite->setPosition(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness);
 	m_scene_layers[static_cast<int>(SceneLayers::kBackground)]->AttachChild(std::move(lake_sprite));
 
-	sf::FloatRect lake_bounds(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness, m_world_bounds.width * 0.875, m_world_bounds.height * 0.834);
+	sf::FloatRect lake_bounds(m_world_bounds.left + border_thickness, m_world_bounds.top + border_thickness, m_world_bounds.width - 2 * border_thickness, m_world_bounds.height - 2 * border_thickness);
 
 	BuildTreesFixed(lake_bounds);
 }
@@ -221,14 +231,14 @@ void WorldClient::CreatePickup(SceneNode& node, PickupSpawnPoint& spawnpoint, co
 	node.AttachChild(std::move(pickup));
 }
 
-sf::FloatRect WorldClient::GetViewBounds() const
-{
-	return sf::FloatRect(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
-}
+//sf::FloatRect WorldClient::GetViewBounds() const
+//{
+//	return sf::FloatRect(m_camera.getCenter() - m_camera.getSize() / 2.f, m_camera.getSize());
+//}
 
 sf::FloatRect WorldClient::GetBattleFieldBounds() const
 {
-	return GetViewBounds();
+	return m_world_bounds;
 }
 
 void WorldClient::AddCharacter(sf::Int16 identifier)

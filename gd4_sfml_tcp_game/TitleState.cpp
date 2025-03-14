@@ -10,7 +10,8 @@ TitleState::TitleState(StateStack& stack, Context context) : State(stack, contex
     //GracieChaudhary - setting up text boxes and background
     sf::Texture& texture = context.textures->Get(TextureID::kMenuScreen);
     m_background_sprite.setTexture(texture);
-    m_background_sprite.setScale(2.f, 2.38f);
+    m_background_sprite.setScale(static_cast<float>(context.window->getSize().x) / texture.getSize().x,
+        static_cast<float>(context.window->getSize().y) / texture.getSize().y);
 
     m_text.setFont(context.fonts->Get(Font::kMain));
     m_text.setString("Press any key to continue");
