@@ -84,10 +84,14 @@ Character::Character(bool is_on_server, int identifier, const TextureHolder& tex
 
 }
 
-Character::Character(bool is_on_server, int identifier)
+Character::Character(bool is_on_server, int identifier, const TextureHolder& textures)
 	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
 	, m_type(CharacterType::kDefault)
 	, m_current_animation(CharacterAnimationType::kWalk)
+	, m_sprite(textures.Get(Table[static_cast<int>(CharacterType::kDefault)].m_texture), Table[static_cast<int>(CharacterType::kDefault)].m_texture_rect)
+	, m_walking(CharacterAnimationType::kWalk, textures.Get(TextureID::kCharacterMovement))
+	, m_attacking(CharacterAnimationType::kAttack, textures.Get(TextureID::kCharacterMovement))
+	, m_explosion(textures.Get(TextureID::kExplosion))
 	, m_health_display(nullptr)
 	, m_is_throwing(false)
 	, m_throw_countdown(sf::Time::Zero)
@@ -109,6 +113,12 @@ Character::Character(bool is_on_server, int identifier)
 {
 		m_got_hit_count = 0;
 		m_throw_count = 0;
+
+		m_throw_command.category = static_cast<int>(ReceiverCategories::kScene);
+		m_throw_command.action = [this, &textures](SceneNode& node, sf::Time dt)
+			{
+				CreateSnowball(node, textures);
+			};
 }
 
 unsigned int Character::GetCategory() const
@@ -148,7 +158,7 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 	float y_offset = 0.5f;
 	sf::Vector2f velocity(0.f,0.f);
 
-	std::unique_ptr<Projectile> projectile(new Projectile(type, textures, m_identifier));
+	std::unique_ptr<Projectile> projectile(new Projectile(type, textures, m_identifier, m_is_on_server));
 
 	float snowball_speed = projectile->GetMaxSpeed();
 
@@ -276,13 +286,13 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 {
 	
-	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
+ 	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
 	{
+		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval / 1.f;
 		m_throw_count++;
 		m_current_animation = CharacterAnimationType::kAttack; 
-		PlayLocalSound(commands, SoundEffect::kSnowballThrow);
+		//PlayLocalSound(commands, SoundEffect::kSnowballThrow);
 		commands.Push(m_throw_command);
-		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval /  1.f;		
 		--m_snowball_count;
 		m_is_throwing = false;
 	}

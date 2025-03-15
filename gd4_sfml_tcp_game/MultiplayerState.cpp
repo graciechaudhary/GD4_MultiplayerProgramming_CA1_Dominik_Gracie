@@ -245,13 +245,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			m_players_controller.SetConnection(&m_socket, identifier);
 		}
 									   break;
-		case Server::PacketType::kHealthChange: {
+		case Server::PacketType::kHealthDown: {
 			sf::Int16 identifer;
-			sf::Int16 hp;
-
-			packet >> identifer >> hp;
-
-			m_world.GetCharacter(identifer)->SetHitPoints(hp);
+			packet >> identifer;
+			m_world.GetCharacter(identifer)->Damage(1);
 		}
 
 		case Server::PacketType::kUpdateClientState: {

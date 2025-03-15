@@ -17,7 +17,7 @@ class Character : public Entity
 {
 public:
 	Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts);
-	Character(bool is_on_server, int identifier);
+	Character(bool is_on_server, int identifier, const TextureHolder& textures);
 	unsigned int GetCategory() const override;
 
 	int GetMaxHitpoints() const;

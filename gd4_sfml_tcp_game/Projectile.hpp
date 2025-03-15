@@ -9,7 +9,7 @@
 class Projectile : public Entity
 {
 public:
-	Projectile(ProjectileType type, const TextureHolder& textures, int identifier);
+	Projectile(ProjectileType type, const TextureHolder& textures, int identifier, bool is_server);
 
 	unsigned int GetCategory() const override;
 	sf::FloatRect GetBoundingRect() const override;
@@ -28,6 +28,7 @@ private:
 	sf::Sprite m_sprite;
 	int m_identifier;
 	sf::Vector2f m_target_direction;
+	bool m_is_on_server;
 
 	//GracieChaudhary
 	Animation m_impact_animation;

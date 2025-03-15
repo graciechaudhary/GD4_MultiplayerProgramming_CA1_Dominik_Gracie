@@ -11,7 +11,7 @@
 
 #include "MultiplayerState.hpp"
 
-const sf::Time Application::kTimePerFrame = sf::seconds(1.f/60.f);
+const sf::Time Application::kTimePerFrame = sf::seconds(1.f/FRAME_RATE);
 
 Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::VideoMode(WINDOW_WIDTH,WINDOW_HEIGHT), "States", sf::Style::
 Default)

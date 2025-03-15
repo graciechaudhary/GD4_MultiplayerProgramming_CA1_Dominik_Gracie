@@ -12,12 +12,13 @@ namespace
     const std::vector<ProjectileData> Table = InitializeProjectileData();
 }
 
-Projectile::Projectile(ProjectileType type, const TextureHolder& textures, int identifier)
+Projectile::Projectile(ProjectileType type, const TextureHolder& textures, int identifier, bool is_on_server)
 	: Entity(1)
     , m_type(type)
     , m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
 	, m_identifier(identifier)
     , m_impact_animation(textures.Get(TextureID::kImpact))
+    , m_is_on_server(is_on_server)
 {
     Utility::CentreOrigin(m_sprite);    
 
@@ -63,7 +64,7 @@ float Projectile::GetDamage() const
 
 bool Projectile::IsMarkedForRemoval() const
 {
-    return IsDestroyed() && m_impact_animation.IsFinished();
+    return IsDestroyed() && (m_impact_animation.IsFinished() || m_is_on_server);
 }
 
 

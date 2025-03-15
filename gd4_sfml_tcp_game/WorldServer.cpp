@@ -15,16 +15,29 @@ WorldServer::WorldServer() : m_scenegraph()
 , m_event_queue()
 {
 	InitializeLayers();
+	LoadTextures();
 }
 
 void WorldServer::LoadTextures()
 {
+	m_textures.Load(TextureID::kHealthRefill, "MediaFiles/Textures/UI/HealthPickupV2.png");
+	m_textures.Load(TextureID::kSnowballRefill, "MediaFiles/Textures/UI/SnowballPickup.png");
+
+	//m_textures.Load(TextureID::kEntities, "MediaFiles/Textures/Entities.png");
+	m_textures.Load(TextureID::kExplosion, "MediaFiles/Textures/Explosion/Explosion.png");
+	m_textures.Load(TextureID::kImpact, "MediaFiles/Textures/Explosion/Impact.png");
+
 	//edited texture for the snow particle effect - GracieChaudhary
 	m_textures.Load(TextureID::kParticle, "MediaFiles/Textures/Particles/SnowBits.png");
 
 	//reloading textures for game assets - GracieChaudhary
 	m_textures.Load(TextureID::kCharacterMovement, "MediaFiles/Textures/Character/CharacterMovementSheet.png");
 	m_textures.Load(TextureID::kSnowball, "MediaFiles/Textures/Weapon/Snowball.png");
+	m_textures.Load(TextureID::kSnowTile, "MediaFiles/Textures/Environment/SnowTile_64x64.png");
+	m_textures.Load(TextureID::kLakeTile, "MediaFiles/Textures/Environment/LakeTile_64x64.png");
+	m_textures.Load(TextureID::kPurpleTree, "MediaFiles/Textures/Tree/PurpleTree_64x64.png");
+	m_textures.Load(TextureID::kGreenTree, "MediaFiles/Textures/Tree/GreenTree_64x64.png");
+	m_textures.Load(TextureID::kDeadTree, "MediaFiles/Textures/Tree/DeadTree_64x64.png");
 }
 
 void WorldServer::InitializeLayers()
@@ -174,16 +187,16 @@ void WorldServer::HandleCollisions()
 			character.Damage(projectile.GetDamage());
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f, 3.f));
-			character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
+			//character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			character.Impacted();
 			projectile.Destroy();
 
-			Packet_Ptr packet;
-			*packet << static_cast<sf::Int16>(Server::PacketType::kHealthChange);
-			*packet << character.GetIdentifier() << static_cast<sf::Int16>(character.GetHitPoints());
+			Packet_Ptr packet = std::make_unique<sf::Packet>();
+			*packet << static_cast<sf::Int16>(Server::PacketType::kHealthDown);
+			*packet << static_cast<sf::Int16>(character.GetIdentifier());
 			m_event_queue.push_back(std::move(packet));
 
-
+			std::cout << "HP:: " << static_cast<sf::Int16>(character.GetHitPoints()) << std::endl;
 		}
 
 	}
@@ -215,7 +228,7 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 
 void WorldServer::AddCharacter(sf::Int16 identifier)
 {
-	std::unique_ptr<Character> leader(new Character(true, identifier));
+	std::unique_ptr<Character> leader(new Character(true, identifier, m_textures));
 	Character* character = leader.get();
 	character->setPosition(100.f, 100.f);
 	character->SetVelocity(0, 0);

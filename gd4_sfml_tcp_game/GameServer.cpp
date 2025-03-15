@@ -50,7 +50,7 @@ void GameServer::ExecutionThread()
     //Initialisation
     SetListening(true);
 
-    sf::Time frame_rate = sf::seconds(1.f / 60.f);
+    sf::Time frame_rate = sf::seconds(1.f / FRAME_RATE);
     sf::Time frame_time = sf::Time::Zero;
     sf::Time tick_rate = sf::seconds(1.f / TICK_RATE);
     sf::Time tick_time = sf::Time::Zero;
