@@ -3,6 +3,11 @@
 
 
 #include <iostream>
+#include "DataTables.hpp"
+
+namespace {
+	std::map<int, SpawnPoint> Table = InitializeSpawnPoints();
+}
 
 WorldServer::WorldServer() : m_scenegraph()
 , m_command_queue()
@@ -230,7 +235,7 @@ void WorldServer::AddCharacter(sf::Int16 identifier)
 {
 	std::unique_ptr<Character> leader(new Character(true, identifier, m_textures));
 	Character* character = leader.get();
-	character->setPosition(100.f, 100.f);
+	character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
 	character->SetVelocity(0, 0);
 	m_characters[identifier] = character;
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));

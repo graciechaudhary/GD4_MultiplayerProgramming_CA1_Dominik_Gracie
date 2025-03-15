@@ -114,6 +114,25 @@ Character::Character(bool is_on_server, int identifier, const TextureHolder& tex
 		m_got_hit_count = 0;
 		m_throw_count = 0;
 
+		//GracieChaudhary - Walking Animation Setup
+		m_walking.SetFrameSize(sf::Vector2i(38, 42));
+		m_walking.SetNumFrames(4);
+		m_walking.SetDuration(sf::seconds(1.f));
+		m_walking.SetRepeating(true);
+
+		//GracieChaudhary - Attacking Animation Setup
+		m_attacking.SetFrameSize(sf::Vector2i(38, 42));
+		m_attacking.SetNumFrames(4);
+		m_attacking.SetDuration(sf::seconds(0.75f));
+		m_attacking.SetRepeating(false);
+
+		m_explosion.SetFrameSize(sf::Vector2i(100, 100));
+		m_explosion.SetNumFrames(81);
+		m_explosion.SetDuration(sf::seconds(1.5f));
+		m_explosion.scale(2, 2);
+		Utility::CentreOrigin(m_sprite);
+		Utility::CentreOrigin(m_explosion);
+
 		m_throw_command.category = static_cast<int>(ReceiverCategories::kScene);
 		m_throw_command.action = [this, &textures](SceneNode& node, sf::Time dt)
 			{
@@ -258,6 +277,7 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		HandleSliding();
 
 		CheckProjectileLaunch(dt, commands);
+		UpdateAnimation(dt);
 	}
 	else
 	{

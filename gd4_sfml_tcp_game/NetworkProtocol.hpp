@@ -3,8 +3,10 @@ const unsigned short SERVER_PORT = 50000;
 const float TICK_RATE = 30.f;
 const float FRAME_RATE = 60.f;
 
-const unsigned short WINDOW_WIDTH = 1920;
-const unsigned short WINDOW_HEIGHT = 1080;
+const unsigned short MAX_CONNECTIONS = 15;
+
+const float WINDOW_WIDTH = 1920.f;
+const float WINDOW_HEIGHT = 1080.f;
 
 namespace Server
 {
