@@ -22,7 +22,6 @@ WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, Soun
 	//, m_centre_position(m_camera.getSize().x / 2.f, m_camera.getSize().y / 2.f)
 	, m_world_bounds(0.f, 0.f, output_target.getSize().x, output_target.getSize().y)
 	, m_centre_position(m_world_bounds.width / 2.f, m_world_bounds.height / 2.f)
-	, m_pos_test(std::vector<std::unique_ptr<sf::Text>>(15))
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -35,18 +34,6 @@ WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, Soun
 			//CreatePickup(node, m_textures);
 		};
 
-	int i = 0;
-	for (auto& text_ptr : m_pos_test) {
-		text_ptr = std::make_unique<sf::Text>();
-		Utility::CentreOrigin(*text_ptr);
-		text_ptr->setFont(font.Get(Font::kMain)); // Set font (make sure m_font is valid!)
-		text_ptr->setString("X");
-		text_ptr->setCharacterSize(24);
-		text_ptr->setFillColor(sf::Color::Black);
-		text_ptr->setPosition(Table[i].m_x, Table[i].m_y);
-		i++;
-	}
-
 }
 
 void WorldClient::Draw()
@@ -58,11 +45,6 @@ void WorldClient::Draw()
 		m_scene_texture.draw(m_scenegraph);
 		m_scene_texture.display();
 		m_bloom_effect.Apply(m_scene_texture, m_target);
-		for (auto& text_ptr : m_pos_test) {
-			m_target.draw(*text_ptr);
-		}
-
-		
 	}
 	else
 	{
