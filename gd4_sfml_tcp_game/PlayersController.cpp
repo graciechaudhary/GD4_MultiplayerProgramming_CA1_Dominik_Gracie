@@ -164,14 +164,16 @@ void PlayersController::HandleEvent(const sf::Event& event)
     if ((event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) && m_socket)
     {
         Action action = m_key_binding[event.key.code];
-        if (IsRealTimeAction(action))
+        bool isPressed = (event.type == sf::Event::KeyPressed);
+        if (IsRealTimeAction(action) && m_action_proxy[action] != isPressed)
         {
+            m_action_proxy[action] = isPressed;
             // Send realtime change over network
             sf::Packet packet;
             packet << static_cast<sf::Int16>(Client::PacketType::kPlayerRealtimeChange);
             packet << m_identifier;
             packet << static_cast<sf::Int16>(action);
-            packet << (event.type == sf::Event::KeyPressed);
+            packet << isPressed;
             m_socket->send(packet);
         }
     }
