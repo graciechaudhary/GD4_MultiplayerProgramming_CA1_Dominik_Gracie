@@ -257,7 +257,7 @@ void WorldClient::Update(sf::Time dt)
 void WorldClient::AddCharacter(sf::Int16 identifier)
 {
 	std::unique_ptr<Character> leader(new Character(false, identifier, m_textures, m_fonts));
-	m_character = leader.get();
+	Character* m_character = leader.get();
 	m_character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
 	m_character->SetVelocity(0, 0);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
@@ -268,6 +268,11 @@ void WorldClient::AddCharacter(sf::Int16 identifier)
 Character* WorldClient::GetCharacter(sf::Int16 identifier)
 {
 	return m_characters[identifier];
+}
+
+void WorldClient::CreateSnowball(sf::Int16 identifier, std::unique_ptr<Projectile> projectile)
+{
+	GetCharacter(identifier)->CreateSnowball(*m_scene_layers[static_cast<int>(SceneLayers::kBackground)], m_textures, std::move(projectile));
 }
 
 void WorldClient::UpdateSounds()

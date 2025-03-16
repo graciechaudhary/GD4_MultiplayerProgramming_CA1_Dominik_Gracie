@@ -11,6 +11,7 @@
 #include "SoundNode.hpp"
 
 #include <iostream>
+#include "NetworkProtocol.hpp"
 
 namespace
 {
@@ -84,7 +85,7 @@ Character::Character(bool is_on_server, int identifier, const TextureHolder& tex
 
 }
 
-Character::Character(bool is_on_server, int identifier, const TextureHolder& textures)
+Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue)
 	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
 	, m_type(CharacterType::kDefault)
 	, m_current_animation(CharacterAnimationType::kWalk)
@@ -110,6 +111,7 @@ Character::Character(bool is_on_server, int identifier, const TextureHolder& tex
 	, m_identifier(identifier)
 	, m_is_on_server(is_on_server)
 	, m_is_impacted(false)
+	, m_event_queue(event_queue)
 {
 		m_got_hit_count = 0;
 		m_throw_count = 0;
@@ -168,6 +170,72 @@ void Character::RechargeSnowballs()
 {
 	m_snowball_count = Table[static_cast<int>(m_type)].max_snowballs;
 	m_is_throwing = false;
+}
+
+void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures, std::unique_ptr<Projectile> projectile) const
+{
+	ProjectileType type = ProjectileType::kSnowball;
+	float x_offset = 0.f;
+	float y_offset = 0.5f;
+	sf::Vector2f velocity(0.f, 0.f);
+
+	projectile.reset(new Projectile(type, textures, m_identifier, m_is_on_server));
+
+	float snowball_speed = projectile->GetMaxSpeed();
+
+	//Set the projectile velocity and offset based on the direction the player faces 
+	switch (GetFacingDirection())
+	{
+	case FacingDirections::kUp:
+		velocity.y = -snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kDown:
+		velocity.y = snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kLeft:
+		velocity.x = -snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kRight:
+		velocity.x = snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kUpLeft:
+		velocity.x = -snowball_speed / std::sqrt(2);
+		velocity.y = -snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = -0.5f;
+		break;
+	case FacingDirections::kUpRight:
+		velocity.x = snowball_speed / std::sqrt(2);
+		velocity.y = -snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = 0.5f;
+		break;
+	case FacingDirections::kDownLeft:
+		velocity.x = -snowball_speed / std::sqrt(2);
+		velocity.y = snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = -0.5f;
+		break;
+	case FacingDirections::kDownRight:
+		velocity.x = snowball_speed / std::sqrt(2);
+		velocity.y = snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = 0.5f;
+		break;
+	default:
+		break;
+	}
+
+	sf::Vector2f offset(x_offset * m_sprite.getGlobalBounds().width, y_offset * m_sprite.getGlobalBounds().height);
+
+	projectile->setPosition(GetWorldPosition() + offset);
+	projectile->SetVelocity(velocity);
+	node.AttachChild(std::move(projectile));
+
 }
 
 void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) const
@@ -233,6 +301,13 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 	projectile->setPosition(GetWorldPosition() + offset);
 	projectile->SetVelocity(velocity);
 	node.AttachChild(std::move(projectile));
+
+	std::unique_ptr<sf::Packet> packet = std::make_unique<sf::Packet>();
+	*packet << static_cast<sf::Int16>(Server::PacketType::kCreateSnowball);
+	*packet << GetIdentifier();
+	*packet << static_cast<sf::Int16>(m_throw_count);
+
+	m_event_queue->push_back(std::move(packet));
 	
 }
 
@@ -648,7 +723,7 @@ sf::Color Character::GetColour()
 	return m_colour;
 }
 
-int Character::GetIdentifier() const
+sf::Int16 Character::GetIdentifier() const
 {
 	return m_identifier;
 }

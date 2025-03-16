@@ -18,6 +18,7 @@ namespace Server
 		kHealthUp,
 		kHealthDown,
 		kInitialState,
+		kCreateSnowball,
 	};
 }
 

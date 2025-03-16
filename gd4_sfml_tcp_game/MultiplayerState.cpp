@@ -267,6 +267,17 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			packet >> identifer;
 			m_world.GetCharacter(identifer)->Damage(1);
 		}
+		break;
+		case Server::PacketType::kCreateSnowball: {
+			sf::Int16 identifer;
+			sf::Int16 snowball_identifier;
+			packet >> identifer >> snowball_identifier;
+
+			std::unique_ptr<Projectile> projectile;
+
+			m_world.CreateSnowball(identifer,std::move(projectile));
+		}
+											break;
 
 		case Server::PacketType::kUpdateClientState: {
 

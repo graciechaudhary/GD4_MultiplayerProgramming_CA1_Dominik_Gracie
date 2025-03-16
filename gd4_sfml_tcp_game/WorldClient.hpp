@@ -43,6 +43,8 @@ public:
 	void AddCharacter(sf::Int16 identifier);
 	Character* GetCharacter(sf::Int16 identifier);
 
+	void CreateSnowball(sf::Int16 identifier, std::unique_ptr<Projectile> projectile);
+
 private:
 	void LoadTextures();
 	void BuildScene();
@@ -74,7 +76,7 @@ private:
 
 	Command m_create_pickup_command;
 	std::map<sf::Int16, Character*> m_characters;
-	Character* m_character;
+	//Character* m_character;
 
 };
 
