@@ -18,6 +18,7 @@ WorldServer::WorldServer() : m_scenegraph()
 , m_scene_layers()
 , m_world_bounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
 , m_event_queue()
+
 {
 	InitializeLayers();
 	LoadTextures();

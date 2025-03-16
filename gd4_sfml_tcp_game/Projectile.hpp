@@ -5,17 +5,22 @@
 #include "ResourceIdentifiers.hpp"
 #include "ProjectileType.hpp"
 #include "Animation.hpp"
+#include "ParticleNode.hpp"
+#include "EmitterNode.hpp"
 
 class Projectile : public Entity
 {
 public:
 	Projectile(ProjectileType type, const TextureHolder& textures, int identifier, bool is_server);
+	Projectile(ProjectileType type, const TextureHolder& textures, int identifier, bool is_server, ParticleNode* particle_system);
 
 	unsigned int GetCategory() const override;
 	sf::FloatRect GetBoundingRect() const override;
 	float GetMaxSpeed() const;
 	float GetDamage() const;
 	bool IsMarkedForRemoval() const override;
+
+	void UpdateVisuals(sf::Time dt);
 	
 	
 
@@ -32,6 +37,6 @@ private:
 
 	//GracieChaudhary
 	Animation m_impact_animation;
-	
+	EmitterNode* m_emitter;
 };
 

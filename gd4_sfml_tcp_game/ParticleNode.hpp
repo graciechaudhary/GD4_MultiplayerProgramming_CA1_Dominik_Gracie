@@ -18,6 +18,8 @@ public:
 
 	int GetIdentifier() const;
 
+	void UpdateVisuals(sf::Time dt);
+
 private:
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands);
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;

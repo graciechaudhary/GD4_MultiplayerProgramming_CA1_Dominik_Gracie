@@ -273,9 +273,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			sf::Int16 snowball_identifier;
 			packet >> identifer >> snowball_identifier;
 
-			std::unique_ptr<Projectile> projectile;
-
-			m_world.CreateSnowball(identifer,std::move(projectile));
+			m_world.CreateSnowball(identifer);
 		}
 											break;
 

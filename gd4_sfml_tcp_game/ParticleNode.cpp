@@ -122,4 +122,19 @@ int ParticleNode::GetIdentifier() const
     return m_identifier;
 }
 
+void ParticleNode::UpdateVisuals(sf::Time dt)
+{
+    while (!m_particles.empty() && m_particles.front().m_lifetime <= sf::Time::Zero)
+    {
+        m_particles.pop_front();
+    }
+
+    //Decrease lifetime of existing particles
+    for (Particle& particle : m_particles)
+    {
+        particle.m_lifetime -= dt;
+    }
+    m_needs_vertex_update = true;
+}
+
 

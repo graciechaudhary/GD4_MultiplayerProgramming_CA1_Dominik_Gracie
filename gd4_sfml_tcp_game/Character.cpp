@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include "NetworkProtocol.hpp"
+#include "ParticleNode.hpp"
 
 namespace
 {
@@ -172,14 +173,11 @@ void Character::RechargeSnowballs()
 	m_is_throwing = false;
 }
 
-void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures, std::unique_ptr<Projectile> projectile) const
+void Character::CreateSnowball(SceneNode& node,  std::unique_ptr<Projectile> projectile) const
 {
-	ProjectileType type = ProjectileType::kSnowball;
 	float x_offset = 0.f;
 	float y_offset = 0.5f;
 	sf::Vector2f velocity(0.f, 0.f);
-
-	projectile.reset(new Projectile(type, textures, m_identifier, m_is_on_server));
 
 	float snowball_speed = projectile->GetMaxSpeed();
 

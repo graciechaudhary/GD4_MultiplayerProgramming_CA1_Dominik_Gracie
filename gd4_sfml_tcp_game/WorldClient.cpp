@@ -5,6 +5,7 @@
 #include "EmitterNode.hpp"
 #include "SpriteNode.hpp"
 #include "DataTables.hpp"
+#include <iostream>
 
 namespace {
 	std::map<int, SpawnPoint> Table = InitializeSpawnPoints();
@@ -22,6 +23,7 @@ WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, Soun
 	//, m_centre_position(m_camera.getSize().x / 2.f, m_camera.getSize().y / 2.f)
 	, m_world_bounds(0.f, 0.f, output_target.getSize().x, output_target.getSize().y)
 	, m_centre_position(m_world_bounds.width / 2.f, m_world_bounds.height / 2.f)
+	, m_projectile_test(nullptr)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -95,6 +97,7 @@ void WorldClient::BuildScene()
 
 
 	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures, 1));
+	m_snow_particle = snowNode.get();
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
 
 	// Add sound effect node
@@ -252,17 +255,23 @@ void WorldClient::Update(sf::Time dt)
 
 		charMap.second->UpdateVisuals(dt);
 	}
+	if (m_projectile_test)
+	{
+		m_snow_particle->UpdateVisuals(dt);
+		m_projectile_test->UpdateVisuals(dt);
+	}
 }
 
 void WorldClient::AddCharacter(sf::Int16 identifier)
 {
 	std::unique_ptr<Character> leader(new Character(false, identifier, m_textures, m_fonts));
-	Character* m_character = leader.get();
-	m_character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
-	m_character->SetVelocity(0, 0);
+	Character* character = leader.get();
+	character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
+	character->SetVelocity(0, 0);
+	character->SetColour(sf::Color::Yellow);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
-	m_characters[identifier] = m_character;
+	m_characters[identifier] = character;
 }
 
 Character* WorldClient::GetCharacter(sf::Int16 identifier)
@@ -270,9 +279,11 @@ Character* WorldClient::GetCharacter(sf::Int16 identifier)
 	return m_characters[identifier];
 }
 
-void WorldClient::CreateSnowball(sf::Int16 identifier, std::unique_ptr<Projectile> projectile)
+void WorldClient::CreateSnowball(sf::Int16 identifier)
 {
-	GetCharacter(identifier)->CreateSnowball(*m_scene_layers[static_cast<int>(SceneLayers::kBackground)], m_textures, std::move(projectile));
+	std::unique_ptr<Projectile> projectile(new Projectile(ProjectileType::kSnowball, m_textures, identifier, false, m_snow_particle));
+	m_projectile_test = projectile.get();
+	GetCharacter(identifier)->CreateSnowball(*m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)], std::move(projectile));
 }
 
 void WorldClient::UpdateSounds()

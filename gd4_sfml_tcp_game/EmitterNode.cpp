@@ -12,6 +12,20 @@ EmitterNode::EmitterNode(ParticleType type, int identifier)
 {
 }
 
+EmitterNode::EmitterNode(ParticleType type, int identifier, ParticleNode* particle_system)
+	:SceneNode()
+	, m_accumulated_time(sf::Time::Zero)
+	, m_type(type)
+	, m_particle_system(particle_system)
+	, m_identifier(identifier)
+{
+}
+
+void EmitterNode::VisualUpdate(sf::Time dt)
+{
+	EmitRadialParticles(dt);
+}
+
 void EmitterNode::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	if (m_particle_system)

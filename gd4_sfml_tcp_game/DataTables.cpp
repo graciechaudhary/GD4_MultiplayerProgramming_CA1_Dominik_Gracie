@@ -31,6 +31,7 @@ std::vector<ProjectileData> InitializeProjectileData()
     data[static_cast<int>(ProjectileType::kSnowball)].m_speed = 500;
     data[static_cast<int>(ProjectileType::kSnowball)].m_texture = TextureID::kSnowball;
 
+
     return data;
 }
 
@@ -59,7 +60,7 @@ std::vector<ParticleData> InitializeParticleData()
 {
     std::vector<ParticleData> data(static_cast<int>(ParticleType::kParticleCount));
 
-    data[static_cast<int>(ParticleType::kSnow)].m_color = sf::Color(255, 255, 255);
+    data[static_cast<int>(ParticleType::kSnow)].m_color = sf::Color::Yellow;
     data[static_cast<int>(ParticleType::kSnow)].m_lifetime = sf::seconds(1.f);
 
 
