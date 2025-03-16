@@ -17,6 +17,7 @@ namespace Server
 		kUpdateClientState,
 		kHealthUp,
 		kHealthDown,
+		kInitialState,
 	};
 }
 

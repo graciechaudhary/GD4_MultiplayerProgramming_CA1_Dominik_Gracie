@@ -76,8 +76,5 @@ private:
 	std::map<sf::Int16, Character*> m_characters;
 	Character* m_character;
 
-	std::vector<std::unique_ptr<sf::Text>> m_pos_test;
-
-
 };
 

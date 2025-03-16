@@ -193,7 +193,7 @@ void WorldServer::HandleCollisions()
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f, 3.f));
 			//character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
-			character.Impacted();
+			//character.Impacted();
 			projectile.Destroy();
 
 			Packet_Ptr packet = std::make_unique<sf::Packet>();

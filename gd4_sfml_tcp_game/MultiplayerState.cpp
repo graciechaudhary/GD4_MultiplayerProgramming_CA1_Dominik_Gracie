@@ -245,6 +245,23 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			m_players_controller.SetConnection(&m_socket, identifier);
 		}
 									   break;
+		case Server::PacketType::kInitialState: {
+			sf::Int16 amount;
+			packet >> amount;
+			std::cout << "Chars: " << amount << std::endl;
+			for (sf::Int16 i = 0; i < amount; i++)
+			{
+
+				sf::Int16 id;
+				packet >> id;
+
+				if (id == m_identifier) continue;
+
+				m_world.AddCharacter(id);
+			}
+
+									   }
+											  break;
 		case Server::PacketType::kHealthDown: {
 			sf::Int16 identifer;
 			packet >> identifer;

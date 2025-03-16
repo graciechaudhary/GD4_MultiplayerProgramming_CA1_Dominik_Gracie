@@ -212,6 +212,10 @@ void GameServer::HandleIncomingConnections()
 		m_player_controllers[m_connected_players] = new PlayersController(&m_peers[m_connected_players]->m_socket, m_connected_players);
 		m_world.AddCharacter(m_connected_players);
 
+        InformWorldState(m_peers[m_connected_players]->m_socket);
+        NotifyPlayerSpawn(m_connected_players);
+        
+
         m_connected_players++;
         if (m_connected_players >= m_max_connected_players)
         {
@@ -264,6 +268,35 @@ void GameServer::BroadcastMessage(const std::string& message)
 	packet << static_cast<sf::Int16>(Server::PacketType::kBroadcastMessage);
 	packet << message;
 	SendToAll(packet);
+}
+
+void GameServer::InformWorldState(sf::TcpSocket& socket)
+{
+    sf::Packet packet;
+    packet << static_cast<sf::Int16>(Server::PacketType::kInitialState);
+    packet << m_connected_players;
+
+    for (sf::Int16 i = 0; i < m_connected_players; ++i)
+    {
+        if (m_peers[i]->m_ready)
+        {
+            sf::Int16 identifier = m_peers[i]->m_identifier;
+            packet << identifier;
+        }
+    }
+
+    socket.send(packet);
+}
+
+void GameServer::NotifyPlayerSpawn(sf::Int16 identifier)
+{
+    sf::Packet packet;
+    sf::Int16 size = 1;
+    packet << static_cast<sf::Int16>(Server::PacketType::kInitialState);
+    packet << size;
+    packet << identifier;
+
+    SendToAll(packet);
 }
 
 GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false)

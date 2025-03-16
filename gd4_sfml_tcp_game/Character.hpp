@@ -20,6 +20,8 @@ public:
 	Character(bool is_on_server, int identifier, const TextureHolder& textures);
 	unsigned int GetCategory() const override;
 
+	typedef std::shared_ptr<Character> Shared;
+
 	int GetMaxHitpoints() const;
 	float GetMaxSpeed() const;
 

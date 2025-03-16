@@ -272,7 +272,7 @@ Character* WorldClient::GetCharacter(sf::Int16 identifier)
 
 void WorldClient::UpdateSounds()
 {
-	m_sounds.SetListenerPosition(m_character->GetWorldPosition());
+	//m_sounds.SetListenerPosition(m_character->GetWorldPosition());
 
 	// Remove unused sounds
 	m_sounds.RemoveStoppedSounds();

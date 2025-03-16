@@ -241,6 +241,7 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 void Character::Damage(int damage)
 {
 	Entity::Damage(damage);
+	Impacted();
 	m_got_hit_count++;
 }
 
@@ -251,7 +252,7 @@ sf::FloatRect Character::GetBoundingRect() const
 
 bool Character::IsMarkedForRemoval() const
 {
-	return IsDestroyed() && (m_explosion.IsFinished() || !m_show_explosion);
+	return IsDestroyed() && (m_explosion.IsFinished() || m_is_on_server);
 }
 
 void Character::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
