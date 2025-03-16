@@ -255,10 +255,13 @@ void WorldClient::Update(sf::Time dt)
 
 		charMap.second->UpdateVisuals(dt);
 	}
-	if (m_projectile_test)
+	for (auto projectile : m_projectiles)
 	{
-		m_snow_particle->UpdateVisuals(dt);
-		m_projectile_test->UpdateVisuals(dt);
+		projectile.second->UpdateVisuals(dt);
+	}
+	for (auto parSys: m_particle_systems)
+	{
+		parSys.second->UpdateVisuals(dt);
 	}
 }
 
@@ -272,6 +275,12 @@ void WorldClient::AddCharacter(sf::Int16 identifier)
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
 	m_characters[identifier] = character;
+
+	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures, identifier));
+	
+	m_particle_systems[identifier] = snowNode.get();
+
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
 }
 
 Character* WorldClient::GetCharacter(sf::Int16 identifier)
@@ -279,11 +288,12 @@ Character* WorldClient::GetCharacter(sf::Int16 identifier)
 	return m_characters[identifier];
 }
 
-void WorldClient::CreateSnowball(sf::Int16 identifier)
+void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier)
 {
-	std::unique_ptr<Projectile> projectile(new Projectile(ProjectileType::kSnowball, m_textures, identifier, false, m_snow_particle));
-	m_projectile_test = projectile.get();
-	GetCharacter(identifier)->CreateSnowball(*m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)], std::move(projectile));
+
+	std::unique_ptr<Projectile> projectile(new Projectile(ProjectileType::kSnowball, m_textures, character_identifier, false, m_particle_systems[character_identifier]));
+	m_projectiles[snowball_identifier] = projectile.get();
+	GetCharacter(character_identifier)->CreateSnowball(*m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)], std::move(projectile));
 }
 
 void WorldClient::UpdateSounds()

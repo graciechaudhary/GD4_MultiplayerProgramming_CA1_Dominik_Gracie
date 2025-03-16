@@ -16,7 +16,8 @@
 
 namespace
 {
-	const std::vector<CharacterData> Table = InitializeCharacterData();	
+	const std::vector<CharacterData> Table = InitializeCharacterData();
+	static sf::Int16 snowball_counter = 0;
 }
 
 Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts)
@@ -303,7 +304,7 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 	std::unique_ptr<sf::Packet> packet = std::make_unique<sf::Packet>();
 	*packet << static_cast<sf::Int16>(Server::PacketType::kCreateSnowball);
 	*packet << GetIdentifier();
-	*packet << static_cast<sf::Int16>(m_throw_count);
+	*packet << static_cast<sf::Int16>(snowball_counter++);
 
 	m_event_queue->push_back(std::move(packet));
 	

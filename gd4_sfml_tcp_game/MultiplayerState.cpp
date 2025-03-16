@@ -273,7 +273,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			sf::Int16 snowball_identifier;
 			packet >> identifer >> snowball_identifier;
 
-			m_world.CreateSnowball(identifer);
+			m_world.CreateSnowball(identifer, snowball_identifier);
 		}
 											break;
 
