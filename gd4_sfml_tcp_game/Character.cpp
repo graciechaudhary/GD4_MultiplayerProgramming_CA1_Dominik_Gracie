@@ -175,7 +175,7 @@ void Character::RechargeSnowballs()
 	m_is_throwing = false;
 }
 
-void Character::CreateSnowball(SceneNode& node,  std::unique_ptr<Projectile> projectile) const
+void Character::CreateSnowball(SceneNode& node,  std::unique_ptr<Projectile> projectile)
 {
 	float x_offset = 0.f;
 	float y_offset = 0.5f;
@@ -231,6 +231,8 @@ void Character::CreateSnowball(SceneNode& node,  std::unique_ptr<Projectile> pro
 	}
 
 	sf::Vector2f offset(x_offset * m_sprite.getGlobalBounds().width, y_offset * m_sprite.getGlobalBounds().height);
+
+	m_current_animation = CharacterAnimationType::kAttack;
 
 	projectile->setPosition(GetWorldPosition() + offset);
 	projectile->SetVelocity(velocity);
@@ -389,8 +391,7 @@ void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
  	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
 	{
 		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval / 1.f;
-		m_throw_count++;
-		m_current_animation = CharacterAnimationType::kAttack; 
+		m_throw_count++; 
 		//PlayLocalSound(commands, SoundEffect::kSnowballThrow);
 		commands.Push(m_throw_command);
 		--m_snowball_count;

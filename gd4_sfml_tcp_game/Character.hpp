@@ -31,7 +31,7 @@ public:
 
 	void RechargeSnowballs();
 
-	void CreateSnowball(SceneNode& node, std::unique_ptr<Projectile> projectile) const;
+	void CreateSnowball(SceneNode& node, std::unique_ptr<Projectile> projectile);
 
 	void CreateSnowball(SceneNode& node, const TextureHolder& textures) const;
 
