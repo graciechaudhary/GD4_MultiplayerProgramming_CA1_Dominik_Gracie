@@ -24,7 +24,7 @@ private:
 	TextureHolder& m_texture_holder;
 	WorldClient m_world;
 
-	std::size_t m_identifier;
+	sf::Int16 m_identifier;
 	sf::TcpSocket m_socket;
 	bool m_connected;
 	std::unique_ptr<GameServer> m_game_server;

@@ -293,6 +293,7 @@ void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowb
 
 	std::unique_ptr<Projectile> projectile(new Projectile(ProjectileType::kSnowball, m_textures, character_identifier, false, m_particle_systems[character_identifier]));
 	m_projectiles[snowball_identifier] = projectile.get();
+	std::cout << "Snowball: " << snowball_identifier << std::endl;
 	GetCharacter(character_identifier)->CreateSnowball(*m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)], std::move(projectile));
 }
 

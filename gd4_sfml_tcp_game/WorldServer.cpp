@@ -234,7 +234,7 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 
 void WorldServer::AddCharacter(sf::Int16 identifier)
 {
-	std::unique_ptr<Character> leader(new Character(true, identifier, m_textures, &m_event_queue));
+	std::unique_ptr<Character> leader(new Character(true, identifier, m_textures, &m_event_queue, &m_projectiles));
 	Character* character = leader.get();
 	character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
 	character->SetVelocity(0, 0);

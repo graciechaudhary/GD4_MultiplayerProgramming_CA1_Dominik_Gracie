@@ -90,6 +90,7 @@ private:
 	int m_max_pickups;
 
 	std::map<sf::Int16, Character*> m_characters;
+	std::map<sf::Int16, Projectile*> m_projectiles;
 	std::deque<Packet_Ptr> m_event_queue;
 };
 

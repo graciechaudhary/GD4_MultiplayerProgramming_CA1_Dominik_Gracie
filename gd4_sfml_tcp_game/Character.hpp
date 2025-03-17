@@ -19,7 +19,7 @@ class Character : public Entity
 {
 public:
 	Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts);
-	Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue);
+	Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles);
 	unsigned int GetCategory() const override;
 
 	typedef std::shared_ptr<Character> Shared;
@@ -135,5 +135,6 @@ private:
 	bool m_is_on_server;
 
 	std::deque<std::unique_ptr<sf::Packet>>* m_event_queue;
+	std::map<sf::Int16, Projectile*>* m_projectiles;
 };
 

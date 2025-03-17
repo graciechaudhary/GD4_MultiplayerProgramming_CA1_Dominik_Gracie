@@ -87,7 +87,7 @@ Character::Character(bool is_on_server, int identifier, const TextureHolder& tex
 
 }
 
-Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue)
+Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles)
 	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
 	, m_type(CharacterType::kDefault)
 	, m_current_animation(CharacterAnimationType::kWalk)
@@ -114,6 +114,7 @@ Character::Character(bool is_on_server, int identifier, const TextureHolder& tex
 	, m_is_on_server(is_on_server)
 	, m_is_impacted(false)
 	, m_event_queue(event_queue)
+	, m_projectiles(projectiles)
 {
 		m_got_hit_count = 0;
 		m_throw_count = 0;
@@ -299,15 +300,19 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 
 	projectile->setPosition(GetWorldPosition() + offset);
 	projectile->SetVelocity(velocity);
+
+	(*m_projectiles)[snowball_counter] = projectile.get();
+
 	node.AttachChild(std::move(projectile));
 
 	std::unique_ptr<sf::Packet> packet = std::make_unique<sf::Packet>();
 	*packet << static_cast<sf::Int16>(Server::PacketType::kCreateSnowball);
 	*packet << GetIdentifier();
-	*packet << static_cast<sf::Int16>(snowball_counter++);
+	*packet << static_cast<sf::Int16>(snowball_counter);
 
 	m_event_queue->push_back(std::move(packet));
-	
+
+	snowball_counter++;
 }
 
 //Dominik Hampejs D00250604
