@@ -13,11 +13,11 @@ namespace
     const std::vector<ProjectileData> Table = InitializeProjectileData();
 }
 
-Projectile::Projectile(ProjectileType type, const TextureHolder& textures, int identifier, bool is_on_server)
+Projectile::Projectile(ProjectileType type, const TextureHolder& textures, sf::Int16 identifier, bool is_on_server)
 	: Entity(1)
     , m_type(type)
     , m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
-	, m_identifier(identifier)
+	, m_character_identifier(identifier)
     , m_impact_animation(textures.Get(TextureID::kImpact))
     , m_is_on_server(is_on_server)
 {
@@ -26,7 +26,7 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, int i
     ParticleType particle_type = ParticleType::kSnow;
 
     //particle system for snow
-    std::unique_ptr<EmitterNode> snow(new EmitterNode(particle_type, m_identifier));
+    std::unique_ptr<EmitterNode> snow(new EmitterNode(particle_type, m_character_identifier));
     snow->setPosition(0.f, GetBoundingRect().height / 2.f);
     AttachChild(std::move(snow));
 
@@ -43,11 +43,11 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, int i
     
 }
 
-Projectile::Projectile(ProjectileType type, const TextureHolder& textures, int identifier, bool is_server, ParticleNode* particle_system)
+Projectile::Projectile(ProjectileType type, const TextureHolder& textures, sf::Int16 identifier, bool is_server, ParticleNode* particle_system)
     : Entity(1)
     , m_type(type)
     , m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
-    , m_identifier(identifier)
+    , m_character_identifier(identifier)
     , m_impact_animation(textures.Get(TextureID::kImpact))
     , m_is_on_server(is_server)
 {
@@ -56,7 +56,7 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, int i
     ParticleType particle_type = ParticleType::kSnow;
 
     //particle system for snow
-    std::unique_ptr<EmitterNode> snow(new EmitterNode(particle_type, m_identifier, particle_system));
+    std::unique_ptr<EmitterNode> snow(new EmitterNode(particle_type, m_character_identifier, particle_system));
     snow->setPosition(0.f, GetBoundingRect().height / 2.f);
     m_emitter = snow.get();
     AttachChild(std::move(snow));

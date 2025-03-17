@@ -42,6 +42,7 @@ public:
 
 	void AddCharacter(sf::Int16 identifier);
 	Character* GetCharacter(sf::Int16 identifier);
+	Projectile* GetProjectile(sf::Int16 identifier);
 
 	void CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier);
 

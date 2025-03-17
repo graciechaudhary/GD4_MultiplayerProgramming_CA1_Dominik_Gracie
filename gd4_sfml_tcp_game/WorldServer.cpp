@@ -189,6 +189,9 @@ void WorldServer::HandleCollisions()
 		{
 			auto& character = static_cast<Character&>(*pair.first);
 			auto& projectile = static_cast<Projectile&>(*pair.second);
+
+			if (character.GetIdentifier() == projectile.GetCharacterIdentifier()) return;
+
 			//Collision response
 			character.Damage(projectile.GetDamage());
 			character.SetVelocity(0.f, 0.f);
@@ -247,6 +250,11 @@ void WorldServer::AddCharacter(sf::Int16 identifier)
 Character* WorldServer::GetCharacter(sf::Int16 identifier)
 {
 	return m_characters[identifier];
+}
+
+Projectile* WorldServer::GetProjectile(sf::Int16 identifier)
+{
+	return m_projectiles[identifier];
 }
 
 //void WorldServer::SpawnPickup()

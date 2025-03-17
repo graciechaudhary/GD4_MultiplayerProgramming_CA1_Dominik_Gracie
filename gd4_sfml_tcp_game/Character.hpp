@@ -71,6 +71,8 @@ public:
 
 	void SetCurrentDirection(FacingDirections dir) { m_current_direction = dir; };
 
+	static sf::Int16  GetSnowballCounter();
+
 
 private:
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;

@@ -115,10 +115,18 @@ void GameServer::Tick()
             sf::Int16 facing_dir = static_cast<sf::Int16>(m_world.GetCharacter(i)->GetFacingDirection());
 
 			packet << identifier << x << y << vx << vy << facing_dir;
-
+            
 
 		}
 	}
+
+    packet << Character::GetSnowballCounter();
+    for (sf::Int16 i = 0; i < Character::GetSnowballCounter(); i++)
+    {
+        Projectile* projectile = m_world.GetProjectile(i);
+        
+        packet << projectile->GetWorldPosition().x << projectile->GetWorldPosition().y;
+    }
 
 	SendToAll(packet);
 }

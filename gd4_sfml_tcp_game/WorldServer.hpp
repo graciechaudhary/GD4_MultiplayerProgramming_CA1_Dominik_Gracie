@@ -21,6 +21,7 @@ public:
 
 	void AddCharacter(sf::Int16 identifier);
 	Character* GetCharacter(sf::Int16 identifier);
+	Projectile* GetProjectile(sf::Int16 identifier);
 
 	typedef std::unique_ptr<sf::Packet> Packet_Ptr;
 

@@ -301,6 +301,16 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 					character->SetCurrentDirection(static_cast<FacingDirections>(dir));
 				}
 			}
+
+			sf::Int16 snowball_counter;
+			packet >> snowball_counter;
+			for (sf::Int16 i = 0; i < snowball_counter; ++i) {
+				float x, y;
+				packet >> x >> y;
+
+				m_world.GetProjectile(i)->setPosition(x,y);
+			}
+
 		}
 												   break;
 	default:

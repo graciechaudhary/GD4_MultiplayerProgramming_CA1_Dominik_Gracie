@@ -288,6 +288,11 @@ Character* WorldClient::GetCharacter(sf::Int16 identifier)
 	return m_characters[identifier];
 }
 
+Projectile* WorldClient::GetProjectile(sf::Int16 identifier)
+{
+	return m_projectiles[identifier];
+}
+
 void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier)
 {
 

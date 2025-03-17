@@ -755,6 +755,11 @@ void Character::UpdateVisuals(sf::Time dt)
 	UpdateAnimation(dt);
 }
 
+sf::Int16 Character::GetSnowballCounter()
+{
+	return snowball_counter;
+}
+
 //Dominik Hampejs D00250604
 void Character::WalkRight()
 {

@@ -11,8 +11,8 @@
 class Projectile : public Entity
 {
 public:
-	Projectile(ProjectileType type, const TextureHolder& textures, int identifier, bool is_server);
-	Projectile(ProjectileType type, const TextureHolder& textures, int identifier, bool is_server, ParticleNode* particle_system);
+	Projectile(ProjectileType type, const TextureHolder& textures, sf::Int16 identifier, bool is_server);
+	Projectile(ProjectileType type, const TextureHolder& textures, sf::Int16 identifier, bool is_server, ParticleNode* particle_system);
 
 	unsigned int GetCategory() const override;
 	sf::FloatRect GetBoundingRect() const override;
@@ -21,6 +21,8 @@ public:
 	bool IsMarkedForRemoval() const override;
 
 	void UpdateVisuals(sf::Time dt);
+
+	sf::Int16 GetCharacterIdentifier() const { return m_character_identifier; };
 	
 	
 
@@ -31,7 +33,7 @@ private:
 private:
 	ProjectileType m_type;
 	sf::Sprite m_sprite;
-	int m_identifier;
+	sf::Int16 m_character_identifier;
 	sf::Vector2f m_target_direction;
 	bool m_is_on_server;
 
