@@ -19,6 +19,8 @@ namespace Server
 		kHealthDown,
 		kInitialState,
 		kCreateSnowball,
+		kCharacterRemoved,
+		kSnowballRemoved
 	};
 }
 

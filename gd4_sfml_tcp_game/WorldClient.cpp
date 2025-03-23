@@ -293,6 +293,24 @@ Projectile* WorldClient::GetProjectile(sf::Int16 identifier)
 	return m_projectiles[identifier];
 }
 
+void WorldClient::RemoveCharacter(sf::Int16 character_id)
+{
+	auto it = m_characters.find(character_id);
+	if (it != m_characters.end()) {
+		delete it->second; 
+		m_characters.erase(it);
+	}
+}
+
+void WorldClient::RemoveSnowball(sf::Int16 snowball_id)
+{
+	auto it = m_projectiles.find(snowball_id);
+	if (it != m_projectiles.end()) {
+		delete it->second; 
+		m_projectiles.erase(it);
+	}
+}
+
 void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier)
 {
 

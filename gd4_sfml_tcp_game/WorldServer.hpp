@@ -22,7 +22,7 @@ public:
 	void AddCharacter(sf::Int16 identifier);
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
-
+	
 	typedef std::unique_ptr<sf::Packet> Packet_Ptr;
 
 	std::deque<Packet_Ptr>& GetEventQueue() { return m_event_queue; };
@@ -70,7 +70,7 @@ private:
 	//void SpawnPickup();
 	//void SendPickupDataToClients(PickupSpawnPoint spawnpoint);
 
-	
+	void CheckMarkedForRemoval();
 	
 
 

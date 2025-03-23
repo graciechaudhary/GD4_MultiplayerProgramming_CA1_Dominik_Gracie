@@ -72,6 +72,9 @@ void WorldServer::Update(sf::Time dt)
 
 	HandleCollisions();
 
+	//check stuff that is marked for removal and then remove it
+	CheckMarkedForRemoval();
+	//send message to all the clients that hit has been removed from the map
 	m_scenegraph.RemoveWrecks();
 
 
@@ -235,6 +238,60 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 	}
 }
 
+void WorldServer::CheckMarkedForRemoval()
+{
+	//just for testing
+	std::cout << "Before removal: "
+		<< m_characters.size() << " characters, "
+		<< m_projectiles.size() << " projectiles." << std::endl;
+
+	//removing characters that have been destoryed
+	for (auto it = m_characters.begin(); it != m_characters.end(); )
+	{
+		if (it->second->IsMarkedForRemoval()) 
+		{
+			std::cout << "Removing character with ID: " << it->first << std::endl;
+
+			Packet_Ptr packet = std::make_unique<sf::Packet>();
+			*packet << static_cast<sf::Int16>(Server::PacketType::kCharacterRemoved);
+			*packet << static_cast<sf::Int16>(it->first); 
+			m_event_queue.push_back(std::move(packet));
+
+			delete it->second;  
+			it = m_characters.erase(it); 
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	//removing the snowballs that have been destroyed
+	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); )
+	{
+		if (it->second->IsMarkedForRemoval())
+		{
+			std::cout << "[DEBUG] Removing projectile with ID: " << it->first << std::endl;
+
+			Packet_Ptr packet = std::make_unique<sf::Packet>();
+			*packet << static_cast<sf::Int16>(Server::PacketType::kSnowballRemoved);
+			*packet << static_cast<sf::Int16>(it->first); 
+			m_event_queue.push_back(std::move(packet));
+
+			delete it->second;
+			it = m_projectiles.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	std::cout << "After removal: "
+		<< m_characters.size() << " characters, "
+		<< m_projectiles.size() << " projectiles." << std::endl;
+}
+
 void WorldServer::AddCharacter(sf::Int16 identifier)
 {
 	std::unique_ptr<Character> leader(new Character(true, identifier, m_textures, &m_event_queue, &m_projectiles));
@@ -256,6 +313,8 @@ Projectile* WorldServer::GetProjectile(sf::Int16 identifier)
 {
 	return m_projectiles[identifier];
 }
+
+
 
 //void WorldServer::SpawnPickup()
 //{

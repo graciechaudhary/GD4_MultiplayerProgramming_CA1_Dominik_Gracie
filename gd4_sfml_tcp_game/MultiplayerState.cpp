@@ -313,6 +313,22 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 		}
 												   break;
+
+		case Server::PacketType::kCharacterRemoved: {
+			sf::Int16 character_id;
+			packet >> character_id;
+
+			m_world.RemoveCharacter(character_id);
+		}
+												  break;
+
+		case Server::PacketType::kSnowballRemoved: {
+			sf::Int16 snowball_id;
+			packet >> snowball_id;
+
+			m_world.RemoveSnowball(snowball_id);
+		}
+												 break;
 	default:
 		break;
 	}
