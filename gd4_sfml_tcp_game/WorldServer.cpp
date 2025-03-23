@@ -314,6 +314,17 @@ Projectile* WorldServer::GetProjectile(sf::Int16 identifier)
 	return m_projectiles[identifier];
 }
 
+std::map<sf::Int16, Character*>& WorldServer::GetCharacters() 
+{
+	return m_characters;
+}
+	
+
+std::map<sf::Int16, Projectile*>& WorldServer::GetProjectiles()
+{
+	return m_projectiles;
+}
+
 
 
 //void WorldServer::SpawnPickup()
