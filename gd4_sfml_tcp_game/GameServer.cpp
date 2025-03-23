@@ -158,14 +158,6 @@ void GameServer::Tick()
         packet << identifier << x << y;
 	}
 
-    //packet << Character::GetSnowballCounter();
-    //for (sf::Int16 i = 0; i < Character::GetSnowballCounter(); i++)
-    //{
-    //    Projectile* projectile = m_world.GetProjectile(i);
-    //    
-    //    packet << projectile->GetWorldPosition().x << projectile->GetWorldPosition().y;
-    //}
-
 	SendToAll(packet);
 }
 
