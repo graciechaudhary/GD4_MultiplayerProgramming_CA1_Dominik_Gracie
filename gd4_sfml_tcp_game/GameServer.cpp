@@ -220,8 +220,6 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
 			packet >> identifier >>action >> action_enabled;
 			m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
-
-			BroadcastMessage("Player action change: " + action);
         }
     default:
         break;

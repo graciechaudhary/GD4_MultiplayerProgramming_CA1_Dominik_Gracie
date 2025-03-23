@@ -138,8 +138,7 @@ bool MultiplayerState::Update(sf::Time dt)
 		if (m_tick_clock.getElapsedTime() > sf::seconds(1.f / TICK_RATE))
 		{
 			sf::Packet packetOut;
-			packetOut << static_cast<sf::Int16>(Client::PacketType::kBroadcastMessage);
-			packetOut << "Working!";
+			packetOut << static_cast<sf::Int16>(Client::PacketType::kNotice);
 			m_socket.send(packetOut);
 			m_tick_clock.restart();
 		}
@@ -294,6 +293,8 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 					
 					float vx, vy;
 					packet >> vx >> vy;
+					//vx *= 0.5;
+					//vy *= 0.5;
 					character->SetVelocity(vx, vy);
 
 					sf::Int16 dir;
