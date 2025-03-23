@@ -305,10 +305,11 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			sf::Int16 snowball_counter;
 			packet >> snowball_counter;
 			for (sf::Int16 i = 0; i < snowball_counter; ++i) {
+				sf::Int16 id;
+				packet >> id;
 				float x, y;
 				packet >> x >> y;
-
-				m_world.GetProjectile(i)->setPosition(x,y);
+				m_world.GetProjectile(id)->setPosition(x,y);
 			}
 
 		}

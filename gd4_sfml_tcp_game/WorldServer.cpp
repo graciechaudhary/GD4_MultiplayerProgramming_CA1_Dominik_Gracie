@@ -240,11 +240,6 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 
 void WorldServer::CheckMarkedForRemoval()
 {
-	//just for testing
-	std::cout << "Before removal: "
-		<< m_characters.size() << " characters, "
-		<< m_projectiles.size() << " projectiles." << std::endl;
-
 	//removing characters that have been destoryed
 	for (auto it = m_characters.begin(); it != m_characters.end(); )
 	{
@@ -257,7 +252,7 @@ void WorldServer::CheckMarkedForRemoval()
 			*packet << static_cast<sf::Int16>(it->first); 
 			m_event_queue.push_back(std::move(packet));
 
-			delete it->second;  
+			//delete it->second;  
 			it = m_characters.erase(it); 
 		}
 		else
@@ -278,7 +273,7 @@ void WorldServer::CheckMarkedForRemoval()
 			*packet << static_cast<sf::Int16>(it->first); 
 			m_event_queue.push_back(std::move(packet));
 
-			delete it->second;
+			//delete it->second;
 			it = m_projectiles.erase(it);
 		}
 		else
@@ -286,10 +281,6 @@ void WorldServer::CheckMarkedForRemoval()
 			++it;
 		}
 	}
-
-	std::cout << "After removal: "
-		<< m_characters.size() << " characters, "
-		<< m_projectiles.size() << " projectiles." << std::endl;
 }
 
 void WorldServer::AddCharacter(sf::Int16 identifier)
