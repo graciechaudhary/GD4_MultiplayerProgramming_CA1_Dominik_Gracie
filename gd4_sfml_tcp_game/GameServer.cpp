@@ -158,6 +158,17 @@ void GameServer::Tick()
         packet << identifier << x << y;
 	}
 
+    //pickups
+	/*size = static_cast<sf::Int16>(m_world.GetPickups().size());
+	packet << size;
+	for (auto& pickup : m_world.GetPickups())
+	{
+		sf::Int16 identifier = pickup.first;
+		float x = pickup.second->GetWorldPosition().x;
+		float y = pickup.second->GetWorldPosition().y;
+		packet << identifier << x << y;
+	}*/
+
 	SendToAll(packet);
 }
 

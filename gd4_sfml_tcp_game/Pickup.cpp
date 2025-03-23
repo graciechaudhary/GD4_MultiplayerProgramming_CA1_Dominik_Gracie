@@ -19,6 +19,15 @@ Pickup::Pickup(PickupType type, const TextureHolder& textures)
     Utility::CentreOrigin(m_sprite);
 }
 
+Pickup::Pickup(int16_t identifer, PickupType type, const TextureHolder& textures)
+    : Entity(1)
+	, m_identifier(identifer)
+    , m_type(type)
+    , m_sprite(textures.Get(Table[static_cast<int>(type)].m_texture), Table[static_cast<int>(type)].m_texture_rect)
+{
+    Utility::CentreOrigin(m_sprite);
+}
+
 unsigned int Pickup::GetCategory() const
 {
     return static_cast<int>(ReceiverCategories::kPickup);
@@ -43,3 +52,16 @@ PickupType Pickup::GetPickupType()
 {
     return m_type;
 }
+
+sf::Int16 Pickup::GetIdentifier() const
+{
+    return m_identifier;
+}
+
+//isMaarekdForRemoval() override
+bool Pickup::IsMarkedForRemoval() const
+{
+	return IsDestroyed();
+}
+
+

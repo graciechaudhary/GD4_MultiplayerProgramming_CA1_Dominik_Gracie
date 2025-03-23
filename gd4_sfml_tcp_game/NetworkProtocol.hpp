@@ -20,7 +20,10 @@ namespace Server
 		kInitialState,
 		kCreateSnowball,
 		kCharacterRemoved,
-		kSnowballRemoved
+		kSnowballRemoved,
+		kPickupSpawned,
+		kPickupRemoved,
+		kSnowballUp
 	};
 }
 
