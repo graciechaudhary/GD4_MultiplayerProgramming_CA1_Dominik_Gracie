@@ -23,8 +23,8 @@ public:
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
 
-	std::map<sf::Int16, Character*>& GetCharacters() const;
-	std::map<sf::Int16, Projectile*>& GetProjectiles() const;
+	const std::map<sf::Int16, Character*>& GetCharacters() const;
+	std::map<sf::Int16, Projectile*>& GetProjectiles();
 	
 	typedef std::unique_ptr<sf::Packet> Packet_Ptr;
 

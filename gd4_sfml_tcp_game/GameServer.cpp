@@ -100,8 +100,9 @@ void GameServer::ExecutionThread()
 
 void GameServer::Tick()
 {
-	
-    /*packet << m_connected_players;
+    /*sf::Packet packet;
+    packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
+    packet << m_connected_players;
 	for (sf::Int16 i = 0; i < m_connected_players; ++i)
 	{
 		if (m_peers[i]->m_ready)
@@ -118,33 +119,47 @@ void GameServer::Tick()
 
 		}
 	}*/
+
     sf::Packet packet;
     packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
-	packet << m_world.GetCharacters().size();
-	for (auto& character : m_world.GetCharacters())
-	{   
-		sf::Int16 identifier = character.first;
-		float x = character.second->GetWorldPosition().x;
-		float y = character.second->GetWorldPosition().y;
-		float vx = character.second->GetVelocity().x;
-		float vy = character.second->GetVelocity().y;
-		sf::Int16 facing_dir = static_cast<sf::Int16>(character.second->GetFacingDirection());
-		packet << identifier << x << y << vx << vy << facing_dir;
-	}
+    packet << m_connected_players;  
 
-	packet << m_world.GetProjectiles().size();
-	for (auto& projectile : m_world.GetProjectiles())
-	{
-		sf::Int16 identifier = projectile.first;
-		float x = projectile.second->GetWorldPosition().x;
-		float y = projectile.second->GetWorldPosition().y;
-		
-		packet << identifier << x << y;
-	}
+    for (sf::Int16 i = 0; i < m_connected_players; ++i)
+    {
+        if (!m_peers[i] || !m_peers[i]->m_ready)
+            continue; 
 
-	SendToAll(packet);
+        sf::Int16 identifier = static_cast<sf::Int16>(m_peers[i]->m_identifier);
 
-    /*packet << Character::GetSnowballCounter();
+        auto& characters = m_world.GetCharacters();
+        auto it = characters.find(identifier);
+        if (it == characters.end())
+            continue; 
+
+        Character* character = it->second;
+        float x = character->GetWorldPosition().x;
+        float y = character->GetWorldPosition().y;
+        float vx = character->GetVelocity().x;
+        float vy = character->GetVelocity().y;
+        sf::Int16 facing_dir = static_cast<sf::Int16>(character->GetFacingDirection());
+
+        packet << identifier << x << y << vx << vy << facing_dir;
+    }
+
+	//packet << m_world.GetProjectiles().size();
+	//for (auto& projectile : m_world.GetProjectiles())
+	//{
+	//	//sf::Int16 identifier = projectile.first;
+	//	float x = projectile.second->GetWorldPosition().x;
+	//	float y = projectile.second->GetWorldPosition().y;
+	//	
+	//	//packet << identifier << x << y;
+ //       packet << x << y;
+	//}
+
+	//SendToAll(packet);
+
+    packet << Character::GetSnowballCounter();
     for (sf::Int16 i = 0; i < Character::GetSnowballCounter(); i++)
     {
         Projectile* projectile = m_world.GetProjectile(i);
@@ -152,7 +167,7 @@ void GameServer::Tick()
         packet << projectile->GetWorldPosition().x << projectile->GetWorldPosition().y;
     }
 
-	SendToAll(packet);*/
+	SendToAll(packet);
 }
 
 sf::Time GameServer::Now() const

@@ -314,7 +314,7 @@ Projectile* WorldServer::GetProjectile(sf::Int16 identifier)
 	return m_projectiles[identifier];
 }
 
-std::map<sf::Int16, Character*>& WorldServer::GetCharacters() 
+const std::map<sf::Int16, Character*>& WorldServer::GetCharacters() const
 {
 	return m_characters;
 }
