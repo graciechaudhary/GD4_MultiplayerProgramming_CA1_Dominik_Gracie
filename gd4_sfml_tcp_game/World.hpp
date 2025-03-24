@@ -79,7 +79,7 @@ private:
 
 	CommandQueue m_command_queue;
 
-	Command m_create_pickup_command;
+	CommandQueue m_create_pickup_command;
 	sf::Time m_pickup_drop_interval;
 	sf::Time m_time_since_last_drop;
 	int m_pickups_spawned;

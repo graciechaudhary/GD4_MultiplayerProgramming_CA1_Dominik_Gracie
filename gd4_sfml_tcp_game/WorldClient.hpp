@@ -43,10 +43,14 @@ public:
 	void AddCharacter(sf::Int16 identifier);
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
+	Pickup* GetPickup(sf::Int16 identifier);
 	void RemoveCharacter(sf::Int16 character_id);
 	void RemoveSnowball(sf::Int16 snowball_id);
+	void RemovePickup(sf::Int16 pickup_id);
 
 	void CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier);
+
+	void SpawnPickup(sf::Int16 pickup_identifier, PickupType type, float x, float y);
 
 private:
 	void LoadTextures();
@@ -80,6 +84,7 @@ private:
 	Command m_create_pickup_command;
 	std::map<sf::Int16, Character*> m_characters;
 	std::map<sf::Int16, Projectile*> m_projectiles;
+	std::map<sf::Int16, Pickup*> m_pickups;
 	std::map<sf::Int16, ParticleNode*> m_particle_systems;
 	ParticleNode* m_snow_particle;
 	Projectile* m_projectile_test;
