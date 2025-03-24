@@ -364,13 +364,6 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 	}
 	break;
 
-	case Server::PacketType::kPickupRemoved: {
-		sf::Int16 pickup_identifier;
-		packet >> pickup_identifier;
-		m_world.RemovePickup(pickup_identifier);
-	}
-	break;
-
 	default:
 		break;
 	}

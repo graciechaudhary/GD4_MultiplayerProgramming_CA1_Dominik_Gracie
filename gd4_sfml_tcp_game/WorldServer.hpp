@@ -26,7 +26,6 @@ public:
 
 	const std::map<sf::Int16, Character*>& GetCharacters() const;
 	std::map<sf::Int16, Projectile*>& GetProjectiles();
-	std::map<sf::Int16, Pickup*>& GetPickups();
 	
 	typedef std::unique_ptr<sf::Packet> Packet_Ptr;
 
@@ -95,10 +94,10 @@ private:
 	sf::Time m_time_since_last_drop;
 	int m_pickups_spawned;
 	int m_max_pickups;
+	sf::Int16 m_pickup_counter;
 
 	std::map<sf::Int16, Character*> m_characters;
 	std::map<sf::Int16, Projectile*> m_projectiles;
-	std::map<sf::Int16, Pickup*> m_pickups;
 	std::deque<Packet_Ptr> m_event_queue;
 };
 

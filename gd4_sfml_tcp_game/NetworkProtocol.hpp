@@ -22,7 +22,6 @@ namespace Server
 		kCharacterRemoved,
 		kSnowballRemoved,
 		kPickupSpawned,
-		kPickupRemoved,
 		kSnowballUp
 	};
 }

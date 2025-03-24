@@ -16,6 +16,7 @@ WorldServer::WorldServer() : m_scenegraph()
 , m_time_since_last_drop(sf::Time::Zero)
 , m_max_pickups(3)
 , m_pickups_spawned(0)
+, m_pickup_counter(0)
 , m_scene_layers()
 , m_world_bounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
 , m_event_queue()
@@ -180,7 +181,7 @@ void WorldServer::HandleCollisions()
 			player_one.Accelerate(velocity_two);
 			playuer_two.Accelerate(velocity_one);
 
-			player_one.PlayLocalSound(m_command_queue, SoundEffect::kExplosion2);
+			//player_one.PlayLocalSound(m_command_queue, SoundEffect::kExplosion2);
 		}
 		//Pickup and apply pickup
 		else if (MatchesCategories(pair, ReceiverCategories::kPlayer, ReceiverCategories::kPickup))
@@ -190,7 +191,6 @@ void WorldServer::HandleCollisions()
 			//Collision response
 			pickup.Apply(player);
 			SoundEffect pickupSoundEffect = pickup.GetPickupType() == PickupType::kHealthRefill ? SoundEffect::kHealthPickup : SoundEffect::kSnowballPickup;
-			auto it = m_pickups.find(pickup.GetIdentifier());
 
 			if (pickup.GetPickupType() == PickupType::kHealthRefill)
 			{
@@ -212,13 +212,9 @@ void WorldServer::HandleCollisions()
 				m_event_queue.push_back(std::move(packet));
 			}
 
-			if (it != m_pickups.end())
-			{
-				m_pickups.erase(it);
-				m_pickups_spawned--; 
-			}
+			m_pickups_spawned--; 
 			pickup.Destroy();
-			player.PlayLocalSound(m_command_queue, pickupSoundEffect);	
+			//player.PlayLocalSound(m_command_queue, pickupSoundEffect);	
 					
 		}
 		//On player snowball collision do damage and push player, and destroy snowball
@@ -314,20 +310,6 @@ void WorldServer::CheckMarkedForRemoval()
 			++it;
 		}
 	}
-
-	//removing the pickups that have been destroyed
-	for (auto it = m_pickups.begin(); it != m_pickups.end(); )
-	{
-		if (it->second->IsMarkedForRemoval())
-		{
-			std::cout << "[DEBUG] Removing pickup with ID: " << it->first << std::endl;
-			it = m_pickups.erase(it);
-		}
-		else
-		{
-			++it;
-		}
-	}
 }
 
 void WorldServer::AddCharacter(sf::Int16 identifier)
@@ -363,20 +345,13 @@ std::map<sf::Int16, Projectile*>& WorldServer::GetProjectiles()
 	return m_projectiles;
 }
 
-std::map<sf::Int16, Pickup*>& WorldServer::GetPickups()
-{
-	return m_pickups;
-}
-
-
-
 void WorldServer::SpawnPickup(){
-	if (m_pickups.size() >= m_max_pickups)
+	if (m_pickups_spawned >= m_max_pickups)
 		return;
 
 	float border_distance = 65.f;
 	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
-	sf::Int16 pickup_id = static_cast<sf::Int16>(m_pickups.size() + 1);
+	sf::Int16 pickup_id = m_pickup_counter++;
 
 	
 	std::unique_ptr<Pickup> pickup = std::make_unique<Pickup>(pickup_id, type, m_textures);
@@ -385,11 +360,6 @@ void WorldServer::SpawnPickup(){
 
 	pickup->setPosition(x, y);
 
-	
-	Pickup* new_pickup = pickup.get();
-	m_pickups.insert(std::make_pair(pickup_id, new_pickup));
-
-	
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(pickup));
 
 	
