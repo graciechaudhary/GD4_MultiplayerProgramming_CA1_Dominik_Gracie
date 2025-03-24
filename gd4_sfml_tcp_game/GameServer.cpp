@@ -15,6 +15,7 @@ GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
 , m_connected_players(0)
 , m_peers(1)
 , m_waiting_thread_end(false)
+, m_game_started(false)
 {
 	m_listener_socket.setBlocking(false);
 	m_peers[0].reset(new RemotePeer());
@@ -71,10 +72,13 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (frame_time >= frame_rate)
         {
-			m_world.Update(frame_rate);
-            for (auto controler : m_player_controllers)
+            if (m_game_started)
             {
-                controler.second->NetworkedRealTimeInputServer(m_world.GetCommandQueue());
+                m_world.Update(frame_rate);
+                for (auto controler : m_player_controllers)
+                {
+                    controler.second->NetworkedRealTimeInputServer(m_world.GetCommandQueue());
+                }
             }
             frame_time -= frame_rate;
         }
@@ -82,7 +86,30 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (tick_time >= tick_rate)
         {
-            Tick();
+            if (m_game_started)
+            {
+                Tick();
+            }
+            else
+            {
+                BroadcastMessage("Game not ready!");
+                sf::Int16 amount_ready = 0;
+                for (sf::Int16 i = 0; i < m_connected_players; ++i)
+                {
+                    if (m_peers[i]->m_game_ready)
+                    {
+                        amount_ready++;
+                    }
+                }
+                if (amount_ready == m_connected_players)
+                {
+                    sf::Packet ready_packet;
+                    ready_packet << static_cast<sf::Int16>(Server::PacketType::kGameReady);
+                    SendToAll(ready_packet);
+                    m_game_started = true;
+                }
+            }
+
             tick_time -= tick_rate;
         }
 
@@ -231,6 +258,20 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
 			packet >> identifier >>action >> action_enabled;
 			m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
+            break;
+        }
+        case Client::PacketType::kReadyNotice : {
+            sf::Int16 id;
+            packet >> id;
+
+            for (sf::Int16 i = 0; i < m_connected_players; ++i)
+            {
+                if (m_peers[i]->m_identifier == id)
+                {
+                    m_peers[i]->m_game_ready = m_peers[i]->m_game_ready ? false : true;
+                }
+            }
+
         }
     default:
         break;
@@ -346,7 +387,7 @@ void GameServer::NotifyPlayerSpawn(sf::Int16 identifier)
     SendToAll(packet);
 }
 
-GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false)
+GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false), m_game_ready(false)
 {
     m_socket.setBlocking(false);
 }

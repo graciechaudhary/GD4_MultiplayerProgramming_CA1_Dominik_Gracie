@@ -25,9 +25,10 @@ private:
 		RemotePeer();
 		sf::TcpSocket m_socket;
 		sf::Time m_last_packet_time;
-		std::size_t m_identifier;
+		sf::Int16 m_identifier;
 		bool m_ready;
 		bool m_timed_out;
+		bool m_game_ready;
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;
@@ -67,5 +68,7 @@ private:
 
 	WorldServer m_world;
 	std::map<sf::Int16, PlayersController*> m_player_controllers;
+
+	bool m_game_started;
 };
 
