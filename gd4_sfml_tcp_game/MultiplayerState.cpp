@@ -138,8 +138,7 @@ bool MultiplayerState::Update(sf::Time dt)
 		if (m_tick_clock.getElapsedTime() > sf::seconds(1.f / TICK_RATE))
 		{
 			sf::Packet packetOut;
-			packetOut << static_cast<sf::Int16>(Client::PacketType::kBroadcastMessage);
-			packetOut << "Working!";
+			packetOut << static_cast<sf::Int16>(Client::PacketType::kNotice);
 			m_socket.send(packetOut);
 			m_tick_clock.restart();
 		}
@@ -271,6 +270,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 	}
 	break;
 
+
 	case Server::PacketType::kHealthUp: {
 		sf::Int16 character_identifer;
 		sf::Int16 pickup_identifier;
@@ -300,30 +300,30 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 	break;
 
 	case Server::PacketType::kUpdateClientState: {
-
-		sf::Int16 character_count;
-		packet >> character_count;
-		for (sf::Int16 i = 0; i < character_count; ++i)
-		{
-			sf::Int16 character_identifier;
-			packet >> character_identifier;
-			Character* character = m_world.GetCharacter(character_identifier);
-			if (character)
+			sf::Int16 character_count;
+			packet >> character_count;
+			for (sf::Int16 i = 0; i < character_count; ++i)
 			{
-				float x, y;
-				packet >> x >> y;
-				character->setPosition(x, y);
+				sf::Int16 character_identifier;
+				packet >> character_identifier;
+				Character* character = m_world.GetCharacter(character_identifier);
+				if (character)
+				{
+					float x, y;
+					packet >> x >> y;
+					character->setPosition(x, y);
 					
-				float vx, vy;
-				packet >> vx >> vy;
-				character->SetVelocity(vx, vy);
+					float vx, vy;
+					packet >> vx >> vy;
+					//vx *= 0.5;
+					//vy *= 0.5;
+					character->SetVelocity(vx, vy);
 
-				sf::Int16 dir;
-				packet >> dir;
-				character->SetCurrentDirection(static_cast<FacingDirections>(dir));
+					sf::Int16 dir;
+					packet >> dir;
+					character->SetCurrentDirection(static_cast<FacingDirections>(dir));
+				}
 			}
-		}
-
 		sf::Int16 snowball_counter;
 		packet >> snowball_counter;
 		for (sf::Int16 i = 0; i < snowball_counter; ++i) {

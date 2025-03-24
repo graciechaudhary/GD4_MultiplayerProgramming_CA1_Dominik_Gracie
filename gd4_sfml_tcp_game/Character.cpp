@@ -750,6 +750,10 @@ void Character::UpdateVisuals(sf::Time dt)
 		return;
 	}
 
+	//CommandQueue cq;
+	//Entity::Update(dt, cq);
+	//HandleSliding();
+
 	//Update resource indicators
 	m_health_display->SetResource(GetHitPoints());
 	m_snowball_display->SetResource(m_snowball_count);

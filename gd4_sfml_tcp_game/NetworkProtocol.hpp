@@ -33,6 +33,7 @@ namespace Client
 	{
 		kBroadcastMessage,
 		kPlayerRealtimeChange,
+		kNotice,
 		kQuit
 	};
 }
