@@ -48,6 +48,10 @@ private:
 
 	void BroadcastMessage(const std::string& message);
 
+	void InformWorldState(sf::TcpSocket& socket);
+
+	void NotifyPlayerSpawn(sf::Int16 identifier);
+
 private:
 	sf::Thread m_thread;
 	sf::Clock m_clock;

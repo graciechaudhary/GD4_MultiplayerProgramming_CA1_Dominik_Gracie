@@ -4,6 +4,12 @@
 #include "SoundNode.hpp"
 #include "EmitterNode.hpp"
 #include "SpriteNode.hpp"
+#include "DataTables.hpp"
+#include <iostream>
+
+namespace {
+	std::map<int, SpawnPoint> Table = InitializeSpawnPoints();
+}
 
 WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, SoundPlayer& sounds)
 	:m_target(output_target)
@@ -17,6 +23,7 @@ WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, Soun
 	//, m_centre_position(m_camera.getSize().x / 2.f, m_camera.getSize().y / 2.f)
 	, m_world_bounds(0.f, 0.f, output_target.getSize().x, output_target.getSize().y)
 	, m_centre_position(m_world_bounds.width / 2.f, m_world_bounds.height / 2.f)
+	, m_projectile_test(nullptr)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -40,8 +47,6 @@ void WorldClient::Draw()
 		m_scene_texture.draw(m_scenegraph);
 		m_scene_texture.display();
 		m_bloom_effect.Apply(m_scene_texture, m_target);
-
-		
 	}
 	else
 	{
@@ -92,6 +97,7 @@ void WorldClient::BuildScene()
 
 
 	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures, 1));
+	m_snow_particle = snowNode.get();
 	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
 
 	// Add sound effect node
@@ -241,15 +247,42 @@ sf::FloatRect WorldClient::GetBattleFieldBounds() const
 	return m_world_bounds;
 }
 
+void WorldClient::Update(sf::Time dt)
+{
+	for (auto charMap : m_characters)
+	{
+		if (charMap.second == nullptr) return;
+
+		charMap.second->UpdateVisuals(dt);
+	}
+	for (auto projectile : m_projectiles)
+	{
+		projectile.second->UpdateVisuals(dt);
+	}
+	for (auto parSys: m_particle_systems)
+	{
+		parSys.second->UpdateVisuals(dt);
+	}
+
+	//m_scenegraph.RemoveWrecks();
+}
+
 void WorldClient::AddCharacter(sf::Int16 identifier)
 {
 	std::unique_ptr<Character> leader(new Character(false, identifier, m_textures, m_fonts));
-	m_character = leader.get();
-	m_character->setPosition(m_centre_position.x - 230, m_centre_position.y);
-	m_character->SetVelocity(0, 0);
+	Character* character = leader.get();
+	character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
+	character->SetVelocity(0, 0);
+	character->SetColour(sf::Color::Yellow);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
-	m_characters[identifier] = m_character;
+	m_characters[identifier] = character;
+
+	std::unique_ptr<ParticleNode> snowNode(new ParticleNode(ParticleType::kSnow, m_textures, identifier));
+	
+	m_particle_systems[identifier] = snowNode.get();
+
+	m_scene_layers[static_cast<int>(SceneLayers::kParticles)]->AttachChild(std::move(snowNode));
 }
 
 Character* WorldClient::GetCharacter(sf::Int16 identifier)
@@ -257,9 +290,61 @@ Character* WorldClient::GetCharacter(sf::Int16 identifier)
 	return m_characters[identifier];
 }
 
+Projectile* WorldClient::GetProjectile(sf::Int16 identifier)
+{
+	return m_projectiles[identifier];
+}
+
+Pickup* WorldClient::GetPickup(sf::Int16 identifier)
+{
+	return m_pickups[identifier];
+}
+
+void WorldClient::RemoveCharacter(sf::Int16 character_id)
+{
+	//m_characters.erase(character_id);
+	//auto it = m_characters.find(character_id);
+	//if (it != m_characters.end()) {
+	//	delete it->second; 
+	//	m_characters.erase(it);
+	//}
+}
+
+void WorldClient::RemoveSnowball(sf::Int16 snowball_id)
+{
+	m_projectiles[snowball_id]->Destroy();
+}
+
+void WorldClient::RemovePickup(sf::Int16 pickup_id)
+{
+	//awkward fix - maybe changed later
+	m_pickups[pickup_id]->setPosition(-100, -100);
+	m_pickups[pickup_id]->Destroy();
+	
+}
+
+void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier)
+{
+
+	std::unique_ptr<Projectile> projectile(new Projectile(ProjectileType::kSnowball, m_textures, character_identifier, false, m_particle_systems[character_identifier]));
+	m_projectiles[snowball_identifier] = projectile.get();
+	std::cout << "Snowball: " << snowball_identifier << std::endl;
+	GetCharacter(character_identifier)->CreateSnowball(*m_scene_layers[static_cast<int>(SceneLayers::kParticles)], std::move(projectile));
+}
+
+void WorldClient::SpawnPickup(sf::Int16 pickup_identifier, PickupType type, float x, float y)
+{
+	std::unique_ptr<Pickup> pickup(new Pickup(pickup_identifier,type, m_textures));
+	pickup->setPosition(x, y);
+	m_pickups[pickup_identifier] = pickup.get();
+	std::cout << "Pickup: " << pickup_identifier << std::endl;
+	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(pickup));
+	
+}
+
 void WorldClient::UpdateSounds()
 {
-	m_sounds.SetListenerPosition(m_character->GetWorldPosition());
+	//m_sounds.SetListenerPosition(m_character->GetWorldPosition());
 
 	// Remove unused sounds
 	m_sounds.RemoveStoppedSounds();

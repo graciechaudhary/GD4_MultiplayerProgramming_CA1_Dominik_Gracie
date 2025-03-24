@@ -39,7 +39,8 @@ private:
 	void BuildSnowLandscape();
 	void BuildTreesRandom(sf::FloatRect lake_bounds);
 	void BuildTreesFixed(sf::FloatRect lake_bounds);
-	void CreatePickup(SceneNode& node, const TextureHolder& textures) const;
+	void 
+		ickup(SceneNode& node, const TextureHolder& textures) const;
 	sf::FloatRect GetViewBounds() const;
 	sf::FloatRect GetBattleFieldBounds() const;
 
@@ -78,7 +79,7 @@ private:
 
 	CommandQueue m_command_queue;
 
-	Command m_create_pickup_command;
+	CommandQueue m_create_pickup_command;
 	sf::Time m_pickup_drop_interval;
 	sf::Time m_time_since_last_drop;
 	int m_pickups_spawned;

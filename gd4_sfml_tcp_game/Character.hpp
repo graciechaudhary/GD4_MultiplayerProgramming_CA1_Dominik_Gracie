@@ -7,18 +7,22 @@
 #include "TextNode.hpp"
 #include "Utility.hpp"
 #include "ProjectileType.hpp"
+#include "Projectile.hpp"
 #include <SFML/Graphics/Sprite.hpp>
 #include "Animation.hpp"
 #include "CharacterAnimation.hpp"
 #include "FacingDirections.hpp"
 #include "ResourceNode.hpp"
+#include <SFML/Network/Packet.hpp>
 
 class Character : public Entity
 {
 public:
 	Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts);
-	Character(bool is_on_server, int identifier);
+	Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles);
 	unsigned int GetCategory() const override;
+
+	typedef std::shared_ptr<Character> Shared;
 
 	int GetMaxHitpoints() const;
 	float GetMaxSpeed() const;
@@ -26,6 +30,8 @@ public:
 	void Throw();
 
 	void RechargeSnowballs();
+
+	void CreateSnowball(SceneNode& node, std::unique_ptr<Projectile> projectile);
 
 	void CreateSnowball(SceneNode& node, const TextureHolder& textures) const;
 
@@ -59,7 +65,13 @@ public:
 
 	sf::Color GetColour();
 
-	int GetIdentifier() const;
+	sf::Int16 GetIdentifier() const;
+
+	void UpdateVisuals(sf::Time dt);
+
+	void SetCurrentDirection(FacingDirections dir) { m_current_direction = dir; };
+
+	static sf::Int16  GetSnowballCounter();
 
 
 private:
@@ -88,6 +100,7 @@ private:
 
 	ResourceNode* m_health_display;
 	ResourceNode* m_snowball_display;
+
 
 	Command m_throw_command;
 
@@ -120,7 +133,10 @@ private:
 	int m_got_hit_count;
 	int m_throw_count;
 
-	int m_identifier;
+	sf::Int16 m_identifier;
 	bool m_is_on_server;
+
+	std::deque<std::unique_ptr<sf::Packet>>* m_event_queue;
+	std::map<sf::Int16, Projectile*>* m_projectiles;
 };
 

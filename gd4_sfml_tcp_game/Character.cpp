@@ -11,10 +11,13 @@
 #include "SoundNode.hpp"
 
 #include <iostream>
+#include "NetworkProtocol.hpp"
+#include "ParticleNode.hpp"
 
 namespace
 {
-	const std::vector<CharacterData> Table = InitializeCharacterData();	
+	const std::vector<CharacterData> Table = InitializeCharacterData();
+	static sf::Int16 snowball_counter = 0;
 }
 
 Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts)
@@ -84,10 +87,14 @@ Character::Character(bool is_on_server, int identifier, const TextureHolder& tex
 
 }
 
-Character::Character(bool is_on_server, int identifier)
+Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles)
 	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
 	, m_type(CharacterType::kDefault)
 	, m_current_animation(CharacterAnimationType::kWalk)
+	, m_sprite(textures.Get(Table[static_cast<int>(CharacterType::kDefault)].m_texture), Table[static_cast<int>(CharacterType::kDefault)].m_texture_rect)
+	, m_walking(CharacterAnimationType::kWalk, textures.Get(TextureID::kCharacterMovement))
+	, m_attacking(CharacterAnimationType::kAttack, textures.Get(TextureID::kCharacterMovement))
+	, m_explosion(textures.Get(TextureID::kExplosion))
 	, m_health_display(nullptr)
 	, m_is_throwing(false)
 	, m_throw_countdown(sf::Time::Zero)
@@ -106,9 +113,36 @@ Character::Character(bool is_on_server, int identifier)
 	, m_identifier(identifier)
 	, m_is_on_server(is_on_server)
 	, m_is_impacted(false)
+	, m_event_queue(event_queue)
+	, m_projectiles(projectiles)
 {
 		m_got_hit_count = 0;
 		m_throw_count = 0;
+
+		//GracieChaudhary - Walking Animation Setup
+		m_walking.SetFrameSize(sf::Vector2i(38, 42));
+		m_walking.SetNumFrames(4);
+		m_walking.SetDuration(sf::seconds(1.f));
+		m_walking.SetRepeating(true);
+
+		//GracieChaudhary - Attacking Animation Setup
+		m_attacking.SetFrameSize(sf::Vector2i(38, 42));
+		m_attacking.SetNumFrames(4);
+		m_attacking.SetDuration(sf::seconds(0.75f));
+		m_attacking.SetRepeating(false);
+
+		m_explosion.SetFrameSize(sf::Vector2i(100, 100));
+		m_explosion.SetNumFrames(81);
+		m_explosion.SetDuration(sf::seconds(1.5f));
+		m_explosion.scale(2, 2);
+		Utility::CentreOrigin(m_sprite);
+		Utility::CentreOrigin(m_explosion);
+
+		m_throw_command.category = static_cast<int>(ReceiverCategories::kScene);
+		m_throw_command.action = [this, &textures](SceneNode& node, sf::Time dt)
+			{
+				CreateSnowball(node, textures);
+			};
 }
 
 unsigned int Character::GetCategory() const
@@ -141,6 +175,72 @@ void Character::RechargeSnowballs()
 	m_is_throwing = false;
 }
 
+void Character::CreateSnowball(SceneNode& node,  std::unique_ptr<Projectile> projectile)
+{
+	float x_offset = 0.f;
+	float y_offset = 0.5f;
+	sf::Vector2f velocity(0.f, 0.f);
+
+	float snowball_speed = projectile->GetMaxSpeed();
+
+	//Set the projectile velocity and offset based on the direction the player faces 
+	switch (GetFacingDirection())
+	{
+	case FacingDirections::kUp:
+		velocity.y = -snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kDown:
+		velocity.y = snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kLeft:
+		velocity.x = -snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kRight:
+		velocity.x = snowball_speed;
+		y_offset = 0.5f;
+		break;
+	case FacingDirections::kUpLeft:
+		velocity.x = -snowball_speed / std::sqrt(2);
+		velocity.y = -snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = -0.5f;
+		break;
+	case FacingDirections::kUpRight:
+		velocity.x = snowball_speed / std::sqrt(2);
+		velocity.y = -snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = 0.5f;
+		break;
+	case FacingDirections::kDownLeft:
+		velocity.x = -snowball_speed / std::sqrt(2);
+		velocity.y = snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = -0.5f;
+		break;
+	case FacingDirections::kDownRight:
+		velocity.x = snowball_speed / std::sqrt(2);
+		velocity.y = snowball_speed / std::sqrt(2);
+		y_offset = 0.5f;
+		x_offset = 0.5f;
+		break;
+	default:
+		break;
+	}
+
+	sf::Vector2f offset(x_offset * m_sprite.getGlobalBounds().width, y_offset * m_sprite.getGlobalBounds().height);
+
+	m_current_animation = CharacterAnimationType::kAttack;
+	m_snowball_count--;
+
+	projectile->setPosition(GetWorldPosition() + offset);
+	projectile->SetVelocity(velocity);
+	node.AttachChild(std::move(projectile));
+
+}
+
 void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) const
 {
 	ProjectileType type = ProjectileType::kSnowball;
@@ -148,7 +248,7 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 	float y_offset = 0.5f;
 	sf::Vector2f velocity(0.f,0.f);
 
-	std::unique_ptr<Projectile> projectile(new Projectile(type, textures, m_identifier));
+	std::unique_ptr<Projectile> projectile(new Projectile(type, textures, m_identifier, m_is_on_server));
 
 	float snowball_speed = projectile->GetMaxSpeed();
 
@@ -203,8 +303,19 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 
 	projectile->setPosition(GetWorldPosition() + offset);
 	projectile->SetVelocity(velocity);
+
+	(*m_projectiles)[snowball_counter] = projectile.get();
+
 	node.AttachChild(std::move(projectile));
-	
+
+	std::unique_ptr<sf::Packet> packet = std::make_unique<sf::Packet>();
+	*packet << static_cast<sf::Int16>(Server::PacketType::kCreateSnowball);
+	*packet << GetIdentifier();
+	*packet << static_cast<sf::Int16>(snowball_counter);
+
+	m_event_queue->push_back(std::move(packet));
+
+	snowball_counter++;
 }
 
 //Dominik Hampejs D00250604
@@ -212,6 +323,7 @@ void Character::CreateSnowball(SceneNode& node, const TextureHolder& textures) c
 void Character::Damage(int damage)
 {
 	Entity::Damage(damage);
+	Impacted();
 	m_got_hit_count++;
 }
 
@@ -222,7 +334,7 @@ sf::FloatRect Character::GetBoundingRect() const
 
 bool Character::IsMarkedForRemoval() const
 {
-	return IsDestroyed() && (m_explosion.IsFinished() || !m_show_explosion);
+	return IsDestroyed() && (m_explosion.IsFinished() || m_is_on_server);
 }
 
 void Character::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
@@ -248,6 +360,7 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 		HandleSliding();
 
 		CheckProjectileLaunch(dt, commands);
+		UpdateAnimation(dt);
 	}
 	else
 	{
@@ -276,13 +389,12 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 void Character::CheckProjectileLaunch(sf::Time dt, CommandQueue& commands)
 {
 	
-	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
+ 	if (m_is_throwing && m_throw_countdown <= sf::Time::Zero && m_snowball_count > 0)
 	{
-		m_throw_count++;
-		m_current_animation = CharacterAnimationType::kAttack; 
-		PlayLocalSound(commands, SoundEffect::kSnowballThrow);
+		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval / 1.f;
+		m_throw_count++; 
+		//PlayLocalSound(commands, SoundEffect::kSnowballThrow);
 		commands.Push(m_throw_command);
-		m_throw_countdown += Table[static_cast<int>(m_type)].m_fire_interval /  1.f;		
 		--m_snowball_count;
 		m_is_throwing = false;
 	}
@@ -617,9 +729,41 @@ sf::Color Character::GetColour()
 	return m_colour;
 }
 
-int Character::GetIdentifier() const
+sf::Int16 Character::GetIdentifier() const
 {
 	return m_identifier;
+}
+
+void Character::UpdateVisuals(sf::Time dt)
+{
+	if (IsDestroyed())
+	{
+		m_explosion.Update(dt);
+		// Play explosion sound only once
+		if (!m_played_explosion_sound)
+		{
+			SoundEffect explosionEffect = (Utility::RandomInt(2) == 0) ? SoundEffect::kExplosion1 : SoundEffect::kExplosion2;
+			//PlayLocalSound(commands, explosionEffect);
+
+			m_played_explosion_sound = true;
+		}
+		return;
+	}
+
+	//CommandQueue cq;
+	//Entity::Update(dt, cq);
+	//HandleSliding();
+
+	//Update resource indicators
+	m_health_display->SetResource(GetHitPoints());
+	m_snowball_display->SetResource(m_snowball_count);
+
+	UpdateAnimation(dt);
+}
+
+sf::Int16 Character::GetSnowballCounter()
+{
+	return snowball_counter;
 }
 
 //Dominik Hampejs D00250604

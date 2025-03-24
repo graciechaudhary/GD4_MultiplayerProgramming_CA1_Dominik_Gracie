@@ -50,9 +50,9 @@ void GameServer::ExecutionThread()
     //Initialisation
     SetListening(true);
 
-    sf::Time frame_rate = sf::seconds(1.f / 60.f);
+    sf::Time frame_rate = sf::seconds(1.f / FRAME_RATE);
     sf::Time frame_time = sf::Time::Zero;
-    sf::Time tick_rate = sf::seconds(1.f / 20.f);
+    sf::Time tick_rate = sf::seconds(1.f / TICK_RATE);
     sf::Time tick_time = sf::Time::Zero;
     sf::Clock frame_clock, tick_clock;
 
@@ -85,15 +85,23 @@ void GameServer::ExecutionThread()
             Tick();
             tick_time -= tick_rate;
         }
+
+        while (!m_world.GetEventQueue().empty()) {
+            WorldServer::Packet_Ptr packet;
+            packet = std::move(m_world.GetEventQueue().front());
+            SendToAll(*packet);
+            m_world.GetEventQueue().pop_front();
+        }
+
         //sleep
-        sf::sleep(sf::milliseconds(50));
+        //sf::sleep(sf::milliseconds(50));
     }
 }
 
 void GameServer::Tick()
 {
-	sf::Packet packet;
-	packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
+    /*sf::Packet packet;
+    packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
     packet << m_connected_players;
 	for (sf::Int16 i = 0; i < m_connected_players; ++i)
 	{
@@ -102,12 +110,64 @@ void GameServer::Tick()
 			sf::Int16 identifier = m_peers[i]->m_identifier;
 			float x = m_world.GetCharacter(i)->GetWorldPosition().x;
 			float y = m_world.GetCharacter(i)->GetWorldPosition().y;
+			float vx = m_world.GetCharacter(i)->GetVelocity().x;
+			float vy = m_world.GetCharacter(i)->GetVelocity().y;
+            sf::Int16 facing_dir = static_cast<sf::Int16>(m_world.GetCharacter(i)->GetFacingDirection());
 
-			packet << identifier << x << y;
-
+			packet << identifier << x << y << vx << vy << facing_dir;
+            
 
 		}
+	}*/
+
+    sf::Packet packet;
+    packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
+    packet << m_connected_players;  
+
+    for (sf::Int16 i = 0; i < m_connected_players; ++i)
+    {
+        if (!m_peers[i] || !m_peers[i]->m_ready)
+            continue; 
+
+        sf::Int16 identifier = static_cast<sf::Int16>(m_peers[i]->m_identifier);
+
+        auto& characters = m_world.GetCharacters();
+        auto it = characters.find(identifier);
+        if (it == characters.end())
+            continue; 
+
+        Character* character = it->second;
+        float x = character->GetWorldPosition().x;
+        float y = character->GetWorldPosition().y;
+        float vx = character->GetVelocity().x;
+        float vy = character->GetVelocity().y;
+        sf::Int16 facing_dir = static_cast<sf::Int16>(character->GetFacingDirection());
+
+        packet << identifier << x << y << vx << vy << facing_dir;
+    }
+
+    sf::Int16 size = static_cast<sf::Int16>(m_world.GetProjectiles().size());
+    packet << size;
+	for (auto& projectile : m_world.GetProjectiles())
+	{
+		sf::Int16 identifier = projectile.first;
+		float x = projectile.second->GetWorldPosition().x;
+		float y = projectile.second->GetWorldPosition().y;
+		
+		//packet << identifier << x << y;
+        packet << identifier << x << y;
 	}
+
+    //pickups
+	/*size = static_cast<sf::Int16>(m_world.GetPickups().size());
+	packet << size;
+	for (auto& pickup : m_world.GetPickups())
+	{
+		sf::Int16 identifier = pickup.first;
+		float x = pickup.second->GetWorldPosition().x;
+		float y = pickup.second->GetWorldPosition().y;
+		packet << identifier << x << y;
+	}*/
 
 	SendToAll(packet);
 }
@@ -171,8 +231,6 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
 			packet >> identifier >>action >> action_enabled;
 			m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
-
-			BroadcastMessage("Player action change: " + action);
         }
     default:
         break;
@@ -200,6 +258,10 @@ void GameServer::HandleIncomingConnections()
 
 		m_player_controllers[m_connected_players] = new PlayersController(&m_peers[m_connected_players]->m_socket, m_connected_players);
 		m_world.AddCharacter(m_connected_players);
+
+        InformWorldState(m_peers[m_connected_players]->m_socket);
+        NotifyPlayerSpawn(m_connected_players);
+        
 
         m_connected_players++;
         if (m_connected_players >= m_max_connected_players)
@@ -253,6 +315,35 @@ void GameServer::BroadcastMessage(const std::string& message)
 	packet << static_cast<sf::Int16>(Server::PacketType::kBroadcastMessage);
 	packet << message;
 	SendToAll(packet);
+}
+
+void GameServer::InformWorldState(sf::TcpSocket& socket)
+{
+    sf::Packet packet;
+    packet << static_cast<sf::Int16>(Server::PacketType::kInitialState);
+    packet << m_connected_players;
+
+    for (sf::Int16 i = 0; i < m_connected_players; ++i)
+    {
+        if (m_peers[i]->m_ready)
+        {
+            sf::Int16 identifier = m_peers[i]->m_identifier;
+            packet << identifier;
+        }
+    }
+
+    socket.send(packet);
+}
+
+void GameServer::NotifyPlayerSpawn(sf::Int16 identifier)
+{
+    sf::Packet packet;
+    sf::Int16 size = 1;
+    packet << static_cast<sf::Int16>(Server::PacketType::kInitialState);
+    packet << size;
+    packet << identifier;
+
+    SendToAll(packet);
 }
 
 GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false)

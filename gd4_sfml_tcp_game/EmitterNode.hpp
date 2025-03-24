@@ -9,8 +9,11 @@ class EmitterNode : public SceneNode
 {
 public:
 	explicit EmitterNode(ParticleType type, int identifier);
+	explicit EmitterNode(ParticleType type, int identifier, ParticleNode* particle_system);
+	void VisualUpdate(sf::Time dt);
 
 private:
+
 	virtual void UpdateCurrent(sf::Time dt, CommandQueue& commands);
 	void EmitRadialParticles(sf::Time dt);	
 

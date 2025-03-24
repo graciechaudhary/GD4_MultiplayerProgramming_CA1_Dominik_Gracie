@@ -6,6 +6,7 @@
 #include "PickupType.hpp"
 #include "Character.hpp"
 #include "ParticleType.hpp"
+#include "NetworkProtocol.hpp"
 
 //GracieChaudhary - alloting new textures
 std::vector<CharacterData> InitializeCharacterData()
@@ -29,6 +30,7 @@ std::vector<ProjectileData> InitializeProjectileData()
     data[static_cast<int>(ProjectileType::kSnowball)].m_damage = 1;
     data[static_cast<int>(ProjectileType::kSnowball)].m_speed = 500;
     data[static_cast<int>(ProjectileType::kSnowball)].m_texture = TextureID::kSnowball;
+
 
     return data;
 }
@@ -58,9 +60,76 @@ std::vector<ParticleData> InitializeParticleData()
 {
     std::vector<ParticleData> data(static_cast<int>(ParticleType::kParticleCount));
 
-    data[static_cast<int>(ParticleType::kSnow)].m_color = sf::Color(255, 255, 255);
+    data[static_cast<int>(ParticleType::kSnow)].m_color = sf::Color::Yellow;
     data[static_cast<int>(ParticleType::kSnow)].m_lifetime = sf::seconds(1.f);
 
+
+    return data;
+}
+
+std::map<int, SpawnPoint> InitializeSpawnPoints()
+{
+    std::map<int, SpawnPoint> data;
+    float offset_x = 100.f;
+    float offset_y = 100.f;
+
+    for (int i = 0; i < MAX_CONNECTIONS; i++)
+    {
+        data[i] = SpawnPoint();
+
+        if ( (i/4)%2 == 0)
+        {
+            switch (i % 4)
+            {
+            case 0:
+                data[i].m_x = offset_x;
+                data[i].m_y = offset_y;
+                break;
+            case 1:
+                data[i].m_x = WINDOW_WIDTH - offset_x;
+                data[i].m_y = WINDOW_HEIGHT - offset_y;
+                break;
+            case 2:
+                data[i].m_x = offset_x;
+                data[i].m_y = WINDOW_HEIGHT - offset_y;
+                break;
+            case 3:
+                data[i].m_x = WINDOW_WIDTH - offset_x;
+                data[i].m_y = offset_y;
+                offset_x += 150.f;
+                offset_y += 100.f;
+                break;
+            default:
+                break;
+            }
+        }
+        else
+        {
+            switch (i % 4)
+            {
+            case 0:
+                data[i].m_x = WINDOW_WIDTH/2.f;
+                data[i].m_y = offset_y;
+                break;
+            case 1:
+                data[i].m_x = WINDOW_WIDTH - offset_x;
+                data[i].m_y = WINDOW_HEIGHT/2.f;
+                break;
+            case 2:
+                data[i].m_x = WINDOW_WIDTH / 2.f;
+                data[i].m_y = WINDOW_HEIGHT- offset_y;
+                break;
+            case 3:
+                data[i].m_x = offset_x;
+                data[i].m_y = WINDOW_HEIGHT / 2.f;
+                offset_x += 150.f;
+                offset_y += 100.f;
+                break;
+            default:
+                break;
+            }
+        }
+    }
 
     return data;
 }
