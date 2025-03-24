@@ -138,8 +138,7 @@ bool MultiplayerState::Update(sf::Time dt)
 		if (m_tick_clock.getElapsedTime() > sf::seconds(1.f / TICK_RATE))
 		{
 			sf::Packet packetOut;
-			packetOut << static_cast<sf::Int16>(Client::PacketType::kBroadcastMessage);
-			packetOut << "Working!";
+			packetOut << static_cast<sf::Int16>(Client::PacketType::kNotice);
 			m_socket.send(packetOut);
 			m_tick_clock.restart();
 		}
@@ -237,48 +236,70 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 	}
 	break;
 
-		case Server::PacketType::kSpawnSelf:{
-			sf::Int16 identifier;
-			packet >> identifier;
-			m_identifier = identifier;
-			m_world.AddCharacter(identifier);
-			m_players_controller.SetConnection(&m_socket, identifier);
+	case Server::PacketType::kSpawnSelf:{
+		sf::Int16 identifier;
+		packet >> identifier;
+		m_identifier = identifier;
+		m_world.AddCharacter(identifier);
+		m_players_controller.SetConnection(&m_socket, identifier);
+	}
+	break;
+
+	case Server::PacketType::kInitialState: {
+		sf::Int16 amount;
+		packet >> amount;
+		std::cout << "Chars: " << amount << std::endl;
+		for (sf::Int16 i = 0; i < amount; i++)
+		{
+
+			sf::Int16 id;
+			packet >> id;
+
+			if (id == m_identifier) continue;
+
+			m_world.AddCharacter(id);
 		}
-									   break;
-		case Server::PacketType::kInitialState: {
-			sf::Int16 amount;
-			packet >> amount;
-			std::cout << "Chars: " << amount << std::endl;
-			for (sf::Int16 i = 0; i < amount; i++)
-			{
 
-				sf::Int16 id;
-				packet >> id;
+	}
+	break;
 
-				if (id == m_identifier) continue;
+	case Server::PacketType::kHealthDown: {
+		sf::Int16 identifer;
+		packet >> identifer;
+		m_world.GetCharacter(identifer)->Damage(1);
+	}
+	break;
 
-				m_world.AddCharacter(id);
-			}
 
-									   }
-											  break;
-		case Server::PacketType::kHealthDown: {
-			sf::Int16 identifer;
-			packet >> identifer;
-			m_world.GetCharacter(identifer)->Damage(1);
-		}
-		break;
-		case Server::PacketType::kCreateSnowball: {
-			sf::Int16 identifer;
-			sf::Int16 snowball_identifier;
-			packet >> identifer >> snowball_identifier;
+	case Server::PacketType::kHealthUp: {
+		sf::Int16 character_identifer;
+		sf::Int16 pickup_identifier;
+		packet >> character_identifer;
+		packet >> pickup_identifier;
+		m_world.GetCharacter(character_identifer)->Repair(1, m_world.GetCharacter(character_identifer)->GetMaxHitpoints());
+		m_world.RemovePickup(pickup_identifier);
+	}
+		
+	case Server::PacketType::kSnowballUp: {
+		sf::Int16 character_identifer;
+		sf::Int16 pickup_identifier;
+		packet >> character_identifer;
+		packet >> pickup_identifier;
+		m_world.GetCharacter(character_identifer)->RechargeSnowballs();
+		m_world.RemovePickup(pickup_identifier);
+	}
+	break;
 
-			m_world.CreateSnowball(identifer, snowball_identifier);
-		}
-											break;
+	case Server::PacketType::kCreateSnowball: {
+		sf::Int16 identifer;
+		sf::Int16 snowball_identifier;
+		packet >> identifer >> snowball_identifier;
 
-		case Server::PacketType::kUpdateClientState: {
+		m_world.CreateSnowball(identifer, snowball_identifier);
+	}
+	break;
 
+	case Server::PacketType::kUpdateClientState: {
 			sf::Int16 character_count;
 			packet >> character_count;
 			for (sf::Int16 i = 0; i < character_count; ++i)
@@ -294,6 +315,8 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 					
 					float vx, vy;
 					packet >> vx >> vy;
+					//vx *= 0.5;
+					//vy *= 0.5;
 					character->SetVelocity(vx, vy);
 
 					sf::Int16 dir;
@@ -301,18 +324,53 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 					character->SetCurrentDirection(static_cast<FacingDirections>(dir));
 				}
 			}
-
-			sf::Int16 snowball_counter;
-			packet >> snowball_counter;
-			for (sf::Int16 i = 0; i < snowball_counter; ++i) {
-				float x, y;
-				packet >> x >> y;
-
-				m_world.GetProjectile(i)->setPosition(x,y);
-			}
-
+		sf::Int16 snowball_counter;
+		packet >> snowball_counter;
+		for (sf::Int16 i = 0; i < snowball_counter; ++i) {
+			sf::Int16 id;
+			packet >> id;
+			float x, y;
+			packet >> x >> y;
+			m_world.GetProjectile(id)->setPosition(x,y);
 		}
-												   break;
+
+
+
+	}
+	break;
+
+	case Server::PacketType::kCharacterRemoved: {
+		sf::Int16 character_id;
+		packet >> character_id;
+
+		m_world.RemoveCharacter(character_id);
+	}
+	break;
+
+	case Server::PacketType::kSnowballRemoved: {
+		sf::Int16 snowball_id;
+		packet >> snowball_id;
+
+		m_world.RemoveSnowball(snowball_id);
+	}
+	break;
+
+	case Server::PacketType::kPickupSpawned: {
+		sf::Int16 pickup_identifier;
+		sf::Int16 type;
+		float x, y;
+		packet >> pickup_identifier >> type >> x >> y;
+		m_world.SpawnPickup(pickup_identifier, static_cast<PickupType>(type), x, y);
+	}
+	break;
+
+	case Server::PacketType::kPickupRemoved: {
+		sf::Int16 pickup_identifier;
+		packet >> pickup_identifier;
+		m_world.RemovePickup(pickup_identifier);
+	}
+	break;
+
 	default:
 		break;
 	}

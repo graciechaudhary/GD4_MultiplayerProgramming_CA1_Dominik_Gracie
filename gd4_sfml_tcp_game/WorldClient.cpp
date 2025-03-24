@@ -263,6 +263,8 @@ void WorldClient::Update(sf::Time dt)
 	{
 		parSys.second->UpdateVisuals(dt);
 	}
+
+	//m_scenegraph.RemoveWrecks();
 }
 
 void WorldClient::AddCharacter(sf::Int16 identifier)
@@ -293,6 +295,34 @@ Projectile* WorldClient::GetProjectile(sf::Int16 identifier)
 	return m_projectiles[identifier];
 }
 
+Pickup* WorldClient::GetPickup(sf::Int16 identifier)
+{
+	return m_pickups[identifier];
+}
+
+void WorldClient::RemoveCharacter(sf::Int16 character_id)
+{
+	//m_characters.erase(character_id);
+	//auto it = m_characters.find(character_id);
+	//if (it != m_characters.end()) {
+	//	delete it->second; 
+	//	m_characters.erase(it);
+	//}
+}
+
+void WorldClient::RemoveSnowball(sf::Int16 snowball_id)
+{
+	m_projectiles[snowball_id]->Destroy();
+}
+
+void WorldClient::RemovePickup(sf::Int16 pickup_id)
+{
+	//awkward fix - maybe changed later
+	m_pickups[pickup_id]->setPosition(-100, -100);
+	m_pickups[pickup_id]->Destroy();
+	
+}
+
 void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier)
 {
 
@@ -300,6 +330,16 @@ void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowb
 	m_projectiles[snowball_identifier] = projectile.get();
 	std::cout << "Snowball: " << snowball_identifier << std::endl;
 	GetCharacter(character_identifier)->CreateSnowball(*m_scene_layers[static_cast<int>(SceneLayers::kParticles)], std::move(projectile));
+}
+
+void WorldClient::SpawnPickup(sf::Int16 pickup_identifier, PickupType type, float x, float y)
+{
+	std::unique_ptr<Pickup> pickup(new Pickup(pickup_identifier,type, m_textures));
+	pickup->setPosition(x, y);
+	m_pickups[pickup_identifier] = pickup.get();
+	std::cout << "Pickup: " << pickup_identifier << std::endl;
+	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(pickup));
+	
 }
 
 void WorldClient::UpdateSounds()

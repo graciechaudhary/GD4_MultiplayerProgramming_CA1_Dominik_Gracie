@@ -1,6 +1,6 @@
 const unsigned short SERVER_PORT = 50000;
 
-const float TICK_RATE = 30.f;
+const float TICK_RATE = 10.f;
 const float FRAME_RATE = 60.f;
 
 const unsigned short MAX_CONNECTIONS = 15;
@@ -19,6 +19,11 @@ namespace Server
 		kHealthDown,
 		kInitialState,
 		kCreateSnowball,
+		kCharacterRemoved,
+		kSnowballRemoved,
+		kPickupSpawned,
+		kPickupRemoved,
+		kSnowballUp
 	};
 }
 
@@ -28,6 +33,7 @@ namespace Client
 	{
 		kBroadcastMessage,
 		kPlayerRealtimeChange,
+		kNotice,
 		kQuit
 	};
 }

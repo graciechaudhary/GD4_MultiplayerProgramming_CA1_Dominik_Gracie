@@ -23,6 +23,11 @@ public:
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
 
+
+	const std::map<sf::Int16, Character*>& GetCharacters() const;
+	std::map<sf::Int16, Projectile*>& GetProjectiles();
+	std::map<sf::Int16, Pickup*>& GetPickups();
+	
 	typedef std::unique_ptr<sf::Packet> Packet_Ptr;
 
 	std::deque<Packet_Ptr>& GetEventQueue() { return m_event_queue; };
@@ -70,8 +75,8 @@ private:
 	//void SpawnPickup();
 	//void SendPickupDataToClients(PickupSpawnPoint spawnpoint);
 
-	
-	
+	void CheckMarkedForRemoval();
+	void SpawnPickup();
 
 
 private:
@@ -79,6 +84,7 @@ private:
 	sf::FloatRect m_world_bounds;
 	sf::Vector2f m_centre_position;
 	CommandQueue m_command_queue;
+	Command m_create_pickup_command;
 
 	SceneNode m_scenegraph;
 	std::array<SceneNode*, static_cast<int>(SceneLayers::kLayerCount)> m_scene_layers;
@@ -92,6 +98,7 @@ private:
 
 	std::map<sf::Int16, Character*> m_characters;
 	std::map<sf::Int16, Projectile*> m_projectiles;
+	std::map<sf::Int16, Pickup*> m_pickups;
 	std::deque<Packet_Ptr> m_event_queue;
 };
 

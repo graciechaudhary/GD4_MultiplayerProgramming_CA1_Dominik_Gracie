@@ -100,8 +100,8 @@ void GameServer::ExecutionThread()
 
 void GameServer::Tick()
 {
-	sf::Packet packet;
-	packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
+    /*sf::Packet packet;
+    packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
     packet << m_connected_players;
 	for (sf::Int16 i = 0; i < m_connected_players; ++i)
 	{
@@ -118,15 +118,56 @@ void GameServer::Tick()
             
 
 		}
+	}*/
+
+    sf::Packet packet;
+    packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
+    packet << m_connected_players;  
+
+    for (sf::Int16 i = 0; i < m_connected_players; ++i)
+    {
+        if (!m_peers[i] || !m_peers[i]->m_ready)
+            continue; 
+
+        sf::Int16 identifier = static_cast<sf::Int16>(m_peers[i]->m_identifier);
+
+        auto& characters = m_world.GetCharacters();
+        auto it = characters.find(identifier);
+        if (it == characters.end())
+            continue; 
+
+        Character* character = it->second;
+        float x = character->GetWorldPosition().x;
+        float y = character->GetWorldPosition().y;
+        float vx = character->GetVelocity().x;
+        float vy = character->GetVelocity().y;
+        sf::Int16 facing_dir = static_cast<sf::Int16>(character->GetFacingDirection());
+
+        packet << identifier << x << y << vx << vy << facing_dir;
+    }
+
+    sf::Int16 size = static_cast<sf::Int16>(m_world.GetProjectiles().size());
+    packet << size;
+	for (auto& projectile : m_world.GetProjectiles())
+	{
+		sf::Int16 identifier = projectile.first;
+		float x = projectile.second->GetWorldPosition().x;
+		float y = projectile.second->GetWorldPosition().y;
+		
+		//packet << identifier << x << y;
+        packet << identifier << x << y;
 	}
 
-    packet << Character::GetSnowballCounter();
-    for (sf::Int16 i = 0; i < Character::GetSnowballCounter(); i++)
-    {
-        Projectile* projectile = m_world.GetProjectile(i);
-        
-        packet << projectile->GetWorldPosition().x << projectile->GetWorldPosition().y;
-    }
+    //pickups
+	/*size = static_cast<sf::Int16>(m_world.GetPickups().size());
+	packet << size;
+	for (auto& pickup : m_world.GetPickups())
+	{
+		sf::Int16 identifier = pickup.first;
+		float x = pickup.second->GetWorldPosition().x;
+		float y = pickup.second->GetWorldPosition().y;
+		packet << identifier << x << y;
+	}*/
 
 	SendToAll(packet);
 }
@@ -190,8 +231,6 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
 			packet >> identifier >>action >> action_enabled;
 			m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
-
-			BroadcastMessage("Player action change: " + action);
         }
     default:
         break;

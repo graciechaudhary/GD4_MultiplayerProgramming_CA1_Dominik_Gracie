@@ -1,4 +1,4 @@
-#include "WorldServer.hpp"
+﻿#include "WorldServer.hpp"
 #include "NetworkProtocol.hpp"
 
 
@@ -11,9 +11,10 @@ namespace {
 
 WorldServer::WorldServer() : m_scenegraph()
 , m_command_queue()
+, m_create_pickup_command()
 , m_pickup_drop_interval(sf::seconds(5.f))
 , m_time_since_last_drop(sf::Time::Zero)
-, m_max_pickups(2)
+, m_max_pickups(3)
 , m_pickups_spawned(0)
 , m_scene_layers()
 , m_world_bounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -22,6 +23,12 @@ WorldServer::WorldServer() : m_scenegraph()
 {
 	InitializeLayers();
 	LoadTextures();
+
+	m_create_pickup_command.category = static_cast<int>(ReceiverCategories::kScene);
+	m_create_pickup_command.action = [this](SceneNode& node, sf::Time)
+		{
+			SpawnPickup();
+		};
 }
 
 void WorldServer::LoadTextures()
@@ -72,6 +79,9 @@ void WorldServer::Update(sf::Time dt)
 
 	HandleCollisions();
 
+	//check stuff that is marked for removal and then remove it
+	CheckMarkedForRemoval();
+	//send message to all the clients that hit has been removed from the map
 	m_scenegraph.RemoveWrecks();
 
 
@@ -180,9 +190,36 @@ void WorldServer::HandleCollisions()
 			//Collision response
 			pickup.Apply(player);
 			SoundEffect pickupSoundEffect = pickup.GetPickupType() == PickupType::kHealthRefill ? SoundEffect::kHealthPickup : SoundEffect::kSnowballPickup;
-			m_pickups_spawned--;
+			auto it = m_pickups.find(pickup.GetIdentifier());
+
+			if (pickup.GetPickupType() == PickupType::kHealthRefill)
+			{
+				player.Repair(1,player.GetMaxHitpoints());
+				Packet_Ptr packet = std::make_unique<sf::Packet>();
+				*packet << static_cast<sf::Int16>(Server::PacketType::kHealthUp);
+				*packet << static_cast<sf::Int16>(player.GetIdentifier());
+				*packet << static_cast<sf::Int16>(pickup.GetIdentifier());
+				m_event_queue.push_back(std::move(packet));
+
+			}
+			else if (pickup.GetPickupType() == PickupType::kSnowballRefill)
+			{
+				player.RechargeSnowballs();
+				Packet_Ptr packet = std::make_unique<sf::Packet>();
+				*packet << static_cast<sf::Int16>(Server::PacketType::kSnowballUp);
+				*packet << static_cast<sf::Int16>(player.GetIdentifier());
+				*packet << static_cast<sf::Int16>(pickup.GetIdentifier());
+				m_event_queue.push_back(std::move(packet));
+			}
+
+			if (it != m_pickups.end())
+			{
+				m_pickups.erase(it);
+				m_pickups_spawned--; 
+			}
 			pickup.Destroy();
-			player.PlayLocalSound(m_command_queue, pickupSoundEffect);
+			player.PlayLocalSound(m_command_queue, pickupSoundEffect);	
+					
 		}
 		//On player snowball collision do damage and push player, and destroy snowball
 		else if (MatchesCategories(pair, ReceiverCategories::kPlayer, ReceiverCategories::kProjectile))
@@ -217,10 +254,9 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 	if (m_time_since_last_drop > m_pickup_drop_interval)
 	{
 		m_time_since_last_drop = sf::Time::Zero;
-		//SpawnPickup();
 		m_pickups_spawned++;
-		
-		//m_command_queue.Push(m_create_pickup_command);
+		std::cout << "Pickup Spawned" << std::endl;
+		m_command_queue.Push(m_create_pickup_command);
 	}
 
 	//When no pickup on the lake speed up spawn
@@ -232,6 +268,65 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 	if (m_pickups_spawned < m_max_pickups)
 	{
 		m_time_since_last_drop += dt;
+	}
+}
+
+void WorldServer::CheckMarkedForRemoval()
+{
+	//removing characters that have been destoryed
+	for (auto it = m_characters.begin(); it != m_characters.end(); )
+	{
+		if (it->second->IsMarkedForRemoval()) 
+		{
+			std::cout << "Removing character with ID: " << it->first << std::endl;
+
+			Packet_Ptr packet = std::make_unique<sf::Packet>();
+			*packet << static_cast<sf::Int16>(Server::PacketType::kCharacterRemoved);
+			*packet << static_cast<sf::Int16>(it->first); 
+			m_event_queue.push_back(std::move(packet));
+
+			//delete it->second;  
+			it = m_characters.erase(it); 
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	//removing the snowballs that have been destroyed
+	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); )
+	{
+		if (it->second->IsMarkedForRemoval())
+		{
+			std::cout << "[DEBUG] Removing projectile with ID: " << it->first << std::endl;
+
+			Packet_Ptr packet = std::make_unique<sf::Packet>();
+			*packet << static_cast<sf::Int16>(Server::PacketType::kSnowballRemoved);
+			*packet << static_cast<sf::Int16>(it->first); 
+			m_event_queue.push_back(std::move(packet));
+
+			//delete it->second;
+			it = m_projectiles.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	//removing the pickups that have been destroyed
+	for (auto it = m_pickups.begin(); it != m_pickups.end(); )
+	{
+		if (it->second->IsMarkedForRemoval())
+		{
+			std::cout << "[DEBUG] Removing pickup with ID: " << it->first << std::endl;
+			it = m_pickups.erase(it);
+		}
+		else
+		{
+			++it;
+		}
 	}
 }
 
@@ -257,16 +352,52 @@ Projectile* WorldServer::GetProjectile(sf::Int16 identifier)
 	return m_projectiles[identifier];
 }
 
-//void WorldServer::SpawnPickup()
-//{
-//	float border_distance = 65.f;
-//	float x = Utility::RandomInt(GetViewBounds().width - border_distance * 2) + border_distance;
-//	float y = Utility::RandomInt(GetViewBounds().height - border_distance * 2) + border_distance;
-//	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
-//
-//	PickupSpawnPoint spawnpoint{type,x,y};
-//
-//}
+const std::map<sf::Int16, Character*>& WorldServer::GetCharacters() const
+{
+	return m_characters;
+}
+	
+
+std::map<sf::Int16, Projectile*>& WorldServer::GetProjectiles()
+{
+	return m_projectiles;
+}
+
+std::map<sf::Int16, Pickup*>& WorldServer::GetPickups()
+{
+	return m_pickups;
+}
+
+
+
+void WorldServer::SpawnPickup(){
+	if (m_pickups.size() >= m_max_pickups)
+		return;
+
+	float border_distance = 65.f;
+	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
+	sf::Int16 pickup_id = static_cast<sf::Int16>(m_pickups.size() + 1);
+
+	
+	std::unique_ptr<Pickup> pickup = std::make_unique<Pickup>(pickup_id, type, m_textures);
+	float x = Utility::RandomInt(GetBattleFieldBounds().width - border_distance * 2) + border_distance;
+	float y = Utility::RandomInt(GetBattleFieldBounds().height - border_distance * 2) + border_distance;
+
+	pickup->setPosition(x, y);
+
+	
+	Pickup* new_pickup = pickup.get();
+	m_pickups.insert(std::make_pair(pickup_id, new_pickup));
+
+	
+	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(pickup));
+
+	
+	Packet_Ptr packet = std::make_unique<sf::Packet>();
+	*packet << static_cast<sf::Int16>(Server::PacketType::kPickupSpawned);
+	*packet << pickup_id << static_cast<sf::Int16>(type) << x << y;  // FIXED
+	m_event_queue.push_back(std::move(packet));
+}
 
 
 void WorldServer::DestroyEntitiesOutsideView()

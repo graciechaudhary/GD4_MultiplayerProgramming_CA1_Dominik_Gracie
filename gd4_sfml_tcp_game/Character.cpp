@@ -233,6 +233,7 @@ void Character::CreateSnowball(SceneNode& node,  std::unique_ptr<Projectile> pro
 	sf::Vector2f offset(x_offset * m_sprite.getGlobalBounds().width, y_offset * m_sprite.getGlobalBounds().height);
 
 	m_current_animation = CharacterAnimationType::kAttack;
+	m_snowball_count--;
 
 	projectile->setPosition(GetWorldPosition() + offset);
 	projectile->SetVelocity(velocity);
@@ -748,6 +749,10 @@ void Character::UpdateVisuals(sf::Time dt)
 		}
 		return;
 	}
+
+	//CommandQueue cq;
+	//Entity::Update(dt, cq);
+	//HandleSliding();
 
 	//Update resource indicators
 	m_health_display->SetResource(GetHitPoints());
