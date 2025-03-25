@@ -89,10 +89,18 @@ void GameServer::ExecutionThread()
             if (m_game_started)
             {
                 Tick();
+
+                if (m_world.CheckAlivePlayers() == 1)
+                {
+                    BroadcastMessage("Game Finished");
+                }
             }
             else
             {
-                BroadcastMessage("Game not ready!");
+                sf::Packet packet;
+                packet << static_cast<sf::Int16>(Server::PacketType::kWaitingNotice);
+                SendToAll(packet);
+
                 sf::Int16 amount_ready = 0;
                 for (sf::Int16 i = 0; i < m_connected_players; ++i)
                 {
@@ -108,6 +116,7 @@ void GameServer::ExecutionThread()
                     SendToAll(ready_packet);
                     m_game_started = true;
                     SetListening(false);
+                    BroadcastMessage("Game Started");
                 }
             }
 
@@ -319,6 +328,8 @@ void GameServer::HandleIncomingConnections()
         {
             m_peers.emplace_back(PeerPtr(new RemotePeer()));
         }
+
+        BroadcastMessage("Waiting for players");
     }
 }
 

@@ -355,6 +355,11 @@ void Character::UpdateCurrent(sf::Time dt, CommandQueue& commands)
 {
 	if (m_is_on_server)
 	{
+		if (IsDestroyed())
+		{
+			return;
+		}
+
 		Entity::UpdateCurrent(dt, commands);
 
 		ClearWalkingFlags(dt);

@@ -43,9 +43,10 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	, m_player_dead(false)
 {
 	m_broadcast_text.setFont(context.fonts->Get(Font::kMain));
+	m_broadcast_text.setCharacterSize(50);
+	m_broadcast_text.setFillColor(sf::Color::Black);
 	Utility::CentreOrigin(m_broadcast_text);
-	m_broadcast_text.setPosition(m_window.getSize().x / 2.f / 2, 100.f);
-	m_failed_connection_text.setFillColor(sf::Color::Black);
+	m_broadcast_text.setPosition(m_window.getSize().x / 2.f, m_window.getSize().y / 2.f);
 
 	//Use this for "Attempt to connect" and "Failed to connect" messages
 	m_failed_connection_text.setFont(context.fonts->Get(Font::kMain));

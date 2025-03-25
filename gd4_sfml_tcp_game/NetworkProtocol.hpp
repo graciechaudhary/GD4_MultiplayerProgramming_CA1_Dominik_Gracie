@@ -23,7 +23,8 @@ namespace Server
 		kSnowballRemoved,
 		kPickupSpawned,
 		kGameReady,
-		kSnowballUp
+		kSnowballUp,
+		kWaitingNotice
 	};
 }
 
