@@ -334,7 +334,8 @@ sf::FloatRect Character::GetBoundingRect() const
 
 bool Character::IsMarkedForRemoval() const
 {
-	return IsDestroyed() && (m_explosion.IsFinished() || m_is_on_server);
+	//return IsDestroyed() && (m_explosion.IsFinished() || m_is_on_server);
+	return false;
 }
 
 void Character::DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const
@@ -736,9 +737,15 @@ sf::Int16 Character::GetIdentifier() const
 
 void Character::UpdateVisuals(sf::Time dt)
 {
+	if (m_explosion.IsFinished()) return;
+
 	if (IsDestroyed())
 	{
 		m_explosion.Update(dt);
+
+		m_health_display->SetResource(0);
+		m_snowball_display->SetResource(0);
+
 		// Play explosion sound only once
 		if (!m_played_explosion_sound)
 		{

@@ -20,7 +20,7 @@ WorldServer::WorldServer() : m_scenegraph()
 , m_scene_layers()
 , m_world_bounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
 , m_event_queue()
-
+, m_players_alive(0)
 {
 	InitializeLayers();
 	LoadTextures();
@@ -88,7 +88,6 @@ void WorldServer::Update(sf::Time dt)
 
 	m_scenegraph.Update(dt, m_command_queue);
 	AdaptPlayerPosition();
-
 }
 
 CommandQueue& WorldServer::GetCommandQueue()
@@ -270,25 +269,25 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 void WorldServer::CheckMarkedForRemoval()
 {
 	//removing characters that have been destoryed
-	for (auto it = m_characters.begin(); it != m_characters.end(); )
-	{
-		if (it->second->IsMarkedForRemoval()) 
-		{
-			std::cout << "Removing character with ID: " << it->first << std::endl;
+	//for (auto it = m_characters.begin(); it != m_characters.end(); )
+	//{
+	//	if (it->second->IsMarkedForRemoval()) 
+	//	{
+	//		std::cout << "Removing character with ID: " << it->first << std::endl;
 
-			Packet_Ptr packet = std::make_unique<sf::Packet>();
-			*packet << static_cast<sf::Int16>(Server::PacketType::kCharacterRemoved);
-			*packet << static_cast<sf::Int16>(it->first); 
-			m_event_queue.push_back(std::move(packet));
+	//		Packet_Ptr packet = std::make_unique<sf::Packet>();
+	//		*packet << static_cast<sf::Int16>(Server::PacketType::kCharacterRemoved);
+	//		*packet << static_cast<sf::Int16>(it->first); 
+	//		m_event_queue.push_back(std::move(packet));
 
-			//delete it->second;  
-			it = m_characters.erase(it); 
-		}
-		else
-		{
-			++it;
-		}
-	}
+	//		//delete it->second;  
+	//		it = m_characters.erase(it); 
+	//	}
+	//	else
+	//	{
+	//		++it;
+	//	}
+	//}
 
 	//removing the snowballs that have been destroyed
 	for (auto it = m_projectiles.begin(); it != m_projectiles.end(); )
@@ -320,8 +319,6 @@ void WorldServer::AddCharacter(sf::Int16 identifier)
 	character->SetVelocity(0, 0);
 	m_characters[identifier] = character;
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
-
-	std::cout << character->GetWorldPosition().x << "  " << character->GetWorldPosition().y << std::endl;
 }
 
 Character* WorldServer::GetCharacter(sf::Int16 identifier)
@@ -367,6 +364,16 @@ void WorldServer::SpawnPickup(){
 	*packet << static_cast<sf::Int16>(Server::PacketType::kPickupSpawned);
 	*packet << pickup_id << static_cast<sf::Int16>(type) << x << y;  // FIXED
 	m_event_queue.push_back(std::move(packet));
+}
+
+sf::Int16 WorldServer::CheckAlivePlayers()
+{
+	sf::Int16 amount_alive = 0;
+	for (auto charPair : m_characters)
+	{
+		if (!charPair.second->IsDestroyed()) amount_alive++;
+	}
+	return amount_alive;
 }
 
 

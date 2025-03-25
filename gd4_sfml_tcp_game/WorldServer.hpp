@@ -31,6 +31,8 @@ public:
 
 	std::deque<Packet_Ptr>& GetEventQueue() { return m_event_queue; };
 
+	sf::Int16 CheckAlivePlayers();
+
 private:
 	struct SpawnPoint
 	{
@@ -78,6 +80,8 @@ private:
 	void SpawnPickup();
 
 
+
+
 private:
 
 	sf::FloatRect m_world_bounds;
@@ -99,5 +103,7 @@ private:
 	std::map<sf::Int16, Character*> m_characters;
 	std::map<sf::Int16, Projectile*> m_projectiles;
 	std::deque<Packet_Ptr> m_event_queue;
+
+	sf::Int16 m_players_alive;
 };
 

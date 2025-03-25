@@ -150,7 +150,9 @@ void GameServer::Tick()
 
     sf::Packet packet;
     packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
-    packet << m_connected_players;  
+
+    sf::Int16 players_alive = m_world.CheckAlivePlayers();
+    packet << players_alive;
 
     for (sf::Int16 i = 0; i < m_connected_players; ++i)
     {
@@ -165,6 +167,9 @@ void GameServer::Tick()
             continue; 
 
         Character* character = it->second;
+
+        if (character->IsDestroyed()) continue;
+
         float x = character->GetWorldPosition().x;
         float y = character->GetWorldPosition().y;
         float vx = character->GetVelocity().x;

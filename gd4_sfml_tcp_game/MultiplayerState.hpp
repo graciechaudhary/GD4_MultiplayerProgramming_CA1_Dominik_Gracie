@@ -45,5 +45,6 @@ private:
 	PlayersController& m_players_controller;
 
 	bool m_game_started;
+	bool m_player_dead;
 };
 

@@ -40,6 +40,7 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	, m_client_timeout(sf::seconds(5.f))
 	, m_time_since_last_packet(sf::seconds(0.f))
 	, m_game_started(false)
+	, m_player_dead(false)
 {
 	m_broadcast_text.setFont(context.fonts->Get(Font::kMain));
 	Utility::CentreOrigin(m_broadcast_text);
@@ -176,7 +177,7 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 		}
 	}
 
-	if (m_game_started)
+	if (m_game_started && !m_player_dead)
 	{
 		m_players_controller.HandleEvent(event);
 	}
@@ -276,6 +277,12 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		sf::Int16 identifer;
 		packet >> identifer;
 		m_world.GetCharacter(identifer)->Damage(1);
+
+		if (m_world.GetCharacter(m_identifier)->IsDestroyed())
+		{
+			m_player_dead = false;
+		}
+
 		break;
 	}
 	case Server::PacketType::kHealthUp: {
