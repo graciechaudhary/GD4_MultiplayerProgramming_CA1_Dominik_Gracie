@@ -107,6 +107,7 @@ void GameServer::ExecutionThread()
                     ready_packet << static_cast<sf::Int16>(Server::PacketType::kGameReady);
                     SendToAll(ready_packet);
                     m_game_started = true;
+                    SetListening(false);
                 }
             }
 
@@ -326,7 +327,7 @@ void GameServer::HandleDisconnections()
             itr = m_peers.erase(itr);
 
             //If the number of peers has dropped below max_connections
-            if (m_connected_players < m_max_connected_players)
+            if (m_connected_players < m_max_connected_players && !m_game_started)
             {
                 m_peers.emplace_back(PeerPtr(new RemotePeer()));
                 SetListening(true);
