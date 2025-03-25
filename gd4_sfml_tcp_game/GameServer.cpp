@@ -15,6 +15,7 @@ GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
 , m_connected_players(0)
 , m_peers(1)
 , m_waiting_thread_end(false)
+, m_game_started(false)
 {
 	m_listener_socket.setBlocking(false);
 	m_peers[0].reset(new RemotePeer());
@@ -71,10 +72,13 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (frame_time >= frame_rate)
         {
-			m_world.Update(frame_rate);
-            for (auto controler : m_player_controllers)
+            if (m_game_started)
             {
-                controler.second->NetworkedRealTimeInputServer(m_world.GetCommandQueue());
+                m_world.Update(frame_rate);
+                for (auto controler : m_player_controllers)
+                {
+                    controler.second->NetworkedRealTimeInputServer(m_world.GetCommandQueue());
+                }
             }
             frame_time -= frame_rate;
         }
@@ -82,7 +86,40 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (tick_time >= tick_rate)
         {
-            Tick();
+            if (m_game_started)
+            {
+                Tick();
+
+                if (m_world.CheckAlivePlayers() == 1)
+                {
+                    BroadcastMessage("Game Finished");
+                }
+            }
+            else
+            {
+                sf::Packet packet;
+                packet << static_cast<sf::Int16>(Server::PacketType::kWaitingNotice);
+                SendToAll(packet);
+
+                sf::Int16 amount_ready = 0;
+                for (sf::Int16 i = 0; i < m_connected_players; ++i)
+                {
+                    if (m_peers[i]->m_game_ready)
+                    {
+                        amount_ready++;
+                    }
+                }
+                if (amount_ready == m_connected_players)
+                {
+                    sf::Packet ready_packet;
+                    ready_packet << static_cast<sf::Int16>(Server::PacketType::kGameReady);
+                    SendToAll(ready_packet);
+                    m_game_started = true;
+                    SetListening(false);
+                    BroadcastMessage("Game Started");
+                }
+            }
+
             tick_time -= tick_rate;
         }
 
@@ -122,7 +159,9 @@ void GameServer::Tick()
 
     sf::Packet packet;
     packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
-    packet << m_connected_players;  
+
+    sf::Int16 players_alive = m_world.CheckAlivePlayers();
+    packet << players_alive;
 
     for (sf::Int16 i = 0; i < m_connected_players; ++i)
     {
@@ -137,6 +176,9 @@ void GameServer::Tick()
             continue; 
 
         Character* character = it->second;
+
+        if (character->IsDestroyed()) continue;
+
         float x = character->GetWorldPosition().x;
         float y = character->GetWorldPosition().y;
         float vx = character->GetVelocity().x;
@@ -231,6 +273,20 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
 			packet >> identifier >>action >> action_enabled;
 			m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
+            break;
+        }
+        case Client::PacketType::kReadyNotice : {
+            sf::Int16 id;
+            packet >> id;
+
+            for (sf::Int16 i = 0; i < m_connected_players; ++i)
+            {
+                if (m_peers[i]->m_identifier == id)
+                {
+                    m_peers[i]->m_game_ready = m_peers[i]->m_game_ready ? false : true;
+                }
+            }
+
         }
     default:
         break;
@@ -272,6 +328,8 @@ void GameServer::HandleIncomingConnections()
         {
             m_peers.emplace_back(PeerPtr(new RemotePeer()));
         }
+
+        BroadcastMessage("Waiting for players");
     }
 }
 
@@ -285,7 +343,7 @@ void GameServer::HandleDisconnections()
             itr = m_peers.erase(itr);
 
             //If the number of peers has dropped below max_connections
-            if (m_connected_players < m_max_connected_players)
+            if (m_connected_players < m_max_connected_players && !m_game_started)
             {
                 m_peers.emplace_back(PeerPtr(new RemotePeer()));
                 SetListening(true);
@@ -346,7 +404,7 @@ void GameServer::NotifyPlayerSpawn(sf::Int16 identifier)
     SendToAll(packet);
 }
 
-GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false)
+GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false), m_game_ready(false)
 {
     m_socket.setBlocking(false);
 }

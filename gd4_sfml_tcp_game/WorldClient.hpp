@@ -91,4 +91,3 @@ private:
 	//Character* m_character;
 
 };
-

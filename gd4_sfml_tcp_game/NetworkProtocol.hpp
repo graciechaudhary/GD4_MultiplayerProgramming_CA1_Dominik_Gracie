@@ -22,8 +22,9 @@ namespace Server
 		kCharacterRemoved,
 		kSnowballRemoved,
 		kPickupSpawned,
-		kPickupRemoved,
-		kSnowballUp
+		kGameReady,
+		kSnowballUp,
+		kWaitingNotice
 	};
 }
 
@@ -33,6 +34,8 @@ namespace Client
 	{
 		kBroadcastMessage,
 		kPlayerRealtimeChange,
+		kColourChange,
+		kReadyNotice,
 		kNotice,
 		kQuit
 	};
