@@ -339,8 +339,16 @@ void GameServer::HandleDisconnections()
     {
         if ((*itr)->m_timed_out)
         {
+			sf::Packet packet;
+			packet << static_cast<sf::Int16>(Server::PacketType::kCharacterRemoved);
+			packet << (*itr)->m_identifier;
+
+			m_world.RemoveCharacter((*itr)->m_identifier);
+
             m_connected_players--;
             itr = m_peers.erase(itr);
+
+			SendToAll(packet);
 
             //If the number of peers has dropped below max_connections
             if (m_connected_players < m_max_connected_players && !m_game_started)

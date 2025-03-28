@@ -33,6 +33,8 @@ public:
 
 	sf::Int16 CheckAlivePlayers();
 
+	void RemoveCharacter(sf::Int16 character_id);
+
 private:
 	struct SpawnPoint
 	{

@@ -302,6 +302,7 @@ Pickup* WorldClient::GetPickup(sf::Int16 identifier)
 
 void WorldClient::RemoveCharacter(sf::Int16 character_id)
 {
+	m_characters[character_id]->setPosition(-1000,-1000);
 	//m_characters.erase(character_id);
 	//auto it = m_characters.find(character_id);
 	//if (it != m_characters.end()) {

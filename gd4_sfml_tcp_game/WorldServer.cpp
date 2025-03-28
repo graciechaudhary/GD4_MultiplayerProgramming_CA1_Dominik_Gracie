@@ -373,7 +373,8 @@ sf::Int16 WorldServer::CheckAlivePlayers()
 	{
 		if (!charPair.second->IsDestroyed()) amount_alive++;
 	}
-	return amount_alive;
+	std::cout << amount_alive << " players alive" << std::endl;
+	return amount_alive;	
 }
 
 
@@ -392,4 +393,16 @@ void WorldServer::DestroyEntitiesOutsideView()
 	m_command_queue.Push(command);
 
 	//we will have to inform the client that entity has been destroyed by sending respective packet
+}
+
+void WorldServer::RemoveCharacter(sf::Int16 character_id)
+{
+	m_characters[character_id]->Destroy();
+	m_characters[character_id]->setPosition(-1000, -1000);
+	//m_characters.erase(character_id);
+	//auto it = m_characters.find(character_id);
+	//if (it != m_characters.end()) {
+	//	delete it->second; 
+	//	m_characters.erase(it);
+	//}
 }
