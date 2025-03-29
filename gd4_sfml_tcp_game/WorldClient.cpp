@@ -300,6 +300,11 @@ Pickup* WorldClient::GetPickup(sf::Int16 identifier)
 	return m_pickups[identifier];
 }
 
+ParticleNode* WorldClient::GetParticleSystem(sf::Int16 identifier)
+{
+	return m_particle_systems[identifier];
+}
+
 void WorldClient::RemoveCharacter(sf::Int16 character_id)
 {
 	m_characters[character_id]->setPosition(-1000,-1000);

@@ -234,6 +234,8 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 				}
 				m_world.GetCharacter(m_identifier)->SetColour(m_colour->GetColour());
 
+				m_world.GetParticleSystem(m_identifier)->SetColor(m_colour->GetColour());
+
 				/*sf::Packet packet;
 				packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
 				packet << m_identifier;
