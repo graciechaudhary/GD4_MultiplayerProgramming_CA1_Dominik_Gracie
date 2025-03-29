@@ -198,67 +198,64 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 	}
 
 	if (m_connected && !m_game_started) {
+		bool is_colour_selecting = false;
 
-		if (!m_is_player_ready) {
+		for (int i = 0; i < 3; i++)
+		{
+			is_colour_selecting = m_buttons[i]->IsActive();
 
-			if (event.type == sf::Event::KeyReleased) {
-				// Navigate between buttons using W and S
-				if (event.key.code == sf::Keyboard::W) {
-					m_selected_button = (m_selected_button - 1 + 4) % 4; 
+			//If the player one is selecting their colour, allow them to change it
+			if (is_colour_selecting)
+			{
+				if (event.type == sf::Event::KeyPressed) {
+					//Pressing W or S will deactivate the button
+					if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::S)
+					{
+						m_buttons[i]->Deactivate();
 
-					sf::Packet packet;
-					packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
-			
-					packet << static_cast<sf::Int16>(m_colour->GetRed());
-					packet << static_cast<sf::Int16>(m_colour->GetGreen());
-					packet << static_cast<sf::Int16>(m_colour->GetBlue());
-					m_socket.send(packet);
-				}
-				else if (event.key.code == sf::Keyboard::S) {
-					m_selected_button = (m_selected_button + 1) % 4; 
+						sf::Packet packet;
+						packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
 
-					sf::Packet packet;
-					packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
-
-					packet << static_cast<sf::Int16>(m_colour->GetRed());
-					packet << static_cast<sf::Int16>(m_colour->GetGreen());
-					packet << static_cast<sf::Int16>(m_colour->GetBlue());
-					m_socket.send(packet);
-				}
-
-				int add = 0;
-				if (event.key.code == sf::Keyboard::D) {
-					add = 20;
-				}
-				else if (event.key.code == sf::Keyboard::A) {
-					add = -20;
-				}
-
-				// Apply changes only to the selected button
-				switch (m_selected_button) {
+						packet << static_cast<sf::Int16>(m_colour->GetRed());
+						packet << static_cast<sf::Int16>(m_colour->GetGreen());
+						packet << static_cast<sf::Int16>(m_colour->GetBlue());
+						m_socket.send(packet);
+					}
+					int add = 0;
+					//Pressing D or A will change the colour
+					if (event.key.code == sf::Keyboard::D)
+					{
+						add = 20;
+					}
+					else if (event.key.code == sf::Keyboard::A)
+					{
+						add = -20;
+					}
+					//Change the colour based on the button pressed
+					switch (i)
+					{
 					case 0:
 						m_colour->addRed(add);
-						m_buttons[0]->SetText(std::to_string(m_colour->GetRed()));
+						m_buttons[i]->SetText(std::to_string(m_colour->GetRed()));
 						break;
 					case 1:
 						m_colour->addGreen(add);
-						m_buttons[1]->SetText(std::to_string(m_colour->GetGreen()));
+						m_buttons[i]->SetText(std::to_string(m_colour->GetGreen()));
 						break;
 					case 2:
 						m_colour->addBlue(add);
-						m_buttons[2]->SetText(std::to_string(m_colour->GetBlue()));
+						m_buttons[i]->SetText(std::to_string(m_colour->GetBlue()));
 						break;
+					default:
+						break;
+					}
 				}
-			}
 				m_world.GetCharacter(m_identifier)->SetColour(m_colour->GetColour());
-
 				m_world.GetParticleSystem(m_identifier)->SetColor(m_colour->GetColour());
-
 			}
-			
+		}
 
-			m_gui_container.HandleEvent(event);
-		
+		m_gui_container.HandleEvent(event);
 	}
 
     return true;
@@ -481,20 +478,23 @@ void MultiplayerState::SetUpColourSelectionUI(Context context)
 	auto green_button = std::make_shared<gui::Button>(context);
 	green_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f);
 	green_button->SetText(color_text);
+	green_button->SetToggle(true);
 
 	auto blue_button = std::make_shared<gui::Button>(context);
 	blue_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f + 100);
 	blue_button->SetText(color_text);
+	blue_button->SetToggle(true);
 
 	auto ready_button = std::make_shared<gui::Button>(context);
 	ready_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f + 200);
 	ready_button->SetText("Confirm");
 	ready_button->SetCallback([this]() {
-				std::string text;
 				sf::Packet packet;
 				packet << static_cast<sf::Int16>(Client::PacketType::kReadyNotice);
 				packet << m_identifier;
 				m_socket.send(packet);
+
+				std::string text;
 				if (m_is_player_ready)
 				{
 					m_is_player_ready = false;
