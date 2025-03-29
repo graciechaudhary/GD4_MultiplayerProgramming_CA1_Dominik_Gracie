@@ -18,8 +18,8 @@
 class Character : public Entity
 {
 public:
-	Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts);
-	Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles);
+	Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place, const TextureHolder& textures, const FontHolder& fonts);
+	Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles);
 	unsigned int GetCategory() const override;
 
 	typedef std::shared_ptr<Character> Shared;
@@ -36,6 +36,8 @@ public:
 	void CreateSnowball(SceneNode& node, const TextureHolder& textures) const;
 
 	void Damage(int damage) override;
+
+	sf::Int16 GetPlace() const { return m_place; };
 
 	sf::FloatRect GetBoundingRect() const override;
 	bool IsMarkedForRemoval() const override;
@@ -138,5 +140,7 @@ private:
 
 	std::deque<std::unique_ptr<sf::Packet>>* m_event_queue;
 	std::map<sf::Int16, Projectile*>* m_projectiles;
+
+	sf::Int16 m_place;
 };
 

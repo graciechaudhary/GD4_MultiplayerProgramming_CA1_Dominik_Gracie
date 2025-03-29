@@ -19,7 +19,7 @@ public:
 	CommandQueue& GetCommandQueue();
 	GameRecords GetGameRecords() const;
 
-	void AddCharacter(sf::Int16 identifier);
+	void AddCharacter(sf::Int16 identifier,sf::Int16 place);
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
 

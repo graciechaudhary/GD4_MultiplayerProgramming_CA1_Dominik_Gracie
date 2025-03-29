@@ -51,7 +51,9 @@ private:
 
 	void InformWorldState(sf::TcpSocket& socket);
 
-	void NotifyPlayerSpawn(sf::Int16 identifier);
+	void NotifyPlayerSpawn(sf::Int16 identifier, sf::Int16 place);
+
+	sf::Int16 GetSpawnPlace();
 
 private:
 	sf::Thread m_thread;
@@ -70,5 +72,6 @@ private:
 	std::map<sf::Int16, PlayersController*> m_player_controllers;
 
 	bool m_game_started;
+	std::deque<sf::Int16> m_places;
 };
 
