@@ -482,6 +482,29 @@ void MultiplayerState::SetUpColourSelectionUI(Context context)
 		m_gui_container.Pack(button);
 	}
 
+	//lables
+	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
+	red_label->setPosition(m_window.getSize().x / 2.f + 150, m_window.getSize().y / 2.f - 85);
+	red_label->SetColor(sf::Color::Red);
+	red_label->SetSize(30);
 
+	auto green_label = std::make_shared<gui::Label>("Green", *context.fonts);
+	green_label->setPosition(m_window.getSize().x / 2.f + 150, m_window.getSize().y / 2.f + 15);
+	green_label->SetColor(sf::Color::Green);
+	green_label->SetSize(30);
 
+	auto blue_label = std::make_shared<gui::Label>("Blue", *context.fonts);
+	blue_label->setPosition(m_window.getSize().x / 2.f + 150, m_window.getSize().y / 2.f + 115);
+	blue_label->SetColor(sf::Color::Blue);
+	blue_label->SetSize(30);
+
+	auto title_label = std::make_shared<gui::Label>("Colour Selection", *context.fonts);
+	title_label->setPosition(m_window.getSize().x / 2.f-200, m_window.getSize().y / 2.f - 200);
+	title_label->SetColor(sf::Color::Red);
+	title_label->SetSize(80);
+
+	m_gui_container.Pack(red_label);
+	m_gui_container.Pack(green_label);
+	m_gui_container.Pack(blue_label);
+	m_gui_container.Pack(title_label);
 }

@@ -293,9 +293,17 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
         case Client::PacketType::kColourChange: {
 			sf::Int16 identifier;
+			packet >> identifier;
+
             sf::Int16 r;
+			packet >> r;
+
 			sf::Int16 g;
+			packet >> g;
+
 			sf::Int16 b;
+			packet >> b;
+
 			m_world.GetCharacter(identifier)->SetColour(sf::Color(r, g, b));
         }
     default:
