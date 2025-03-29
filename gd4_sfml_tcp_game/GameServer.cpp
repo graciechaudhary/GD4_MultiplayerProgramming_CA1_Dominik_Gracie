@@ -261,36 +261,35 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
     switch (static_cast<Client::PacketType> (packet_type))
     {
-	    case Client::PacketType::kBroadcastMessage:
-	    {
-		    std::string message;
-		    packet >> message;
-		    BroadcastMessage(message);
-		    break;
-	    }
-        case Client::PacketType::kPlayerRealtimeChange: {
-			sf::Int16 identifier;
-			sf::Int16 action;
-			bool action_enabled;
+    case Client::PacketType::kBroadcastMessage:
+    {
+        std::string message;
+        packet >> message;
+        BroadcastMessage(message);
+        break;
+    }
+    case Client::PacketType::kPlayerRealtimeChange: {
+        sf::Int16 identifier;
+        sf::Int16 action;
+        bool action_enabled;
 
-			packet >> identifier >>action >> action_enabled;
-			m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
-            break;
-        }
-        case Client::PacketType::kReadyNotice : {
-            sf::Int16 id;
-            packet >> id;
+        packet >> identifier >> action >> action_enabled;
+        m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
+        break;
+    }
+    case Client::PacketType::kReadyNotice: {
+        sf::Int16 id;
+        packet >> id;
 
-            for (sf::Int16 i = 0; i < m_connected_players; ++i)
+        for (sf::Int16 i = 0; i < m_connected_players; ++i)
+        {
+            if (m_peers[i]->m_identifier == id)
             {
-                if (m_peers[i]->m_identifier == id)
-                {
-                    m_peers[i]->m_game_ready = m_peers[i]->m_game_ready ? false : true;
-                }
+                m_peers[i]->m_game_ready = m_peers[i]->m_game_ready ? false : true;
             }
-            break;
         }
-
+        break;
+    }
         case Client::PacketType::kColourChange: {
 
             sf::Int16 r;
@@ -310,7 +309,32 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 			colour_change << receiving_peer.m_identifier << r << g << b;
 			SendToAll(colour_change);
 			break;
+    }
+
+    case Client::PacketType::kRequestNameSync: {
+		std::string name;
+		packet >> name;
+		receiving_peer.m_name = name;
+
+		sf::Packet name_packet;
+		name_packet << static_cast<sf::Int16>(Server::PacketType::kNameSync);
+		name_packet << m_connected_players;
+
+        for (auto& peer : m_peers) {
+			if (peer->m_ready) {
+				name_packet << peer->m_identifier << peer->m_name;
+			}
         }
+		receiving_peer.m_socket.send(name_packet);
+
+        sf::Packet new_name;
+		new_name << static_cast<sf::Int16>(Server::PacketType::kNameSync);
+		sf::Int16 size = 1;
+        new_name << size;
+		new_name << receiving_peer.m_identifier << receiving_peer.m_name;
+		SendToAll(new_name);
+		break;
+    }
     default:
         break;
     }
@@ -459,7 +483,7 @@ sf::Int16 GameServer::GetSpawnPlace()
     return place;
 }
 
-GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false), m_game_ready(false)
+GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false), m_game_ready(false), m_name("")
 {
     m_socket.setBlocking(false);
 }

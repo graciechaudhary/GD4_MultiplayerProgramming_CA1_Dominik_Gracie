@@ -12,6 +12,7 @@ namespace Server
 {
 	enum class PacketType
 	{
+		kNameSync,
 		kBroadcastMessage,
 		kSpawnSelf,
 		kUpdateClientState,
@@ -33,6 +34,7 @@ namespace Client
 {
 	enum class PacketType
 	{
+		kRequestNameSync,
 		kBroadcastMessage,
 		kPlayerRealtimeChange,
 		kColourChange,

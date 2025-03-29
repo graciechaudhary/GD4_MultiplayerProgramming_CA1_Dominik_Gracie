@@ -30,6 +30,7 @@ private:
 		bool m_timed_out;
 		bool m_game_ready;
 		RGBColour m_colour;
+		std::string m_name;
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;
