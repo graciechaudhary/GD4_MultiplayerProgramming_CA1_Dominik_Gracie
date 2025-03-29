@@ -487,6 +487,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		sf::Int16 red, green, blue;
 		packet >> identifier >> red >> green >> blue;
 		m_world.GetCharacter(identifier)->SetColour(sf::Color(red, green, blue));
+		m_world.GetParticleSystem(identifier)->SetColor(sf::Color(red, green, blue));
 		break;
 	}
 
