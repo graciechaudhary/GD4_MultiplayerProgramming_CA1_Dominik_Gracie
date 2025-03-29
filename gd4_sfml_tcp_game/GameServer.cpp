@@ -291,7 +291,6 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
         break;
     }
     case Client::PacketType::kRequestNameSync: {
-
 		std::string name;
 		packet >> name;
 		receiving_peer.m_name = name;
@@ -305,12 +304,12 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 				name_packet << peer->m_identifier << peer->m_name;
 			}
         }
-
 		receiving_peer.m_socket.send(name_packet);
 
         sf::Packet new_name;
 		new_name << static_cast<sf::Int16>(Server::PacketType::kNameSync);
-        new_name << sf::Int16(1);
+		sf::Int16 size = 1;
+        new_name << size;
 		new_name << receiving_peer.m_identifier << receiving_peer.m_name;
 		SendToAll(new_name);
 		break;
