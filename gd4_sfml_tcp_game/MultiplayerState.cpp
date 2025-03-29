@@ -41,7 +41,12 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	, m_time_since_last_packet(sf::seconds(0.f))
 	, m_game_started(false)
 	, m_player_dead(false)
+	, m_gui_container(true)
+	, m_is_player_ready(false)
+	, m_colour(std::make_unique<RGBColour>())
 {
+
+	SetUpColourSelectionUI(context);
 	m_broadcast_text.setFont(context.fonts->Get(Font::kMain));
 	m_broadcast_text.setCharacterSize(50);
 	m_broadcast_text.setFillColor(sf::Color::Black);
@@ -69,7 +74,7 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	if (m_host)
 	{
 		m_game_server.reset(new GameServer());
-		ip = "192.168.0.2";
+		ip = "127.0.0.1";
 	}
 	else
 	{
@@ -102,6 +107,11 @@ void MultiplayerState::Draw()
 		if (!m_broadcasts.empty())
 		{
 			m_window.draw(m_broadcast_text);
+		}
+
+		if (!m_game_started)
+		{
+			m_window.draw(m_gui_container);
 		}
 	}
 	else
@@ -168,7 +178,8 @@ bool MultiplayerState::Update(sf::Time dt)
 
 bool MultiplayerState::HandleEvent(const sf::Event& event)
 {
-	if (event.type == sf::Event::KeyPressed) {
+	if (event.type == sf::Event::KeyPressed) 
+	{
 		if (event.key.code == sf::Keyboard::Return && m_connected && !m_game_started)
 		{
 			sf::Packet packet;
@@ -181,6 +192,65 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 	if (m_game_started && !m_player_dead)
 	{
 		m_players_controller.HandleEvent(event);
+	}
+
+	if (m_connected && !m_game_started) {
+
+		if (!m_is_player_ready) {
+
+			for (int i = 0; i < 3; i++)
+			{
+				m_buttons[i]->IsActive();
+				
+				if (event.type == sf::Event::KeyPressed) {
+					//Pressing W or S will deactivate the button
+					if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::S)
+					{
+						m_buttons[i]->Deactivate();
+					}
+					int add = 0;
+					//Pressing D or A will change the colour
+					if (event.key.code == sf::Keyboard::D)
+					{
+						add = 20;
+					}
+					else if (event.key.code == sf::Keyboard::A)
+					{
+						add = -20;
+					}
+					//Change the colour based on the button pressed
+					switch (i)
+					{
+					case 0:
+						m_colour->addRed(add);
+						m_buttons[i]->SetText(std::to_string(m_colour->GetRed()));
+						break;
+					case 1:
+						m_colour->addGreen(add);
+						m_buttons[i]->SetText(std::to_string(m_colour->GetGreen()));
+						break;
+					case 2:
+						m_colour->addBlue(add);
+						m_buttons[i]->SetText(std::to_string(m_colour->GetBlue()));
+						break;
+					default:
+						break;
+					}
+				}
+				m_world.GetCharacter(m_identifier)->SetColour(m_colour->GetColour());
+
+				sf::Packet packet;
+				packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
+				packet << m_identifier;
+				packet << static_cast<sf::Int16>(m_colour->GetRed());
+				packet << static_cast<sf::Int16>(m_colour->GetGreen());
+				packet << static_cast<sf::Int16>(m_colour->GetBlue());				
+				m_socket.send(packet);
+			}
+			
+
+			m_gui_container.HandleEvent(event);
+		}
 	}
 
     return true;
@@ -375,4 +445,43 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 	default:
 		break;
 	}
+}
+
+void MultiplayerState::SetUpColourSelectionUI(Context context)
+{
+	std::string color_text = "220";
+
+	auto red_button = std::make_shared<gui::Button>(context);
+	//setting button position to the middle of the screen
+	red_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f - 100);
+	red_button->SetText(color_text);
+	red_button->SetToggle(true);
+
+	auto green_button = std::make_shared<gui::Button>(context);
+	green_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f);
+	green_button->SetText(color_text);
+
+	auto blue_button = std::make_shared<gui::Button>(context);
+	blue_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f + 100);
+	blue_button->SetText(color_text);
+
+	auto ready_button = std::make_shared<gui::Button>(context);
+	ready_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f + 200);
+	ready_button->SetText("Confirm");
+	ready_button->SetCallback([this]() {
+		m_is_player_ready = !m_is_player_ready;
+		m_buttons[3]->SetText(m_is_player_ready ? "Ready" : "Confirm");
+	});
+
+	m_buttons.push_back(red_button);
+	m_buttons.push_back(green_button);
+	m_buttons.push_back(blue_button);
+	m_buttons.push_back(ready_button);
+
+	for (auto& button : m_buttons) {
+		m_gui_container.Pack(button);
+	}
+
+
+
 }
