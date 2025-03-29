@@ -291,9 +291,7 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
         }
 
-       /* case Client::PacketType::kColourChange: {
-			sf::Int16 identifier;
-			packet >> identifier;
+        case Client::PacketType::kColourChange: {
 
             sf::Int16 r;
 			packet >> r;
@@ -304,8 +302,15 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 			sf::Int16 b;
 			packet >> b;
 
-			m_world.GetCharacter(identifier)->SetColour(sf::Color(r, g, b));
-        }*/
+			receiving_peer.m_colour = RGBColour(r, g, b);
+			
+
+            sf::Packet colour_change;
+			colour_change << static_cast<sf::Int16>(Server::PacketType::kColourSync);
+			colour_change << receiving_peer.m_identifier << r << g << b;
+			SendToAll(colour_change);
+			break;
+        }
     default:
         break;
     }

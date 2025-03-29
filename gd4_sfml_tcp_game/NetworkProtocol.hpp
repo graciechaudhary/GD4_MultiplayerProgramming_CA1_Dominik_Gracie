@@ -24,7 +24,8 @@ namespace Server
 		kPickupSpawned,
 		kGameReady,
 		kSnowballUp,
-		kWaitingNotice
+		kWaitingNotice,
+		kColourSync
 	};
 }
 

@@ -29,6 +29,7 @@ private:
 		bool m_ready;
 		bool m_timed_out;
 		bool m_game_ready;
+		RGBColour m_colour;
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;

@@ -79,6 +79,6 @@ bool MenuState::Update(sf::Time dt)
 bool MenuState::HandleEvent(const sf::Event& event)
 {
     m_gui_container.HandleEvent(event);
-    return true;
+    return false;
 }
 

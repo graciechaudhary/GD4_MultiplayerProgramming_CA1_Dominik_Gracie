@@ -22,7 +22,7 @@ sf::IpAddress GetAddressFromFile()
 
 	//If the open/read failed, create a new file
 	std::ofstream output_file("ip.txt");
-	std::string local_address = "192.168.0.2";
+	std::string local_address = "127.0.0.1";
 	output_file << local_address;
 	return local_address;
 
@@ -190,6 +190,8 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 		}
 	}*/
 
+	
+
 	if (m_game_started && !m_player_dead)
 	{
 		m_players_controller.HandleEvent(event);
@@ -199,13 +201,29 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 
 		if (!m_is_player_ready) {
 
-			if (event.type == sf::Event::KeyPressed) {
+			if (event.type == sf::Event::KeyReleased) {
 				// Navigate between buttons using W and S
 				if (event.key.code == sf::Keyboard::W) {
-					m_selected_button = (m_selected_button - 1 + 3) % 3; 
+					m_selected_button = (m_selected_button - 1 + 4) % 4; 
+
+					sf::Packet packet;
+					packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
+			
+					packet << static_cast<sf::Int16>(m_colour->GetRed());
+					packet << static_cast<sf::Int16>(m_colour->GetGreen());
+					packet << static_cast<sf::Int16>(m_colour->GetBlue());
+					m_socket.send(packet);
 				}
 				else if (event.key.code == sf::Keyboard::S) {
-					m_selected_button = (m_selected_button + 1) % 3; 
+					m_selected_button = (m_selected_button + 1) % 4; 
+
+					sf::Packet packet;
+					packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
+
+					packet << static_cast<sf::Int16>(m_colour->GetRed());
+					packet << static_cast<sf::Int16>(m_colour->GetGreen());
+					packet << static_cast<sf::Int16>(m_colour->GetBlue());
+					m_socket.send(packet);
 				}
 
 				int add = 0;
@@ -218,31 +236,24 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 
 				// Apply changes only to the selected button
 				switch (m_selected_button) {
-				case 0:
-					m_colour->addRed(add);
-					m_buttons[0]->SetText(std::to_string(m_colour->GetRed()));
-					break;
-				case 1:
-					m_colour->addGreen(add);
-					m_buttons[1]->SetText(std::to_string(m_colour->GetGreen()));
-					break;
-				case 2:
-					m_colour->addBlue(add);
-					m_buttons[2]->SetText(std::to_string(m_colour->GetBlue()));
-					break;
+					case 0:
+						m_colour->addRed(add);
+						m_buttons[0]->SetText(std::to_string(m_colour->GetRed()));
+						break;
+					case 1:
+						m_colour->addGreen(add);
+						m_buttons[1]->SetText(std::to_string(m_colour->GetGreen()));
+						break;
+					case 2:
+						m_colour->addBlue(add);
+						m_buttons[2]->SetText(std::to_string(m_colour->GetBlue()));
+						break;
 				}
-				}
+			}
 				m_world.GetCharacter(m_identifier)->SetColour(m_colour->GetColour());
 
 				m_world.GetParticleSystem(m_identifier)->SetColor(m_colour->GetColour());
 
-				/*sf::Packet packet;
-				packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
-				packet << m_identifier;
-				packet << static_cast<sf::Int16>(m_colour->GetRed());
-				packet << static_cast<sf::Int16>(m_colour->GetGreen());
-				packet << static_cast<sf::Int16>(m_colour->GetBlue());				
-				m_socket.send(packet);*/
 			}
 			
 
@@ -435,6 +446,14 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		float x, y;
 		packet >> pickup_identifier >> type >> x >> y;
 		m_world.SpawnPickup(pickup_identifier, static_cast<PickupType>(type), x, y);
+		break;
+	}
+
+	case Server::PacketType::kColourSync: {
+		sf::Int16 identifier;
+		sf::Int16 red, green, blue;
+		packet >> identifier >> red >> green >> blue;
+		m_world.GetCharacter(identifier)->SetColour(sf::Color(red, green, blue));
 		break;
 	}
 
