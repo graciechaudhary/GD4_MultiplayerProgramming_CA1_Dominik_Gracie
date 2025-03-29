@@ -8,23 +8,24 @@
 #include "PickupType.hpp"
 #include <iostream>
 
-sf::IpAddress GetAddressFromFile()
+std::pair<sf::IpAddress, std::string> GetAddressFromFile()
 {
 	{
 		//Try to open existing file
-		std::ifstream input_file("ip.txt");
-		std::string ip_address;
-		if (input_file >> ip_address)
+		std::ifstream input_file("env_info.txt");
+		std::string ip_address, nametag;
+		if (input_file >> ip_address >> nametag)
 		{
-			return ip_address;
+			return std::pair<sf::IpAddress, std::string>(ip_address, nametag);
 		}
 	}
 
 	//If the open/read failed, create a new file
-	std::ofstream output_file("ip.txt");
+	std::ofstream output_file("env_info.txt");
 	std::string local_address = "192.168.0.2";
-	output_file << local_address;
-	return local_address;
+	std::string nametag = "Tag";
+	output_file << local_address << nametag;
+	return std::pair<sf::IpAddress, std::string>(local_address, nametag);
 
 }
 MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_host)
@@ -66,14 +67,14 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	//If this is the host, create a server
 	sf::IpAddress ip;
 
+	auto file_info = GetAddressFromFile();
+
+	ip = file_info.first;
+	m_players_controller.SetName(file_info.second);
+
 	if (m_host)
 	{
 		m_game_server.reset(new GameServer());
-		ip = "192.168.0.2";
-	}
-	else
-	{
-		ip = GetAddressFromFile();
 	}
 
 	if (m_socket.connect(ip, SERVER_PORT, sf::seconds(5.f)) == sf::TcpSocket::Done)
@@ -254,7 +255,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		sf::Int16 identifier, place;
 		packet >> identifier >> place;
 		m_identifier = identifier;
-		m_world.AddCharacter(identifier, place);
+		m_world.AddCharacter(identifier, place, m_players_controller.GetName());
 		m_players_controller.SetConnection(&m_socket, identifier);
 		break;
 	}
@@ -270,7 +271,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 			if (id == m_identifier) continue;
 
-			m_world.AddCharacter(id, place);
+			m_world.AddCharacter(id, place, std::to_string(id));
 		}
 		break;
 	}

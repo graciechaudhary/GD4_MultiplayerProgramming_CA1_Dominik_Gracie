@@ -370,3 +370,8 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
 	command_queue.Push(set_particle_colour_one);
 	m_should_update_colours = false;
 }
+
+void PlayersController::SetName(std::string name)
+{
+	m_name = name.substr(0, 4);
+}

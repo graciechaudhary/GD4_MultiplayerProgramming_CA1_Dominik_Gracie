@@ -75,6 +75,7 @@ public:
 
 	static sf::Int16  GetSnowballCounter();
 
+	void SetName(std::string name) { m_name_display->SetString(name);};
 
 private:
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;

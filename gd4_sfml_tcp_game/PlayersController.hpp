@@ -44,6 +44,9 @@ public:
 
 	void UpdateColours(CommandQueue& command_queue);
 
+	void SetName(std::string name);
+	std::string GetName() const { return m_name; };
+
 	GameRecords m_game_records;
 private:
 	void InitialiseActions();
@@ -62,5 +65,7 @@ private:
 
 	sf::TcpSocket* m_socket;
 	sf::Int16 m_identifier;
+
+	std::string m_name;
 };
 
