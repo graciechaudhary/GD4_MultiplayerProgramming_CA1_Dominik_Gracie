@@ -60,5 +60,6 @@ private:
 	std::unique_ptr<RGBColour> m_colour;
 	bool m_is_player_ready;
 	sf::Sprite m_sprite;
+	int m_selected_button;
 };
 

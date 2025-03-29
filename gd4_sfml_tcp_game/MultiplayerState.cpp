@@ -190,8 +190,6 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 		}
 	}*/
 
-	
-
 	if (m_game_started && !m_player_dead)
 	{
 		m_players_controller.HandleEvent(event);
@@ -201,44 +199,38 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 
 		if (!m_is_player_ready) {
 
-			for (int i = 0; i < 3; i++)
-			{
-				m_buttons[i]->IsActive();
-				
-				if (event.type == sf::Event::KeyPressed) {
-					
-					if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::S)
-					{
-						m_buttons[i]->Deactivate();
-					}
-					int add = 0;
-					
-					if (event.key.code == sf::Keyboard::D)
-					{
-						add = 20;
-					}
-					else if (event.key.code == sf::Keyboard::A)
-					{
-						add = -20;
-					}
-					
-					switch (i)
-					{
-					case 0:
-						m_colour->addRed(add);
-						m_buttons[0]->SetText(std::to_string(m_colour->GetRed()));
-						break;
-					case 1:
-						m_colour->addGreen(add);
-						m_buttons[1]->SetText(std::to_string(m_colour->GetGreen()));
-						break;
-					case 2:
-						m_colour->addBlue(add);
-						m_buttons[2]->SetText(std::to_string(m_colour->GetBlue()));
-						break;
-					default:
-						break;
-					}
+			if (event.type == sf::Event::KeyPressed) {
+				// Navigate between buttons using W and S
+				if (event.key.code == sf::Keyboard::W) {
+					m_selected_button = (m_selected_button - 1 + 3) % 3; 
+				}
+				else if (event.key.code == sf::Keyboard::S) {
+					m_selected_button = (m_selected_button + 1) % 3; 
+				}
+
+				int add = 0;
+				if (event.key.code == sf::Keyboard::D) {
+					add = 20;
+				}
+				else if (event.key.code == sf::Keyboard::A) {
+					add = -20;
+				}
+
+				// Apply changes only to the selected button
+				switch (m_selected_button) {
+				case 0:
+					m_colour->addRed(add);
+					m_buttons[0]->SetText(std::to_string(m_colour->GetRed()));
+					break;
+				case 1:
+					m_colour->addGreen(add);
+					m_buttons[1]->SetText(std::to_string(m_colour->GetGreen()));
+					break;
+				case 2:
+					m_colour->addBlue(add);
+					m_buttons[2]->SetText(std::to_string(m_colour->GetBlue()));
+					break;
+				}
 				}
 				m_world.GetCharacter(m_identifier)->SetColour(m_colour->GetColour());
 
@@ -253,7 +245,7 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 			
 
 			m_gui_container.HandleEvent(event);
-		}
+		
 	}
 
     return true;
