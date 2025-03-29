@@ -257,6 +257,30 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		m_identifier = identifier;
 		m_world.AddCharacter(identifier, place, m_players_controller.GetName());
 		m_players_controller.SetConnection(&m_socket, identifier);
+
+		sf::Packet name_packet;
+		name_packet << static_cast<sf::Int16>(Client::PacketType::kRequestNameSync);
+		name_packet << m_players_controller.GetName();
+
+		m_socket.send(name_packet);
+
+		break;
+	}
+	case Server::PacketType::kNameSync: {
+		sf::Int16 amount;
+		packet >> amount;
+
+		for (sf::Int16 i = 0; i < amount; i++)
+		{
+			sf::Int16 id;
+			std::string name;
+			packet >> id >> name;
+
+			if (id == m_identifier) continue;
+
+			m_world.GetCharacter(id)->SetName(name);
+		}
+
 		break;
 	}
 	case Server::PacketType::kInitialState: {

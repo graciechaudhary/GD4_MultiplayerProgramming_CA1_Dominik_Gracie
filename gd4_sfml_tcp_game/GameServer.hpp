@@ -29,6 +29,7 @@ private:
 		bool m_ready;
 		bool m_timed_out;
 		bool m_game_ready;
+		std::string m_name;
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;
