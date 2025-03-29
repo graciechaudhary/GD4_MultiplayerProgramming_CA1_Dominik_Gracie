@@ -267,13 +267,14 @@ void WorldClient::Update(sf::Time dt)
 	//m_scenegraph.RemoveWrecks();
 }
 
-void WorldClient::AddCharacter(sf::Int16 identifier, sf::Int16 place)
+void WorldClient::AddCharacter(sf::Int16 identifier, sf::Int16 place, std::string name)
 {
 	std::unique_ptr<Character> leader(new Character(false, identifier, place ,m_textures, m_fonts));
 	Character* character = leader.get();
 	character->setPosition(Table[place].m_x, Table[place].m_y);
 	character->SetVelocity(0, 0);
 	character->SetColour(sf::Color::Yellow);
+	character->SetName(name);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
 	m_characters[identifier] = character;

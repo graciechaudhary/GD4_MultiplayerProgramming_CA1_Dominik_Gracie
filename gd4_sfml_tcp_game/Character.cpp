@@ -78,14 +78,21 @@ Character::Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place , 
 
 	std::unique_ptr<ResourceNode> health_display(new ResourceNode(textures, TextureID::kHealthRefill ,GetHitPoints(), 14.f, 0.3f));
 	m_health_display = health_display.get();
-	m_health_display->setPosition(-20.f, 25.f);
+	m_health_display->setPosition(-20.f, 23.f);
 	AttachChild(std::move(health_display));
 
 	std::unique_ptr<ResourceNode> snowball_display(new ResourceNode(textures, TextureID::kSnowball, m_snowball_count, 12.f, 0.4f));
 	m_snowball_display = snowball_display.get();
-	m_snowball_display->setPosition(-28.f, -34.f);
+	m_snowball_display->setPosition(-28.f, 35.f);
 	AttachChild(std::move(snowball_display));
 
+	std::string name = "TAG" + std::to_string(identifier);
+	std::unique_ptr<TextNode> name_display(new TextNode(fonts, name));
+	name_display->SetString(name);
+	m_name_display = name_display.get();
+	m_name_display->setPosition(0, -30.f);
+	
+	AttachChild(std::move(name_display));
 }
 
 Character::Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles)
@@ -752,6 +759,7 @@ void Character::UpdateVisuals(sf::Time dt)
 
 		m_health_display->SetResource(0);
 		m_snowball_display->SetResource(0);
+		m_name_display->SetString("");
 
 		// Play explosion sound only once
 		if (!m_played_explosion_sound)
