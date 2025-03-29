@@ -346,9 +346,14 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			sf::Int16 id, place;
 			packet >> id >> place;
 
+			sf::Int16 r, g, b;
+			packet >> r >> g >> b;
+
 			if (id == m_identifier) continue;
 
 			m_world.AddCharacter(id, place);
+			m_world.GetCharacter(id)->SetColour(sf::Color(r, g, b));
+			m_world.GetParticleSystem(id)->SetColor(sf::Color(r, g, b));
 		}
 		break;
 	}
