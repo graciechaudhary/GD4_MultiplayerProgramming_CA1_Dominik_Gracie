@@ -22,7 +22,7 @@ sf::IpAddress GetAddressFromFile()
 
 	//If the open/read failed, create a new file
 	std::ofstream output_file("ip.txt");
-	std::string local_address = "127.0.0.1";
+	std::string local_address = "192.168.0.2";
 	output_file << local_address;
 	return local_address;
 
@@ -69,7 +69,7 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	if (m_host)
 	{
 		m_game_server.reset(new GameServer());
-		ip = "127.0.0.1";
+		ip = "192.168.0.2";
 	}
 	else
 	{
@@ -251,10 +251,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		break;
 	}
 	case Server::PacketType::kSpawnSelf:{
-		sf::Int16 identifier;
-		packet >> identifier;
+		sf::Int16 identifier, place;
+		packet >> identifier >> place;
 		m_identifier = identifier;
-		m_world.AddCharacter(identifier);
+		m_world.AddCharacter(identifier, place);
 		m_players_controller.SetConnection(&m_socket, identifier);
 		break;
 	}
@@ -265,12 +265,12 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		for (sf::Int16 i = 0; i < amount; i++)
 		{
 
-			sf::Int16 id;
-			packet >> id;
+			sf::Int16 id, place;
+			packet >> id >> place;
 
 			if (id == m_identifier) continue;
 
-			m_world.AddCharacter(id);
+			m_world.AddCharacter(id, place);
 		}
 		break;
 	}
