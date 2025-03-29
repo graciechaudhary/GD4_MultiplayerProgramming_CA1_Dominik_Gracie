@@ -44,6 +44,7 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	, m_gui_container(true)
 	, m_is_player_ready(false)
 	, m_colour(std::make_unique<RGBColour>())
+
 {
 
 	SetUpColourSelectionUI(context);
@@ -178,7 +179,7 @@ bool MultiplayerState::Update(sf::Time dt)
 
 bool MultiplayerState::HandleEvent(const sf::Event& event)
 {
-	if (event.type == sf::Event::KeyPressed) 
+	/*if (event.type == sf::Event::KeyPressed) 
 	{
 		if (event.key.code == sf::Keyboard::Return && m_connected && !m_game_started)
 		{
@@ -187,7 +188,9 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 			packet << m_identifier;
 			m_socket.send(packet);
 		}
-	}
+	}*/
+
+	
 
 	if (m_game_started && !m_player_dead)
 	{
@@ -203,13 +206,13 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 				m_buttons[i]->IsActive();
 				
 				if (event.type == sf::Event::KeyPressed) {
-					//Pressing W or S will deactivate the button
+					
 					if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::S)
 					{
 						m_buttons[i]->Deactivate();
 					}
 					int add = 0;
-					//Pressing D or A will change the colour
+					
 					if (event.key.code == sf::Keyboard::D)
 					{
 						add = 20;
@@ -218,20 +221,20 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 					{
 						add = -20;
 					}
-					//Change the colour based on the button pressed
+					
 					switch (i)
 					{
 					case 0:
 						m_colour->addRed(add);
-						m_buttons[i]->SetText(std::to_string(m_colour->GetRed()));
+						m_buttons[0]->SetText(std::to_string(m_colour->GetRed()));
 						break;
 					case 1:
 						m_colour->addGreen(add);
-						m_buttons[i]->SetText(std::to_string(m_colour->GetGreen()));
+						m_buttons[1]->SetText(std::to_string(m_colour->GetGreen()));
 						break;
 					case 2:
 						m_colour->addBlue(add);
-						m_buttons[i]->SetText(std::to_string(m_colour->GetBlue()));
+						m_buttons[2]->SetText(std::to_string(m_colour->GetBlue()));
 						break;
 					default:
 						break;
@@ -239,13 +242,13 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 				}
 				m_world.GetCharacter(m_identifier)->SetColour(m_colour->GetColour());
 
-				sf::Packet packet;
+				/*sf::Packet packet;
 				packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
 				packet << m_identifier;
 				packet << static_cast<sf::Int16>(m_colour->GetRed());
 				packet << static_cast<sf::Int16>(m_colour->GetGreen());
 				packet << static_cast<sf::Int16>(m_colour->GetBlue());				
-				m_socket.send(packet);
+				m_socket.send(packet);*/
 			}
 			
 
@@ -469,9 +472,24 @@ void MultiplayerState::SetUpColourSelectionUI(Context context)
 	ready_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f + 200);
 	ready_button->SetText("Confirm");
 	ready_button->SetCallback([this]() {
-		m_is_player_ready = !m_is_player_ready;
-		m_buttons[3]->SetText(m_is_player_ready ? "Ready" : "Confirm");
-	});
+				std::string text;
+				sf::Packet packet;
+				packet << static_cast<sf::Int16>(Client::PacketType::kReadyNotice);
+				packet << m_identifier;
+				m_socket.send(packet);
+				if (m_is_player_ready)
+				{
+					m_is_player_ready = false;
+					text = "Confirm";
+				}
+				else {
+					text = "Ready";
+					m_is_player_ready = true;
+					
+				}
+				m_buttons[3]->SetText(text);
+			});
+	
 
 	m_buttons.push_back(red_button);
 	m_buttons.push_back(green_button);
