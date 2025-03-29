@@ -110,7 +110,6 @@ void GameServer::ExecutionThread()
                         amount_ready++;
                     }
                 }
-				std::cout << amount_ready << " = " << m_connected_players << std::endl; 
                 if (amount_ready == m_connected_players)
                 {
                     sf::Packet ready_packet;

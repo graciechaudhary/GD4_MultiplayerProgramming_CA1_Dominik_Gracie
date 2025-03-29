@@ -145,6 +145,13 @@ std::size_t Animation::GetCurrentFrame()
     return m_current_frame;
 }
 
+void Animation::ForceFrameOne()
+{
+    sf::Time time;
+	time = m_duration / static_cast<float>(m_num_frames);
+	Update(time);
+}
+
 void Animation::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();

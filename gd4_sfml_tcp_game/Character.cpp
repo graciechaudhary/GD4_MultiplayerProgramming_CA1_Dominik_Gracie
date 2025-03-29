@@ -69,6 +69,7 @@ Character::Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place , 
 	m_explosion.scale(2, 2);
 	Utility::CentreOrigin(m_sprite);
 	Utility::CentreOrigin(m_explosion);
+	m_explosion.ForceFrameOne();
 
 	m_throw_command.category = static_cast<int>(ReceiverCategories::kScene);
 	m_throw_command.action = [this, &textures](SceneNode& node, sf::Time dt)
