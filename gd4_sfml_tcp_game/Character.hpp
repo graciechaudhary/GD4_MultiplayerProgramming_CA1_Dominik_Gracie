@@ -102,6 +102,7 @@ private:
 
 	ResourceNode* m_health_display;
 	ResourceNode* m_snowball_display;
+	TextNode* m_name_display;
 
 
 	Command m_throw_command;
