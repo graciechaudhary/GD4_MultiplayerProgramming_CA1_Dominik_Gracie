@@ -40,7 +40,7 @@ public:
 	void Draw();
 	void Update(sf::Time dt);
 
-	void AddCharacter(sf::Int16 identifier);
+	void AddCharacter(sf::Int16 identifier, sf::Int16 place);
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
 	Pickup* GetPickup(sf::Int16 identifier);
