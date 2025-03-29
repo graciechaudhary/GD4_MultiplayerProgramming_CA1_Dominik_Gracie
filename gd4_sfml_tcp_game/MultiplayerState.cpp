@@ -471,22 +471,22 @@ void MultiplayerState::SetUpColourSelectionUI(Context context)
 
 	auto red_button = std::make_shared<gui::Button>(context);
 	//setting button position to the middle of the screen
-	red_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f - 100);
+	red_button->setPosition(m_window.getSize().x / 2.f - 60, m_window.getSize().y / 2.f - 80);
 	red_button->SetText(color_text);
 	red_button->SetToggle(true);
 
 	auto green_button = std::make_shared<gui::Button>(context);
-	green_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f);
+	green_button->setPosition(m_window.getSize().x / 2.f - 60, m_window.getSize().y / 2.f - 20);
 	green_button->SetText(color_text);
 	green_button->SetToggle(true);
 
 	auto blue_button = std::make_shared<gui::Button>(context);
-	blue_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f + 100);
+	blue_button->setPosition(m_window.getSize().x / 2.f - 60, m_window.getSize().y / 2.f +40);
 	blue_button->SetText(color_text);
 	blue_button->SetToggle(true);
 
 	auto ready_button = std::make_shared<gui::Button>(context);
-	ready_button->setPosition(m_window.getSize().x / 2.f - 100, m_window.getSize().y / 2.f + 200);
+	ready_button->setPosition(m_window.getSize().x / 2.f - 60, m_window.getSize().y / 2.f + 100);
 	ready_button->SetText("Confirm");
 	ready_button->SetCallback([this]() {
 				sf::Packet packet;
@@ -520,24 +520,24 @@ void MultiplayerState::SetUpColourSelectionUI(Context context)
 
 	//lables
 	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
-	red_label->setPosition(m_window.getSize().x / 2.f + 150, m_window.getSize().y / 2.f - 85);
+	red_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f - 75);
 	red_label->SetColor(sf::Color::Red);
 	red_label->SetSize(30);
 
 	auto green_label = std::make_shared<gui::Label>("Green", *context.fonts);
-	green_label->setPosition(m_window.getSize().x / 2.f + 150, m_window.getSize().y / 2.f + 15);
+	green_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f -15);
 	green_label->SetColor(sf::Color::Green);
 	green_label->SetSize(30);
 
 	auto blue_label = std::make_shared<gui::Label>("Blue", *context.fonts);
-	blue_label->setPosition(m_window.getSize().x / 2.f + 150, m_window.getSize().y / 2.f + 115);
+	blue_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f + 35);
 	blue_label->SetColor(sf::Color::Blue);
 	blue_label->SetSize(30);
 
 	auto title_label = std::make_shared<gui::Label>("Colour Selection", *context.fonts);
-	title_label->setPosition(m_window.getSize().x / 2.f-200, m_window.getSize().y / 2.f - 200);
+	title_label->setPosition(m_window.getSize().x / 2.f-120, m_window.getSize().y / 2.f - 160);
 	title_label->SetColor(sf::Color::Red);
-	title_label->SetSize(80);
+	title_label->SetSize(50);
 
 	m_gui_container.Pack(red_label);
 	m_gui_container.Pack(green_label);
