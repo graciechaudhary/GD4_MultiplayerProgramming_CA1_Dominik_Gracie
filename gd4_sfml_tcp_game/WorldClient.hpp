@@ -44,6 +44,8 @@ public:
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
 	Pickup* GetPickup(sf::Int16 identifier);
+	ParticleNode* GetParticleSystem(sf::Int16 identifier);
+
 	void RemoveCharacter(sf::Int16 character_id);
 	void RemoveSnowball(sf::Int16 snowball_id);
 	void RemovePickup(sf::Int16 pickup_id);

@@ -42,7 +42,13 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	, m_time_since_last_packet(sf::seconds(0.f))
 	, m_game_started(false)
 	, m_player_dead(false)
+	, m_gui_container(true)
+	, m_is_player_ready(false)
+	, m_colour(std::make_unique<RGBColour>())
+
 {
+
+	SetUpColourSelectionUI(context);
 	m_broadcast_text.setFont(context.fonts->Get(Font::kMain));
 	m_broadcast_text.setCharacterSize(50);
 	m_broadcast_text.setFillColor(sf::Color::Black);
@@ -103,6 +109,11 @@ void MultiplayerState::Draw()
 		if (!m_broadcasts.empty())
 		{
 			m_window.draw(m_broadcast_text);
+		}
+
+		if (!m_game_started)
+		{
+			m_window.draw(m_gui_container);
 		}
 	}
 	else
@@ -169,7 +180,8 @@ bool MultiplayerState::Update(sf::Time dt)
 
 bool MultiplayerState::HandleEvent(const sf::Event& event)
 {
-	if (event.type == sf::Event::KeyPressed) {
+	/*if (event.type == sf::Event::KeyPressed) 
+	{
 		if (event.key.code == sf::Keyboard::Return && m_connected && !m_game_started)
 		{
 			sf::Packet packet;
@@ -177,11 +189,74 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 			packet << m_identifier;
 			m_socket.send(packet);
 		}
-	}
+	}*/
+
+	
 
 	if (m_game_started && !m_player_dead)
 	{
 		m_players_controller.HandleEvent(event);
+	}
+
+	if (m_connected && !m_game_started) {
+		bool is_colour_selecting = false;
+
+		for (int i = 0; i < 3; i++)
+		{
+			is_colour_selecting = m_buttons[i]->IsActive();
+
+			//If the player one is selecting their colour, allow them to change it
+			if (is_colour_selecting)
+			{
+				if (event.type == sf::Event::KeyPressed) {
+					//Pressing W or S will deactivate the button
+					if (event.key.code == sf::Keyboard::W || event.key.code == sf::Keyboard::S)
+					{
+						m_buttons[i]->Deactivate();
+
+						sf::Packet packet;
+						packet << static_cast<sf::Int16>(Client::PacketType::kColourChange);
+
+						packet << static_cast<sf::Int16>(m_colour->GetRed());
+						packet << static_cast<sf::Int16>(m_colour->GetGreen());
+						packet << static_cast<sf::Int16>(m_colour->GetBlue());
+						m_socket.send(packet);
+					}
+					int add = 0;
+					//Pressing D or A will change the colour
+					if (event.key.code == sf::Keyboard::D)
+					{
+						add = 20;
+					}
+					else if (event.key.code == sf::Keyboard::A)
+					{
+						add = -20;
+					}
+					//Change the colour based on the button pressed
+					switch (i)
+					{
+					case 0:
+						m_colour->addRed(add);
+						m_buttons[i]->SetText(std::to_string(m_colour->GetRed()));
+						break;
+					case 1:
+						m_colour->addGreen(add);
+						m_buttons[i]->SetText(std::to_string(m_colour->GetGreen()));
+						break;
+					case 2:
+						m_colour->addBlue(add);
+						m_buttons[i]->SetText(std::to_string(m_colour->GetBlue()));
+						break;
+					default:
+						break;
+					}
+				}
+				m_world.GetCharacter(m_identifier)->SetColour(m_colour->GetColour());
+				m_world.GetParticleSystem(m_identifier)->SetColor(m_colour->GetColour());
+			}
+		}
+
+		m_gui_container.HandleEvent(event);
 	}
 
     return true;
@@ -293,9 +368,14 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			sf::Int16 id, place;
 			packet >> id >> place;
 
+			sf::Int16 r, g, b;
+			packet >> r >> g >> b;
+
 			if (id == m_identifier) continue;
 
 			m_world.AddCharacter(id, place, std::to_string(id));
+			m_world.GetCharacter(id)->SetColour(sf::Color(r, g, b));
+			m_world.GetParticleSystem(id)->SetColor(sf::Color(r, g, b));
 		}
 		break;
 	}
@@ -396,8 +476,96 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		break;
 	}
 
+	case Server::PacketType::kColourSync: {
+		sf::Int16 identifier;
+		sf::Int16 red, green, blue;
+		packet >> identifier >> red >> green >> blue;
+		m_world.GetCharacter(identifier)->SetColour(sf::Color(red, green, blue));
+		break;
+	}
+
 
 	default:
 		break;
 	}
+}
+
+void MultiplayerState::SetUpColourSelectionUI(Context context)
+{
+	std::string color_text = "220";
+
+	auto red_button = std::make_shared<gui::Button>(context);
+	//setting button position to the middle of the screen
+	red_button->setPosition(m_window.getSize().x / 2.f - 60, m_window.getSize().y / 2.f - 80);
+	red_button->SetText(color_text);
+	red_button->SetToggle(true);
+
+	auto green_button = std::make_shared<gui::Button>(context);
+	green_button->setPosition(m_window.getSize().x / 2.f - 60, m_window.getSize().y / 2.f - 20);
+	green_button->SetText(color_text);
+	green_button->SetToggle(true);
+
+	auto blue_button = std::make_shared<gui::Button>(context);
+	blue_button->setPosition(m_window.getSize().x / 2.f - 60, m_window.getSize().y / 2.f +40);
+	blue_button->SetText(color_text);
+	blue_button->SetToggle(true);
+
+	auto ready_button = std::make_shared<gui::Button>(context);
+	ready_button->setPosition(m_window.getSize().x / 2.f - 60, m_window.getSize().y / 2.f + 100);
+	ready_button->SetText("Confirm");
+	ready_button->SetCallback([this]() {
+				sf::Packet packet;
+				packet << static_cast<sf::Int16>(Client::PacketType::kReadyNotice);
+				packet << m_identifier;
+				m_socket.send(packet);
+
+				std::string text;
+				if (m_is_player_ready)
+				{
+					m_is_player_ready = false;
+					text = "Confirm";
+				}
+				else {
+					text = "Ready";
+					m_is_player_ready = true;
+					
+				}
+				m_buttons[3]->SetText(text);
+			});
+	
+
+	m_buttons.push_back(red_button);
+	m_buttons.push_back(green_button);
+	m_buttons.push_back(blue_button);
+	m_buttons.push_back(ready_button);
+
+	for (auto& button : m_buttons) {
+		m_gui_container.Pack(button);
+	}
+
+	//lables
+	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
+	red_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f - 75);
+	red_label->SetColor(sf::Color::Red);
+	red_label->SetSize(30);
+
+	auto green_label = std::make_shared<gui::Label>("Green", *context.fonts);
+	green_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f -15);
+	green_label->SetColor(sf::Color::Green);
+	green_label->SetSize(30);
+
+	auto blue_label = std::make_shared<gui::Label>("Blue", *context.fonts);
+	blue_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f + 35);
+	blue_label->SetColor(sf::Color::Blue);
+	blue_label->SetSize(30);
+
+	auto title_label = std::make_shared<gui::Label>("Colour Selection", *context.fonts);
+	title_label->setPosition(m_window.getSize().x / 2.f-120, m_window.getSize().y / 2.f - 160);
+	title_label->SetColor(sf::Color::Red);
+	title_label->SetSize(50);
+
+	m_gui_container.Pack(red_label);
+	m_gui_container.Pack(green_label);
+	m_gui_container.Pack(blue_label);
+	m_gui_container.Pack(title_label);
 }

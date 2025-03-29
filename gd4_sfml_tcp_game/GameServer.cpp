@@ -290,6 +290,27 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
         }
         break;
     }
+        case Client::PacketType::kColourChange: {
+
+            sf::Int16 r;
+			packet >> r;
+
+			sf::Int16 g;
+			packet >> g;
+
+			sf::Int16 b;
+			packet >> b;
+
+			receiving_peer.m_colour = RGBColour(r, g, b);
+			
+
+            sf::Packet colour_change;
+			colour_change << static_cast<sf::Int16>(Server::PacketType::kColourSync);
+			colour_change << receiving_peer.m_identifier << r << g << b;
+			SendToAll(colour_change);
+			break;
+    }
+
     case Client::PacketType::kRequestNameSync: {
 		std::string name;
 		packet >> name;
@@ -428,11 +449,14 @@ void GameServer::InformWorldState(sf::TcpSocket& socket)
         {
             sf::Int16 identifier = m_peers[i]->m_identifier;
 			sf::Int16 place = m_world.GetCharacter(identifier)->GetPlace();
-			packet << identifier << place;
-        }
-    }
-
-    socket.send(packet);
+            sf::Int16 r,g,b;
+			r = m_peers[i]->m_colour.GetRed();
+			g = m_peers[i]->m_colour.GetGreen();
+			b = m_peers[i]->m_colour.GetBlue();
+			packet << identifier << place << r << g << b;
+		}
+	}
+	socket.send(packet);
 }
 
 void GameServer::NotifyPlayerSpawn(sf::Int16 identifier, sf::Int16 place)
@@ -443,6 +467,11 @@ void GameServer::NotifyPlayerSpawn(sf::Int16 identifier, sf::Int16 place)
     packet << size;
     packet << identifier;
 	packet << place;
+    sf::Int16 r, g, b;
+    r = m_peers[identifier]->m_colour.GetRed();
+    g = m_peers[identifier]->m_colour.GetGreen();
+    b = m_peers[identifier]->m_colour.GetBlue();
+	packet << r << g << b;
 
     SendToAll(packet);
 }
