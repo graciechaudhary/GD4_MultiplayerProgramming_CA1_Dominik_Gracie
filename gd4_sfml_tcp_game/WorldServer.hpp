@@ -19,7 +19,7 @@ public:
 	CommandQueue& GetCommandQueue();
 	GameRecords GetGameRecords() const;
 
-	void AddCharacter(sf::Int16 identifier,sf::Int16 place);
+	void AddCharacter(sf::Int16 identifier);
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
 
@@ -32,8 +32,6 @@ public:
 	std::deque<Packet_Ptr>& GetEventQueue() { return m_event_queue; };
 
 	sf::Int16 CheckAlivePlayers();
-
-	void RemoveCharacter(sf::Int16 character_id);
 
 private:
 	struct SpawnPoint

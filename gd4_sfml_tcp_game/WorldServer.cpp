@@ -311,11 +311,11 @@ void WorldServer::CheckMarkedForRemoval()
 	}
 }
 
-void WorldServer::AddCharacter(sf::Int16 identifier, sf::Int16 place)
+void WorldServer::AddCharacter(sf::Int16 identifier)
 {
-	std::unique_ptr<Character> leader(new Character(true, identifier, place, m_textures, &m_event_queue, &m_projectiles));
+	std::unique_ptr<Character> leader(new Character(true, identifier, m_textures, &m_event_queue, &m_projectiles));
 	Character* character = leader.get();
-	character->setPosition(Table[place].m_x, Table[place].m_y);
+	character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
 	character->SetVelocity(0, 0);
 	m_characters[identifier] = character;
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
@@ -373,7 +373,7 @@ sf::Int16 WorldServer::CheckAlivePlayers()
 	{
 		if (!charPair.second->IsDestroyed()) amount_alive++;
 	}
-	return amount_alive;	
+	return amount_alive;
 }
 
 
@@ -392,16 +392,4 @@ void WorldServer::DestroyEntitiesOutsideView()
 	m_command_queue.Push(command);
 
 	//we will have to inform the client that entity has been destroyed by sending respective packet
-}
-
-void WorldServer::RemoveCharacter(sf::Int16 character_id)
-{
-	m_characters[character_id]->Destroy();
-	m_characters[character_id]->setPosition(-1000, -1000);
-	//m_characters.erase(character_id);
-	//auto it = m_characters.find(character_id);
-	//if (it != m_characters.end()) {
-	//	delete it->second; 
-	//	m_characters.erase(it);
-	//}
 }
