@@ -191,6 +191,12 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 		}
 	}*/
 
+	if (event.type == sf::Event::Closed)
+	{
+		sf::Packet packet;
+		packet << static_cast<sf::Int16>(Client::PacketType::kQuit);
+		m_socket.send(packet);
+	}
 	
 
 	if (m_game_started && !m_player_dead)

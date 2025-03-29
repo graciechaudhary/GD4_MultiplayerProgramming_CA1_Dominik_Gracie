@@ -260,6 +260,11 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
     switch (static_cast<Client::PacketType> (packet_type))
     {
+    case Client::PacketType::kQuit: {
+		receiving_peer.m_timed_out = true;
+		detected_timeout = true;
+		break;
+    }
     case Client::PacketType::kBroadcastMessage:
     {
         std::string message;
@@ -352,25 +357,26 @@ void GameServer::HandleIncomingConnections()
 
 		sf::Packet packet;
 		packet << static_cast<sf::Int16>(Server::PacketType::kSpawnSelf);
-		packet << m_connected_players;
+		packet << m_player_id_count;
         packet << place;
 		m_peers[m_connected_players]->m_socket.send(packet);
 
-        m_peers[m_connected_players]->m_identifier = m_connected_players;
+        m_peers[m_connected_players]->m_identifier = m_player_id_count;
         m_peers[m_connected_players]->m_ready = true;
         m_peers[m_connected_players]->m_last_packet_time = Now();
 
-		m_player_controllers[m_connected_players] = new PlayersController(&m_peers[m_connected_players]->m_socket, m_connected_players);
+		m_player_controllers[m_player_id_count] = new PlayersController(&m_peers[m_connected_players]->m_socket, m_player_id_count);
 
-		m_world.AddCharacter(m_connected_players, place);
+		m_world.AddCharacter(m_player_id_count, place);
 
         InformWorldState(m_peers[m_connected_players]->m_socket);
-        NotifyPlayerSpawn(m_connected_players, place);
+        NotifyPlayerSpawn(m_player_id_count, place);
 
-		std::cout << "Player " << m_connected_players << " connected at place: " <<  place << std::endl;
+		std::cout << "Player " << m_player_id_count << " connected at place: " <<  place << std::endl;
         
 
         m_connected_players++;
+		m_player_id_count++;
         if (m_connected_players >= m_max_connected_players)
         {
             SetListening(false);

@@ -66,6 +66,7 @@ private:
 
 	sf::Int16 m_max_connected_players;
 	sf::Int16 m_connected_players;
+	sf::Int16 m_player_id_count;
 
 	std::vector<PeerPtr> m_peers;
 	bool m_waiting_thread_end;
