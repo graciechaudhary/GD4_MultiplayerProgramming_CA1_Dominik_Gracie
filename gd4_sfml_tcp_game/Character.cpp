@@ -20,7 +20,7 @@ namespace
 	static sf::Int16 snowball_counter = 0;
 }
 
-Character::Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place , const TextureHolder& textures, const FontHolder& fonts)
+Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, const FontHolder& fonts)
 	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
 	, m_type(CharacterType::kDefault)
 	, m_sprite(textures.Get(Table[static_cast<int>(CharacterType::kDefault)].m_texture), Table[static_cast<int>(CharacterType::kDefault)].m_texture_rect)
@@ -46,7 +46,6 @@ Character::Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place , 
 	, m_identifier(identifier)
 	, m_is_on_server(is_on_server)
 	, m_is_impacted(false)
-	, m_place(place)
 	{
 	m_got_hit_count = 0;
 	m_throw_count = 0;
@@ -88,7 +87,7 @@ Character::Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place , 
 
 }
 
-Character::Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles)
+Character::Character(bool is_on_server, int identifier, const TextureHolder& textures, std::deque<std::unique_ptr<sf::Packet>>* event_queue, std::map<sf::Int16, Projectile*>* projectiles)
 	: Entity(Table[static_cast<int>(CharacterType::kDefault)].m_hitpoints)
 	, m_type(CharacterType::kDefault)
 	, m_current_animation(CharacterAnimationType::kWalk)
@@ -116,7 +115,6 @@ Character::Character(bool is_on_server, sf::Int16 identifier, sf::Int16 place, c
 	, m_is_impacted(false)
 	, m_event_queue(event_queue)
 	, m_projectiles(projectiles)
-	, m_place(place)
 {
 		m_got_hit_count = 0;
 		m_throw_count = 0;

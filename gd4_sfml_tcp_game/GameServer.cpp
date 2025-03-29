@@ -20,7 +20,6 @@ GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
 	m_listener_socket.setBlocking(false);
 	m_peers[0].reset(new RemotePeer());
 	m_thread.launch();
-	m_places = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 }
 
 GameServer::~GameServer()
@@ -110,7 +109,6 @@ void GameServer::ExecutionThread()
                         amount_ready++;
                     }
                 }
-				std::cout << amount_ready << " = " << m_connected_players << std::endl; 
                 if (amount_ready == m_connected_players)
                 {
                     sf::Packet ready_packet;
@@ -304,12 +302,10 @@ void GameServer::HandleIncomingConnections()
 
     if (m_listener_socket.accept(m_peers[m_connected_players]->m_socket) == sf::TcpListener::Done)
     {
-        sf::Int16 place = GetSpawnPlace();
 
 		sf::Packet packet;
 		packet << static_cast<sf::Int16>(Server::PacketType::kSpawnSelf);
 		packet << m_connected_players;
-        packet << place;
 		m_peers[m_connected_players]->m_socket.send(packet);
 
         m_peers[m_connected_players]->m_identifier = m_connected_players;
@@ -317,13 +313,10 @@ void GameServer::HandleIncomingConnections()
         m_peers[m_connected_players]->m_last_packet_time = Now();
 
 		m_player_controllers[m_connected_players] = new PlayersController(&m_peers[m_connected_players]->m_socket, m_connected_players);
-
-		m_world.AddCharacter(m_connected_players, place);
+		m_world.AddCharacter(m_connected_players);
 
         InformWorldState(m_peers[m_connected_players]->m_socket);
-        NotifyPlayerSpawn(m_connected_players, place);
-
-		std::cout << "Player " << m_connected_players << " connected at place: " <<  place << std::endl;
+        NotifyPlayerSpawn(m_connected_players);
         
 
         m_connected_players++;
@@ -346,18 +339,8 @@ void GameServer::HandleDisconnections()
     {
         if ((*itr)->m_timed_out)
         {
-			sf::Packet packet;
-			packet << static_cast<sf::Int16>(Server::PacketType::kCharacterRemoved);
-			packet << (*itr)->m_identifier;
-
-            m_places.push_front(m_world.GetCharacter((*itr)->m_identifier)->GetPlace());
-
-			m_world.RemoveCharacter((*itr)->m_identifier);
-
             m_connected_players--;
             itr = m_peers.erase(itr);
-
-			SendToAll(packet);
 
             //If the number of peers has dropped below max_connections
             if (m_connected_players < m_max_connected_players && !m_game_started)
@@ -403,31 +386,22 @@ void GameServer::InformWorldState(sf::TcpSocket& socket)
         if (m_peers[i]->m_ready)
         {
             sf::Int16 identifier = m_peers[i]->m_identifier;
-			sf::Int16 place = m_world.GetCharacter(identifier)->GetPlace();
-			packet << identifier << place;
+            packet << identifier;
         }
     }
 
     socket.send(packet);
 }
 
-void GameServer::NotifyPlayerSpawn(sf::Int16 identifier, sf::Int16 place)
+void GameServer::NotifyPlayerSpawn(sf::Int16 identifier)
 {
     sf::Packet packet;
     sf::Int16 size = 1;
     packet << static_cast<sf::Int16>(Server::PacketType::kInitialState);
     packet << size;
     packet << identifier;
-	packet << place;
 
     SendToAll(packet);
-}
-
-sf::Int16 GameServer::GetSpawnPlace()
-{
-	sf::Int16 place = m_places.front();
-	m_places.pop_front();
-    return place;
 }
 
 GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false), m_game_ready(false)
