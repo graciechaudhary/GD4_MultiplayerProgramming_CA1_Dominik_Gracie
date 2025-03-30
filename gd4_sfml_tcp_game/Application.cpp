@@ -6,10 +6,10 @@
 #include "MenuState.hpp"
 #include "PauseState.hpp"
 #include "SettingsState.hpp"
-#include "GameOverState.hpp"
 #include "PreGameState.hpp"
 
 #include "MultiplayerState.hpp"
+#include "ScoreboardState.hpp"
 
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/FRAME_RATE);
 
@@ -90,5 +90,5 @@ void Application::RegisterStates()
 	m_stack.RegisterState<MultiplayerState>(StateID::kJoinGame, false);
 	m_stack.RegisterState<PauseState>(StateID::kPause);
 	m_stack.RegisterState<SettingsState>(StateID::kSettings);
-	m_stack.RegisterState<GameOverState>(StateID::kGameOver);
+	m_stack.RegisterState<ScoreboardState>(StateID::kGameOver);
 }

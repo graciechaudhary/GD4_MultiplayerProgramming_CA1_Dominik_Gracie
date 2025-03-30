@@ -26,7 +26,8 @@ namespace Server
 		kGameReady,
 		kSnowballUp,
 		kWaitingNotice,
-		kColourSync
+		kColourSync,
+		kResults
 	};
 }
 

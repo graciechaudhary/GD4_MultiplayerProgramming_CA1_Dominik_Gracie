@@ -238,6 +238,13 @@ void WorldServer::HandleCollisions()
 				m_players_alive--;
 				m_order_of_death.push_back(character.GetIdentifier());
 			}
+
+			if (m_players_alive == 1)
+			{
+				m_players_records[projectile.GetCharacterIdentifier()].m_survival_time = m_clock.getElapsedTime(); 
+				m_order_of_death.push_back(projectile.GetCharacterIdentifier());
+			}
+
 			//character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			//character.Impacted();
 			projectile.Destroy();
@@ -454,4 +461,21 @@ void WorldServer::PrintRecords()
 	{
 		std::cout << "Player: " << record.first << " Time: " << record.second.m_survival_time.asSeconds() << " Kills: " << record.second.m_kills << std::endl;
 	}
+
+	Packet_Ptr packet = std::make_unique<sf::Packet>();
+	*packet << static_cast<sf::Int16>(Server::PacketType::kResults);
+
+	sf::Int16 size = m_players_records.size();
+	*packet << size;
+
+	while (!m_order_of_death.empty()) {
+		sf::Int16 player_id = m_order_of_death.back();
+		*packet << player_id;
+		*packet << m_players_records[player_id].m_survival_time.asSeconds();
+		*packet << m_players_records[player_id].m_kills;
+		m_order_of_death.pop_back();
+	}
+
+	m_event_queue.push_back(std::move(packet));
+
 }

@@ -54,6 +54,9 @@ private:
 
 	bool m_game_started;
 	bool m_player_dead;
+	
+	bool m_game_ended;
+	sf::Time m_game_end_time;
 
 	gui::Container m_gui_container;
 	std::vector<gui::Button::Ptr> m_buttons;
@@ -61,5 +64,6 @@ private:
 	bool m_is_player_ready;
 	sf::Sprite m_sprite;
 	int m_selected_button;
+
 };
 

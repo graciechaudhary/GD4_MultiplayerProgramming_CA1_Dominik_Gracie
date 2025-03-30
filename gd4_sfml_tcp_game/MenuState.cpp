@@ -26,7 +26,7 @@ MenuState::MenuState(StateStack& stack, Context context)
 
     auto play_button = std::make_shared<gui::Button>(context);
     play_button->setPosition((context.window->getSize().x - 200)/2, 489);
-    play_button->SetText("Play");
+    play_button->SetText("Host");
     play_button->SetCallback([this]()
     {
             RequestStackPop();
@@ -38,7 +38,7 @@ MenuState::MenuState(StateStack& stack, Context context)
 
     auto settings_button = std::make_shared<gui::Button>(context);
     settings_button->setPosition((context.window->getSize().x - 200) / 2, 559);
-    settings_button->SetText("Settings");
+    settings_button->SetText("Join");
     settings_button->SetCallback([this]()
     {
             RequestStackPop();

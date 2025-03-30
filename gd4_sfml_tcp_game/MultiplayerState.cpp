@@ -45,6 +45,8 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	, m_gui_container(true)
 	, m_is_player_ready(false)
 	, m_colour(std::make_unique<RGBColour>())
+	, m_game_ended(false)
+	, m_game_end_time(sf::seconds(1))
 
 {
 
@@ -124,7 +126,21 @@ void MultiplayerState::Draw()
 
 bool MultiplayerState::Update(sf::Time dt)
 {
-	if (m_connected)
+	if (m_game_ended)
+	{
+		m_world.Update(dt);
+
+		if (m_game_end_time <= sf::Time::Zero)
+		{
+			RequestStackPop();
+			RequestStackPush(StateID::kGameOver);
+		}
+		else
+		{
+			m_game_end_time -= dt;
+		}
+	}
+	else if (m_connected)
 	{
 		if (m_game_started)
 		{
@@ -488,6 +504,26 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> identifier >> red >> green >> blue;
 		m_world.GetCharacter(identifier)->SetColour(sf::Color(red, green, blue));
 		m_world.GetParticleSystem(identifier)->SetColor(sf::Color(red, green, blue));
+		break;
+	}
+	case Server::PacketType::kResults: {
+		std::stringstream& results = m_players_controller.m_score_ss;
+
+		sf::Int16 amount;
+		packet >> amount;
+		for (sf::Int16 i = 0; i < amount; i++)
+		{
+			sf::Int16 id;
+			float time;
+			sf::Int16 kills;
+			packet >> id >> time >> kills;
+
+			std::string name = m_world.GetCharacter(id)->GetName();
+
+			results << i+1 << ".\t" << name << "\tTime: " << time << "s\tKills: " << kills << std::endl;
+		}
+
+		m_game_ended = true;
 		break;
 	}
 

@@ -10,6 +10,8 @@
 
 #include <SFML/Network/TcpSocket.hpp>
 
+#include <sstream>
+
 class Command;
 
 struct GameRecords
@@ -50,6 +52,8 @@ public:
 	void SetActive(bool active) { m_active = active;};
 
 	GameRecords m_game_records;
+	std::stringstream m_score_ss;
+
 private:
 	void InitialiseActions();
 	static bool IsRealTimeAction(Action action);
