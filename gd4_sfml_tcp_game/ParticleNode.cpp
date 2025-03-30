@@ -114,7 +114,6 @@ void ParticleNode::ComputeVertices() const
 //Dominik Hampejs D00250604
 void ParticleNode::SetColor(sf::Color color)
 {
-	std::cout << "Setting color " <<color.toInteger() <<std::endl;
 	m_color = color;
 }
 

@@ -134,12 +134,12 @@ struct CharacterThrower
     sf::Int16 identifier;
 };
 
-PlayersController::PlayersController() : m_current_game_status(GameStatus::kGameRunning), m_should_update_colours(false), m_socket(nullptr), m_identifier(1)
+PlayersController::PlayersController() : m_current_game_status(GameStatus::kGameRunning), m_should_update_colours(false), m_socket(nullptr), m_identifier(1), m_active(true)
 {
     InitialiseActions();
 }
 
-PlayersController::PlayersController(sf::TcpSocket* socket, sf::Int16 identifier) : m_should_update_colours(false), m_socket(socket), m_identifier(identifier)
+PlayersController::PlayersController(sf::TcpSocket* socket, sf::Int16 identifier) : m_should_update_colours(false), m_socket(socket), m_identifier(identifier), m_active(true)
 {
     InitialiseActions();
 }
@@ -235,6 +235,8 @@ void PlayersController::HandleControllerInput(const sf::Event& event) {
 
 void PlayersController::NetworkedRealTimeInputServer(CommandQueue& command_queue)
 {
+    if (!m_active) return;
+
 	for (auto pair : m_action_proxy)
 	{
 		if (pair.second)

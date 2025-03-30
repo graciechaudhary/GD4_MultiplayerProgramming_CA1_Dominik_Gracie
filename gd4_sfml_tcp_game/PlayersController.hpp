@@ -47,6 +47,8 @@ public:
 	void SetName(std::string name);
 	std::string GetName() const { return m_name; };
 
+	void SetActive(bool active) { m_active = active;};
+
 	GameRecords m_game_records;
 private:
 	void InitialiseActions();
@@ -67,5 +69,6 @@ private:
 	sf::Int16 m_identifier;
 
 	std::string m_name;
+	bool m_active;
 };
 
