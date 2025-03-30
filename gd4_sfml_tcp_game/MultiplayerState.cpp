@@ -520,7 +520,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 			std::string name = m_world.GetCharacter(id)->GetName();
 
-			results << i+1 << ".\t" << name << "\tTime: " << time << "s\tKills: " << kills << std::endl;
+			results << i+1 << ".\t\t" << name << "\t\tTime: " << time << "s\t\tKills: " << kills << std::endl;
 		}
 
 		m_game_ended = true;

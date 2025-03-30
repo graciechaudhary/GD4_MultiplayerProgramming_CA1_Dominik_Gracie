@@ -239,12 +239,6 @@ void WorldServer::HandleCollisions()
 				m_order_of_death.push_back(character.GetIdentifier());
 			}
 
-			if (m_players_alive == 1)
-			{
-				m_players_records[projectile.GetCharacterIdentifier()].m_survival_time = m_clock.getElapsedTime(); 
-				m_order_of_death.push_back(projectile.GetCharacterIdentifier());
-			}
-
 			//character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			//character.Impacted();
 			projectile.Destroy();
@@ -445,6 +439,10 @@ void WorldServer::RemoveCharacter(sf::Int16 character_id)
 {
 	m_characters[character_id]->Destroy();
 	m_characters[character_id]->setPosition(-1000, -1000);
+
+	m_players_records[character_id].m_survival_time = m_clock.getElapsedTime();
+	m_order_of_death.push_back(character_id);
+
 	m_players_alive--;
 	//m_characters.erase(character_id);
 	//auto it = m_characters.find(character_id);
@@ -456,6 +454,15 @@ void WorldServer::RemoveCharacter(sf::Int16 character_id)
 
 void WorldServer::PrintRecords()
 {
+
+	for (auto& character : m_characters)
+	{
+		if (!character.second->IsDestroyed()) {
+			m_players_records[character.first].m_survival_time = m_clock.getElapsedTime();
+			m_order_of_death.push_back(character.first);
+		}
+	}
+
 	std::cout << "Printing records" << std::endl;
 	for (auto& record : m_players_records)
 	{
