@@ -110,7 +110,7 @@ void GameServer::ExecutionThread()
                         amount_ready++;
                     }
                 }
-                if (amount_ready == m_connected_players)
+                if (amount_ready == m_connected_players && amount_ready != 0)
                 {
                     sf::Packet ready_packet;
                     ready_packet << static_cast<sf::Int16>(Server::PacketType::kGameReady);
