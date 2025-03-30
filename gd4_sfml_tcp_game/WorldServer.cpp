@@ -22,6 +22,7 @@ WorldServer::WorldServer() : m_scenegraph()
 , m_world_bounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
 , m_event_queue()
 , m_players_alive(0)
+, m_last_quadrant(-1)
 {
 	InitializeLayers();
 	LoadTextures();
@@ -350,21 +351,58 @@ void WorldServer::SpawnPickup(){
 
 	
 	std::unique_ptr<Pickup> pickup = std::make_unique<Pickup>(pickup_id, type, m_textures);
-	float x = Utility::RandomInt(GetBattleFieldBounds().width - border_distance * 2) + border_distance;
-	float y = Utility::RandomInt(GetBattleFieldBounds().height - border_distance * 2) + border_distance;
+	
+	int quadrant = Utility::RandomInt(4);
+	while (quadrant == m_last_quadrant) {
+		quadrant = Utility::RandomInt(4);
+	}
+	m_last_quadrant = quadrant;
 
-	pickup->setPosition(x, y);
+	sf::Vector2f position;
+
+	float mid_x = GetBattleFieldBounds().width / 2;
+	float mid_y = GetBattleFieldBounds().height / 2;
+
+	switch (quadrant) {
+	case 0: // Top-left quadrant
+		position = GetRandomPosition(border_distance, mid_x, border_distance, mid_y);
+		break;
+	case 1: // Top-right quadrant
+		position = GetRandomPosition(mid_x, GetBattleFieldBounds().width - border_distance, border_distance, mid_y);
+		break;
+	case 2: // Bottom-left quadrant
+		position = GetRandomPosition(border_distance, mid_x, mid_y, GetBattleFieldBounds().height - border_distance);
+		break;
+	case 3: // Bottom-right quadrant
+		position = GetRandomPosition(mid_x, GetBattleFieldBounds().width - border_distance, mid_y, GetBattleFieldBounds().height - border_distance);
+		break;
+	default:
+		return;
+	}
+
+	pickup->setPosition(position.x, position.y);
 
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(pickup));
 
-	std::cout << "Pickup Spawned at " << x << " " << y << std::endl;
+	std::cout << "Pickup Spawned at " << position.x  << " " << position.y << std::endl;
 
 	
 	Packet_Ptr packet = std::make_unique<sf::Packet>();
 	*packet << static_cast<sf::Int16>(Server::PacketType::kPickupSpawned);
-	*packet << pickup_id << static_cast<sf::Int16>(type) << x << y;
+	*packet << pickup_id << static_cast<sf::Int16>(type) << position.x << position.y;
 	m_event_queue.push_back(std::move(packet));
 }
+
+sf::Vector2f WorldServer::GetRandomPosition(float min_x, float max_x, float min_y, float max_y)
+{
+	sf::Vector2f position;
+
+	position.x =  Utility::RandomInt(max_x - min_x) + min_x;
+	position.y =  Utility::RandomInt(max_y - min_y) + min_y;
+
+	return position;
+}
+
 
 sf::Int16 WorldServer::CheckAlivePlayers()
 {

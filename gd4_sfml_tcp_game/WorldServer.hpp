@@ -81,6 +81,8 @@ private:
 	void CheckMarkedForRemoval();
 	void SpawnPickup();
 
+	sf::Vector2f GetRandomPosition(float min_x, float max_x, float min_y, float max_y);
+
 
 
 
@@ -108,5 +110,6 @@ private:
 	std::deque<Packet_Ptr> m_event_queue;
 
 	sf::Int16 m_players_alive;
+	int m_last_quadrant;
 };
 
