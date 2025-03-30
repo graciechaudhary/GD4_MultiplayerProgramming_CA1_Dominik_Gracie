@@ -97,6 +97,7 @@ private:
 	TextureHolder m_textures;
 
 	sf::Time m_pickup_drop_interval;
+	sf::Time m_full_drop_interval;
 	sf::Time m_time_since_last_drop;
 	int m_pickups_spawned;
 	int m_max_pickups;

@@ -12,9 +12,10 @@ namespace {
 WorldServer::WorldServer() : m_scenegraph()
 , m_command_queue()
 , m_create_pickup_command()
-, m_pickup_drop_interval(sf::seconds(5.f))
+, m_full_drop_interval(sf::seconds(4.5f))
+, m_pickup_drop_interval(sf::seconds(2.f))
 , m_time_since_last_drop(sf::Time::Zero)
-, m_max_pickups(3)
+, m_max_pickups(4)
 , m_pickups_spawned(0)
 , m_pickup_counter(0)
 , m_scene_layers()
@@ -253,7 +254,8 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 		m_command_queue.Push(m_create_pickup_command);
 	}
 
-	//When no pickup on the lake speed up spawn
+	m_pickup_drop_interval = m_full_drop_interval - sf::seconds(m_players_alive / 4.f);
+
 	if (m_pickups_spawned == 0)
 	{
 		m_time_since_last_drop += dt;
