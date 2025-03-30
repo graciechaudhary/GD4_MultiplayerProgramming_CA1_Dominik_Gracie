@@ -35,6 +35,20 @@ public:
 
 	void RemoveCharacter(sf::Int16 character_id);
 
+	void StartClock() { m_clock.restart(); };
+
+	struct PlayerRecords {
+		PlayerRecords() :m_survival_time(sf::Time::Zero), m_kills(0)
+		{
+		}
+		sf::Time m_survival_time = sf::Time::Zero;
+		sf::Int16 m_kills = 0;
+	};
+
+	void PrintRecords();
+
+
+
 private:
 	struct SpawnPoint
 	{
@@ -105,6 +119,11 @@ private:
 	int m_max_pickups;
 	sf::Int16 m_pickup_counter;
 
+
+	sf::Clock m_clock;
+	std::map<sf::Int16, PlayerRecords> m_players_records;
+	std::deque<sf::Int16> m_order_of_death;
+	
 	std::map<sf::Int16, Character*> m_characters;
 	std::map<sf::Int16, Projectile*> m_projectiles;
 	std::deque<Packet_Ptr> m_event_queue;

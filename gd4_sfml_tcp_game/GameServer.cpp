@@ -94,6 +94,8 @@ void GameServer::ExecutionThread()
                 if (m_world.CheckAlivePlayers() == 1)
                 {
                     BroadcastMessage("Game Finished");
+                    m_world.PrintRecords();
+					m_waiting_thread_end = true;
                 }
             }
             else
@@ -118,6 +120,7 @@ void GameServer::ExecutionThread()
                     m_game_started = true;
                     SetListening(false);
                     BroadcastMessage("Game Started");
+					m_world.StartClock();
                 }
             }
 

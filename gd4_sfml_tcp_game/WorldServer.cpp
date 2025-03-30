@@ -230,6 +230,14 @@ void WorldServer::HandleCollisions()
 			character.Damage(projectile.GetDamage());
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f, 3.f));
+
+			if (character.IsDestroyed())
+			{
+				m_players_records[character.GetIdentifier()].m_survival_time = m_clock.getElapsedTime();
+				m_players_records[projectile.GetCharacterIdentifier()].m_kills++;
+				m_players_alive--;
+				m_order_of_death.push_back(character.GetIdentifier());
+			}
 			//character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			//character.Impacted();
 			projectile.Destroy();
@@ -296,8 +304,6 @@ void WorldServer::CheckMarkedForRemoval()
 	{
 		if (it->second->IsMarkedForRemoval())
 		{
-			std::cout << "[DEBUG] Removing projectile with ID: " << it->first << std::endl;
-
 			Packet_Ptr packet = std::make_unique<sf::Packet>();
 			*packet << static_cast<sf::Int16>(Server::PacketType::kSnowballRemoved);
 			*packet << static_cast<sf::Int16>(it->first); 
@@ -321,6 +327,7 @@ void WorldServer::AddCharacter(sf::Int16 identifier, sf::Int16 place)
 	character->SetVelocity(0, 0);
 	m_characters[identifier] = character;
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
+	m_players_alive++;
 }
 
 Character* WorldServer::GetCharacter(sf::Int16 identifier)
@@ -406,12 +413,7 @@ sf::Vector2f WorldServer::GetRandomPosition(float min_x, float max_x, float min_
 
 sf::Int16 WorldServer::CheckAlivePlayers()
 {
-	sf::Int16 amount_alive = 0;
-	for (auto charPair : m_characters)
-	{
-		if (!charPair.second->IsDestroyed()) amount_alive++;
-	}
-	return amount_alive;	
+	return m_players_alive;
 }
 
 
@@ -436,10 +438,20 @@ void WorldServer::RemoveCharacter(sf::Int16 character_id)
 {
 	m_characters[character_id]->Destroy();
 	m_characters[character_id]->setPosition(-1000, -1000);
+	m_players_alive--;
 	//m_characters.erase(character_id);
 	//auto it = m_characters.find(character_id);
 	//if (it != m_characters.end()) {
 	//	delete it->second; 
 	//	m_characters.erase(it);
 	//}
+}
+
+void WorldServer::PrintRecords()
+{
+	std::cout << "Printing records" << std::endl;
+	for (auto& record : m_players_records)
+	{
+		std::cout << "Player: " << record.first << " Time: " << record.second.m_survival_time.asSeconds() << " Kills: " << record.second.m_kills << std::endl;
+	}
 }

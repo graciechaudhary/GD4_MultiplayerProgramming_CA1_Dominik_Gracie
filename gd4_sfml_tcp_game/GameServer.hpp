@@ -31,6 +31,9 @@ private:
 		bool m_game_ready;
 		RGBColour m_colour;
 		std::string m_name;
+
+		sf::Time m_survival_time;
+
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;
@@ -76,5 +79,7 @@ private:
 
 	bool m_game_started;
 	std::deque<sf::Int16> m_places;
+
+	std::deque<sf::Int16> m_scoreboard;
 };
 
