@@ -250,7 +250,6 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 	{
 		m_time_since_last_drop = sf::Time::Zero;
 		m_pickups_spawned++;
-		std::cout << "Pickup Spawned" << std::endl;
 		m_command_queue.Push(m_create_pickup_command);
 	}
 
@@ -343,9 +342,6 @@ std::map<sf::Int16, Projectile*>& WorldServer::GetProjectiles()
 }
 
 void WorldServer::SpawnPickup(){
-	if (m_pickups_spawned >= m_max_pickups)
-		return;
-
 	float border_distance = 65.f;
 	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
 	sf::Int16 pickup_id = m_pickup_counter++;
@@ -359,10 +355,12 @@ void WorldServer::SpawnPickup(){
 
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(pickup));
 
+	std::cout << "Pickup Spawned at " << x << " " << y << std::endl;
+
 	
 	Packet_Ptr packet = std::make_unique<sf::Packet>();
 	*packet << static_cast<sf::Int16>(Server::PacketType::kPickupSpawned);
-	*packet << pickup_id << static_cast<sf::Int16>(type) << x << y;  // FIXED
+	*packet << pickup_id << static_cast<sf::Int16>(type) << x << y;
 	m_event_queue.push_back(std::move(packet));
 }
 

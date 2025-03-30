@@ -319,15 +319,22 @@ void WorldClient::RemoveCharacter(sf::Int16 character_id)
 
 void WorldClient::RemoveSnowball(sf::Int16 snowball_id)
 {
-	m_projectiles[snowball_id]->Destroy();
+	Projectile* snowball = m_projectiles[snowball_id];
+	if (snowball)
+	{
+		snowball->setPosition(-100, -100);
+		snowball->Destroy();
+	}
 }
 
 void WorldClient::RemovePickup(sf::Int16 pickup_id)
 {
-	//awkward fix - maybe changed later
-	m_pickups[pickup_id]->setPosition(-100, -100);
-	m_pickups[pickup_id]->Destroy();
-	
+	Pickup* pickup = m_pickups[pickup_id];
+	if (pickup)
+	{
+		pickup->setPosition(-100, -100);
+		pickup->Destroy();
+	}
 }
 
 void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier)
