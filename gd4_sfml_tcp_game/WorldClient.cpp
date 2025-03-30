@@ -24,6 +24,7 @@ WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, Soun
 	, m_world_bounds(0.f, 0.f, output_target.getSize().x, output_target.getSize().y)
 	, m_centre_position(m_world_bounds.width / 2.f, m_world_bounds.height / 2.f)
 	, m_projectile_test(nullptr)
+	, m_sound_player(nullptr)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -102,6 +103,8 @@ void WorldClient::BuildScene()
 
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
+	m_sound_player = soundNode.get();
+	//m_scene_layers[static_cast<int>(SceneLayers::kSoundEffects)]->AttachChild(std::move(soundNode));
 	m_scenegraph.AttachChild(std::move(soundNode));
 }
 
@@ -335,6 +338,13 @@ void WorldClient::RemovePickup(sf::Int16 pickup_id)
 		pickup->setPosition(-100, -100);
 		pickup->Destroy();
 	}
+}
+
+void WorldClient::PlaySoundEffect(sf::Int16 identifier, SoundEffect effect)
+{
+
+	//using m_sound_player to play sound effect
+	m_sounds.Play(effect, m_characters[identifier]->GetWorldPosition());
 }
 
 void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier)

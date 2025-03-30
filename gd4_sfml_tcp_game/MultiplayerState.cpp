@@ -361,6 +361,8 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 		m_socket.send(name_packet);
 
+		m_world.PlaySoundEffect(identifier, SoundEffect::kExplosion2);
+
 		break;
 	}
 	case Server::PacketType::kNameSync: {
@@ -410,8 +412,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		{
 			m_player_dead = false;
 		}
-
+		m_world.PlaySoundEffect(identifer, SoundEffect::kSnowballHitPlayer);
 		break;
+
+		
 	}
 	case Server::PacketType::kHealthUp: {
 		sf::Int16 character_identifer;
@@ -420,7 +424,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> pickup_identifier;
 		m_world.GetCharacter(character_identifer)->Repair(1, m_world.GetCharacter(character_identifer)->GetMaxHitpoints());
 		m_world.RemovePickup(pickup_identifier);
+		m_world.PlaySoundEffect(character_identifer, SoundEffect::kHealthPickup);
 		break;
+
+		
 	}
 	case Server::PacketType::kSnowballUp: {
 		sf::Int16 character_identifer;
@@ -429,7 +436,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> pickup_identifier;
 		m_world.GetCharacter(character_identifer)->RechargeSnowballs();
 		m_world.RemovePickup(pickup_identifier);
+		m_world.PlaySoundEffect(character_identifer, SoundEffect::kSnowballPickup);
 		break;
+
+
 	}
 	case Server::PacketType::kCreateSnowball: {
 		sf::Int16 identifer;
@@ -437,8 +447,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> identifer >> snowball_identifier;
 
 		m_world.CreateSnowball(identifer, snowball_identifier);
+		m_world.PlaySoundEffect(identifer, SoundEffect::kSnowballThrow);
 		break;
 	}
+
 	case Server::PacketType::kUpdateClientState: {
 			sf::Int16 character_count;
 			packet >> character_count;
@@ -480,6 +492,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> character_id;
 
 		m_world.RemoveCharacter(character_id);
+		m_world.PlaySoundEffect(character_id, SoundEffect::kExplosion1);
 		break;
 	}
 	case Server::PacketType::kSnowballRemoved: {

@@ -8,6 +8,7 @@
 #include "BloomEffect.hpp"
 #include "Character.hpp"
 #include "Pickup.hpp"
+#include "SoundNode.hpp"
 
 class WorldClient : private sf::NonCopyable
 {
@@ -50,6 +51,8 @@ public:
 	void RemoveSnowball(sf::Int16 snowball_id);
 	void RemovePickup(sf::Int16 pickup_id);
 
+	void PlaySoundEffect(sf::Int16 identifier, SoundEffect effect);
+
 	void CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier);
 
 	void SpawnPickup(sf::Int16 pickup_identifier, PickupType type, float x, float y);
@@ -91,5 +94,7 @@ private:
 	ParticleNode* m_snow_particle;
 	Projectile* m_projectile_test;
 	//Character* m_character;
+
+	SoundNode* m_sound_player;
 
 };
