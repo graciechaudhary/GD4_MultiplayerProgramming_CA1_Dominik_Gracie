@@ -27,6 +27,9 @@ enum class TextureID
 	kMenuScreen,
 	kMenuButton,
 	kScoreboardScreen,
+	kScoreboard,
+	kTopKills,
+	kTopTime,
 	kWSAD,
 	kSpace
 

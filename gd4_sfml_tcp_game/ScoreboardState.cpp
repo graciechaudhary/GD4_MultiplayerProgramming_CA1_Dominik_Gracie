@@ -8,16 +8,17 @@ ScoreboardState::ScoreboardState(StateStack& stack, Context context) : State(sta
     m_instruction_text(),
     m_scoreboard()
 {
-    sf::Texture& texture = context.textures->Get(TextureID::kScoreboardScreen);
-    m_background_sprite.setTexture(texture);
-    m_background_sprite.setScale(static_cast<float>(context.window->getSize().x) / texture.getSize().x, static_cast<float>(context.window->getSize().y) / texture.getSize().y);
+	SetupVisuals(context);
+    SetupText(context);
 
     m_results = context.players_controller->m_score_ss.str();
 	context.players_controller->m_score_ss.str(std::string());
 
- 
+	m_top_kills_results = context.players_controller->m_kills_score_ss.str();
+	context.players_controller->m_kills_score_ss.str(std::string());
 
-	SetupText(context);
+	m_top_time_results = context.players_controller->m_time_score_ss.str();
+	context.players_controller->m_time_score_ss.str(std::string());
 
 }
 
@@ -30,16 +31,17 @@ void ScoreboardState::Draw()
     backgroundShape.setFillColor(sf::Color(0, 0, 0, 150));
     backgroundShape.setSize(window.getView().getSize());
 
-    window.draw(backgroundShape);
-    window.draw(m_scoreboard);
+    //window.draw(backgroundShape);
     window.draw(m_background_sprite);
+    
+     // window.draw(m_scoreboard);
+	window.draw(m_scoreboard_sprite);
+    window.draw(m_top_kills_sprite);
+	window.draw(m_top_time_sprite);   
    
 	window.draw(m_player_list);
     window.draw(m_top_kills);
     window.draw(m_top_time);
-
-	//blinking effect for instruction where the text will be displayed every 0.25 seconds
-    
 
     if (m_show_text) {
         window.draw(m_instruction_text);
@@ -114,4 +116,26 @@ void ScoreboardState::SetupText(Context context)
     Utility::CentreOrigin(m_top_time);
     //setting right top
     m_top_time.setPosition(0.85f * view_size.x, 0.17f * view_size.y);
+}
+
+void ScoreboardState::SetupVisuals(Context context)
+{
+    sf::Texture& texture = context.textures->Get(TextureID::kScoreboardScreen);
+    m_background_sprite.setTexture(texture);
+    m_background_sprite.setScale(static_cast<float>(context.window->getSize().x) / texture.getSize().x, static_cast<float>(context.window->getSize().y) / texture.getSize().y);
+
+    sf::Texture& scoreboard_texture = context.textures->Get(TextureID::kScoreboard);
+    m_scoreboard_sprite.setTexture(scoreboard_texture);
+    Utility::CentreOrigin(m_scoreboard_sprite);
+    m_scoreboard_sprite.setPosition(0.5f * context.window->getView().getSize().x, 0.5f * context.window->getView().getSize().y);
+
+    sf::Texture& top_kills_texture = context.textures->Get(TextureID::kTopKills);
+    m_top_kills_sprite.setTexture(top_kills_texture);
+    Utility::CentreOrigin(m_top_kills_sprite);
+    m_top_kills_sprite.setPosition(0.15f * context.window->getView().getSize().x, 0.37f * context.window->getView().getSize().y);
+
+    sf::Texture& top_time_texture = context.textures->Get(TextureID::kTopTime);
+    m_top_time_sprite.setTexture(top_time_texture);
+    Utility::CentreOrigin(m_top_time_sprite);
+    m_top_time_sprite.setPosition(0.85f * context.window->getView().getSize().x, 0.37f * context.window->getView().getSize().y);
 }

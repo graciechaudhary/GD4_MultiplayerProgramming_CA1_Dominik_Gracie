@@ -13,7 +13,7 @@
 
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/FRAME_RATE);
 
-Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::VideoMode(WINDOW_WIDTH,WINDOW_HEIGHT), "States", sf::Style::Default)
+Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::VideoMode(WINDOW_WIDTH,WINDOW_HEIGHT), "States", sf::Style::Fullscreen)
 	, m_stack(State::Context(m_window, m_textures, m_fonts, m_players_controller, m_music, m_sound))
 {
 	m_window.setKeyRepeatEnabled(false);
@@ -29,7 +29,11 @@ Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::Vid
 
 	//GracieChaudhary - new menu screen
 	m_textures.Load(TextureID::kMenuScreen, "MediaFiles/Textures/Menu/5.png");
-	m_textures.Load(TextureID::kScoreboardScreen, "MediaFiles/Textures/Scoreboard/ScoreboardDraft001.png");
+
+	m_textures.Load(TextureID::kScoreboardScreen, "MediaFiles/Textures/Scoreboard/ScoreboardBackground.png");
+	m_textures.Load(TextureID::kScoreboard, "MediaFiles/Textures/Scoreboard/Scoreboard.png");
+	m_textures.Load(TextureID::kTopKills, "MediaFiles/Textures/Scoreboard/Top.png");
+	m_textures.Load(TextureID::kTopTime, "MediaFiles/Textures/Scoreboard/Top.png");
 
 	RegisterStates();
 	m_stack.PushState(StateID::kTitle);

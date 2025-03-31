@@ -656,7 +656,7 @@ void MultiplayerState::SetUpColourSelectionUI(Context context)
 
 	auto title_label = std::make_shared<gui::Label>("Select your player colour", *context.fonts);
 	title_label->SetOutlineDesign(sf::Color::White, 2);
-	title_label->setPosition(m_window.getSize().x / 2.f-120, m_window.getSize().y / 2.f - 160);
+	title_label->setPosition(m_window.getSize().x / 2.f - 120, m_window.getSize().y / 2.f - 160);
 	title_label->SetColor(sf::Color::Red);
 	title_label->SetSize(50);
 
