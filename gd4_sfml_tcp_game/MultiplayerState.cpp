@@ -8,7 +8,9 @@
 #include "PickupType.hpp"
 #include <iostream>
 
-std::pair<sf::IpAddress, std::string> GetAddressFromFile()
+//Dominik
+//Get IP and Nametag from file
+std::pair<sf::IpAddress, std::string> GetIpAndNametagFromFile()
 {
 	{
 		//Try to open existing file
@@ -24,10 +26,11 @@ std::pair<sf::IpAddress, std::string> GetAddressFromFile()
 	std::ofstream output_file("env_info.txt");
 	std::string local_address = "127.0.0.1";
 	std::string nametag = "Tag";
-	output_file << local_address << nametag;
+	output_file << local_address << " " << nametag;
 	return std::pair<sf::IpAddress, std::string>(local_address, nametag);
 
 }
+//Dominik & Gracie
 MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_host)
 	:State(stack, context)
 	, m_world(*context.window, *context.fonts, *context.sounds)
@@ -75,7 +78,7 @@ MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_h
 	//If this is the host, create a server
 	sf::IpAddress ip;
 
-	auto file_info = GetAddressFromFile();
+	auto file_info = GetIpAndNametagFromFile();
 
 	ip = file_info.first;
 	m_players_controller.SetName(file_info.second);
@@ -123,9 +126,10 @@ void MultiplayerState::Draw()
 		m_window.draw(m_failed_connection_text);
 	}
 }
-
+//Dominik & Gracie
 bool MultiplayerState::Update(sf::Time dt)
 {
+	//When end of game wait for a few seconds before transitioning to the game over state
 	if (m_game_ended)
 	{
 		m_world.Update(dt);
@@ -172,6 +176,7 @@ bool MultiplayerState::Update(sf::Time dt)
 
 		if (m_tick_clock.getElapsedTime() > sf::seconds(1.f / TICK_RATE))
 		{
+			//Send a notice to the server that this client is still alive
 			sf::Packet packetOut;
 			packetOut << static_cast<sf::Int16>(Client::PacketType::kNotice);
 			m_socket.send(packetOut);
@@ -194,19 +199,10 @@ bool MultiplayerState::Update(sf::Time dt)
 	return true;
 }
 
+//Dominik & Gracie
 bool MultiplayerState::HandleEvent(const sf::Event& event)
 {
-	/*if (event.type == sf::Event::KeyPressed) 
-	{
-		if (event.key.code == sf::Keyboard::Return && m_connected && !m_game_started)
-		{
-			sf::Packet packet;
-			packet << static_cast<sf::Int16>(Client::PacketType::kReadyNotice);
-			packet << m_identifier;
-			m_socket.send(packet);
-		}
-	}*/
-
+	//Call quit on window close
 	if (event.type == sf::Event::Closed)
 	{
 		sf::Packet packet;
@@ -220,6 +216,7 @@ bool MultiplayerState::HandleEvent(const sf::Event& event)
 		m_players_controller.HandleEvent(event);
 	}
 
+	//Allow colour selection if the game has not started
 	if (m_connected && !m_game_started) {
 		bool is_colour_selecting = false;
 
@@ -324,10 +321,12 @@ void MultiplayerState::UpdateBroadcastMessage(sf::Time elapsed_time)
 	}
 }
 
+//Dominik & Gracie
 void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 {
 	switch (static_cast<Server::PacketType>(packet_type))
 	{
+		//Everyoone is ready, start the game
 	case Server::PacketType::kGameReady: {
 		m_game_started = true;
 		break;
@@ -348,6 +347,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		}
 		break;
 	}
+	//Server has sent the client their identifier and spawn place
 	case Server::PacketType::kSpawnSelf:{
 		sf::Int16 identifier, place;
 		packet >> identifier >> place;
@@ -355,6 +355,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		m_world.AddCharacter(identifier, place, m_players_controller.GetName());
 		m_players_controller.SetConnection(&m_socket, identifier);
 
+		//Share players name with the server
 		sf::Packet name_packet;
 		name_packet << static_cast<sf::Int16>(Client::PacketType::kRequestNameSync);
 		name_packet << m_players_controller.GetName();
@@ -369,6 +370,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 		break;
 	}
+	//Dominik
 	case Server::PacketType::kNameSync: {
 		sf::Int16 amount;
 		packet >> amount;
@@ -386,6 +388,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 		break;
 	}
+
 	case Server::PacketType::kInitialState: {
 		sf::Int16 amount;
 		packet >> amount;
@@ -581,7 +584,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		break;
 	}
 }
-
+//Dominik & Gracie
 void MultiplayerState::SetUpColourSelectionUI(Context context)
 {
 	std::string color_text = "220";
