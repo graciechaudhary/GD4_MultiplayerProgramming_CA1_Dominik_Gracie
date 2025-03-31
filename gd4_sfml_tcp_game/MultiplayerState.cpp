@@ -410,7 +410,8 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 		if (m_world.GetCharacter(m_identifier)->IsDestroyed())
 		{
-			m_player_dead = false;
+			m_player_dead = true;
+			m_world.PlaySoundEffect(identifer, SoundEffect::kExplosion1);
 		}
 		m_world.PlaySoundEffect(identifer, SoundEffect::kSnowballHitPlayer);
 		break;
@@ -492,7 +493,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> character_id;
 
 		m_world.RemoveCharacter(character_id);
-		m_world.PlaySoundEffect(character_id, SoundEffect::kExplosion1);
+		
 		break;
 	}
 	case Server::PacketType::kSnowballRemoved: {
