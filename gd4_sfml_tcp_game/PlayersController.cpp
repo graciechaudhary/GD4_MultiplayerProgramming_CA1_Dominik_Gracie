@@ -118,7 +118,7 @@ struct CharacterMover
 	Direction direction;
 	sf::Int16 identifier;
 };
-
+//Dominik & Gracie
 struct CharacterThrower
 {
 	CharacterThrower(sf::Int16 identifier) : identifier(identifier)
@@ -150,6 +150,7 @@ void PlayersController::SetConnection(sf::TcpSocket* socket, sf::Int16 identifie
 	m_identifier = identifier;
 }
 
+//Dominik & Gracie
 void PlayersController::HandleEvent(const sf::Event& event)
 {
     //if (event.type == sf::Event::KeyPressed)
@@ -165,7 +166,7 @@ void PlayersController::HandleEvent(const sf::Event& event)
     {
         Action action = m_key_binding[event.key.code];
         bool isPressed = (event.type == sf::Event::KeyPressed);
-        if (IsRealTimeAction(action) && m_action_proxy[action] != isPressed)
+		if (IsRealTimeAction(action) && m_action_proxy[action] != isPressed) //Only call if the state has changed -> reduce network traffic
         {
             m_action_proxy[action] = isPressed;
             // Send realtime change over network
@@ -180,6 +181,7 @@ void PlayersController::HandleEvent(const sf::Event& event)
 
 	//HandleControllerInput(event);
 }
+
 
 void PlayersController::HandleRealTimeInput(CommandQueue& command_queue)
 {
@@ -232,7 +234,7 @@ void PlayersController::HandleControllerInput(const sf::Event& event) {
 }
 
  
-
+//Dominik & Gracie
 void PlayersController::NetworkedRealTimeInputServer(CommandQueue& command_queue)
 {
     if (!m_active) return;
@@ -247,6 +249,7 @@ void PlayersController::NetworkedRealTimeInputServer(CommandQueue& command_queue
 	}
 }
 
+//Dominik & Gracie
 void PlayersController::RegisterRealTimeInputChange(Action action, bool state)
 {
 	m_action_proxy[action] = state;

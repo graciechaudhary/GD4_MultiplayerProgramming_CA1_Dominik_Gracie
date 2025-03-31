@@ -21,9 +21,14 @@ GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
 	m_listener_socket.setBlocking(false);
 	m_peers[0].reset(new RemotePeer());
 	m_thread.launch();
+
+	//Dominik
+	//A queue of available places for players to spawn that correspond to spawn points from DataTables
 	m_places = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 
     {
+		//---------------------------------------------Read Highscores from files
+
         //Try to open existing file
         std::ifstream input_file("kills_highscores.txt");
         for (int i = 0; i < m_max_connected_players; ++i)
@@ -123,6 +128,8 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (frame_time >= frame_rate)
         {
+            //Dominik
+			//------------------Update world and handle input from clients IF game has started
             if (m_game_started)
             {
                 m_world.Update(frame_rate);
@@ -140,13 +147,16 @@ void GameServer::ExecutionThread()
             if (m_game_started)
             {
                 Tick();
-
+				//Dominik
+				//---------------------------------Check if game has ended
                 if (m_world.CheckAlivePlayers() == 1)
                 {
                     BroadcastMessage("Game Finished");
 
+					//Get winner into score board
                     m_world.MarkWinnersScore();
 
+					//Check for highscores
 					auto& players = m_world.GetPlayerRecords();
 					for (auto& player : players){
 						std::string name = m_world.GetCharacter(player.first)->GetName();
@@ -154,9 +164,11 @@ void GameServer::ExecutionThread()
 						AddTimeScore(player.second.m_survival_time.asSeconds(), name);
                     }
 
+					//Write highscores to file
                     std::ofstream output_file_kills("kills_highscores.txt");
 					std::ofstream output_file_time("time_highscores.txt");
 
+					//Share highscores with clients
 					sf::Packet packet;
 					packet << static_cast<sf::Int16>(Server::PacketType::kHighScores);
 					for (int i = 0; i < 5; ++i)
@@ -172,13 +184,15 @@ void GameServer::ExecutionThread()
 					output_file_kills.close();
 					output_file_time.close();
 
-
+					//Share score board with clients
                     m_world.PrintRecords();
 					m_waiting_thread_end = true;
                 }
             }
             else
             {
+                //Dominik
+				//---------------------------------Check if all players are ready to start the game
                 sf::Packet packet;
                 packet << static_cast<sf::Int16>(Server::PacketType::kWaitingNotice);
                 SendToAll(packet);
@@ -206,6 +220,7 @@ void GameServer::ExecutionThread()
             tick_time -= tick_rate;
         }
 
+        //Handle events called from the world
         while (!m_world.GetEventQueue().empty()) {
             WorldServer::Packet_Ptr packet;
             packet = std::move(m_world.GetEventQueue().front());
@@ -218,28 +233,9 @@ void GameServer::ExecutionThread()
     }
 }
 
+//Dominik & Gracie
 void GameServer::Tick()
 {
-    /*sf::Packet packet;
-    packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
-    packet << m_connected_players;
-	for (sf::Int16 i = 0; i < m_connected_players; ++i)
-	{
-		if (m_peers[i]->m_ready)
-		{
-			sf::Int16 identifier = m_peers[i]->m_identifier;
-			float x = m_world.GetCharacter(i)->GetWorldPosition().x;
-			float y = m_world.GetCharacter(i)->GetWorldPosition().y;
-			float vx = m_world.GetCharacter(i)->GetVelocity().x;
-			float vy = m_world.GetCharacter(i)->GetVelocity().y;
-            sf::Int16 facing_dir = static_cast<sf::Int16>(m_world.GetCharacter(i)->GetFacingDirection());
-
-			packet << identifier << x << y << vx << vy << facing_dir;
-            
-
-		}
-	}*/
-
     sf::Packet packet;
     packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
 
@@ -279,20 +275,8 @@ void GameServer::Tick()
 		float x = projectile.second->GetWorldPosition().x;
 		float y = projectile.second->GetWorldPosition().y;
 		
-		//packet << identifier << x << y;
         packet << identifier << x << y;
 	}
-
-    //pickups
-	/*size = static_cast<sf::Int16>(m_world.GetPickups().size());
-	packet << size;
-	for (auto& pickup : m_world.GetPickups())
-	{
-		sf::Int16 identifier = pickup.first;
-		float x = pickup.second->GetWorldPosition().x;
-		float y = pickup.second->GetWorldPosition().y;
-		packet << identifier << x << y;
-	}*/
 
 	SendToAll(packet);
 }
@@ -354,6 +338,7 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
         BroadcastMessage(message);
         break;
     }
+	//Dominik & Gracie
     case Client::PacketType::kPlayerRealtimeChange: {
         sf::Int16 identifier;
         sf::Int16 action;
@@ -363,6 +348,7 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
         m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
         break;
     }
+    //Dominik                                              
     case Client::PacketType::kReadyNotice: {
         sf::Int16 id;
         packet >> id;
@@ -376,27 +362,28 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
         }
         break;
     }
-        case Client::PacketType::kColourChange: {
+    //Gracie
+    case Client::PacketType::kColourChange: {
 
-            sf::Int16 r;
-			packet >> r;
+        sf::Int16 r;
+		packet >> r;
 
-			sf::Int16 g;
-			packet >> g;
+		sf::Int16 g;
+		packet >> g;
 
-			sf::Int16 b;
-			packet >> b;
+		sf::Int16 b;
+		packet >> b;
 
-			receiving_peer.m_colour = RGBColour(r, g, b);
+		receiving_peer.m_colour = RGBColour(r, g, b);
 			
 
-            sf::Packet colour_change;
-			colour_change << static_cast<sf::Int16>(Server::PacketType::kColourSync);
-			colour_change << receiving_peer.m_identifier << r << g << b;
-			SendToAll(colour_change);
-			break;
+        sf::Packet colour_change;
+		colour_change << static_cast<sf::Int16>(Server::PacketType::kColourSync);
+		colour_change << receiving_peer.m_identifier << r << g << b;
+		SendToAll(colour_change);
+		break;
     }
-
+    //Gracie
     case Client::PacketType::kRequestNameSync: {
 		std::string name;
 		packet >> name;
@@ -427,6 +414,7 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
     }
 }
 
+//Dominik & Gracie
 void GameServer::HandleIncomingConnections()
 {
     if (!m_listening_state)
@@ -473,18 +461,22 @@ void GameServer::HandleIncomingConnections()
     }
 }
 
+//Dominik & Gracie
 void GameServer::HandleDisconnections()
 {
     for (auto itr = m_peers.begin(); itr != m_peers.end();)
     {
         if ((*itr)->m_timed_out)
         {
+			//Inform all clients of the disconnection
 			sf::Packet packet;
 			packet << static_cast<sf::Int16>(Server::PacketType::kCharacterRemoved);
 			packet << (*itr)->m_identifier;
 
+			//Add place back to the list
             m_places.push_front(m_world.GetCharacter((*itr)->m_identifier)->GetPlace());
 
+			//Remove character from world
 			m_world.RemoveCharacter((*itr)->m_identifier);
 			m_player_controllers[(*itr)->m_identifier]->SetActive(false);
 
@@ -526,6 +518,7 @@ void GameServer::BroadcastMessage(const std::string& message)
 	SendToAll(packet);
 }
 
+//Dominik & Gracie
 void GameServer::InformWorldState(sf::TcpSocket& socket)
 {
     sf::Packet packet;
@@ -548,6 +541,7 @@ void GameServer::InformWorldState(sf::TcpSocket& socket)
 	socket.send(packet);
 }
 
+//Dominik & Gracie
 void GameServer::NotifyPlayerSpawn(sf::Int16 identifier, sf::Int16 place)
 {
     sf::Packet packet;
@@ -565,6 +559,7 @@ void GameServer::NotifyPlayerSpawn(sf::Int16 identifier, sf::Int16 place)
     SendToAll(packet);
 }
 
+//Dominik
 sf::Int16 GameServer::GetSpawnPlace()
 {
 	sf::Int16 place = m_places.front();
@@ -572,8 +567,12 @@ sf::Int16 GameServer::GetSpawnPlace()
     return place;
 }
 
+//Dominink
 void GameServer::AddKillScore(sf::Int16 kills, std::string name)
 {
+    //Add
+    //Sort
+    //Pop over 5
     m_high_scores_kills.emplace_back(kills, name);
 
     std::sort(m_high_scores_kills.begin(), m_high_scores_kills.end(), [](const auto& a, const auto& b) {
@@ -585,8 +584,12 @@ void GameServer::AddKillScore(sf::Int16 kills, std::string name)
     }
 }
 
+//Dominik
 void GameServer::AddTimeScore(float time, std::string name)
 {
+    //Add
+	//Sort
+	//Pop over 5
     m_high_scores_time.emplace_back(time, name);
 
     std::sort(m_high_scores_time.begin(), m_high_scores_time.end(), [](const auto& a, const auto& b) {
