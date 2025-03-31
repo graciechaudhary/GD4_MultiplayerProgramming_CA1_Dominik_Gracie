@@ -42,7 +42,6 @@ public:
 	void Update(sf::Time dt);
 
 	void AddCharacter(sf::Int16 identifier, sf::Int16 place, std::string name);
-
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
 	Pickup* GetPickup(sf::Int16 identifier);

@@ -205,9 +205,7 @@ void GameServer::ExecutionThread()
                         amount_ready++;
                     }
                 }
-
                 if (amount_ready == m_connected_players && amount_ready != 0)
-
                 {
                     sf::Packet ready_packet;
                     ready_packet << static_cast<sf::Int16>(Server::PacketType::kGameReady);
@@ -426,12 +424,12 @@ void GameServer::HandleIncomingConnections()
 
     if (m_listener_socket.accept(m_peers[m_connected_players]->m_socket) == sf::TcpListener::Done)
     {
+        sf::Int16 place = GetSpawnPlace();
 
 		sf::Packet packet;
 		packet << static_cast<sf::Int16>(Server::PacketType::kSpawnSelf);
 		packet << m_player_id_count;
-    packet << place;
-
+        packet << place;
 		m_peers[m_connected_players]->m_socket.send(packet);
 
         m_peers[m_connected_players]->m_identifier = m_player_id_count;
@@ -484,6 +482,8 @@ void GameServer::HandleDisconnections()
 
             m_connected_players--;
             itr = m_peers.erase(itr);
+
+			SendToAll(packet);
 
             //If the number of peers has dropped below max_connections
             if (m_connected_players < m_max_connected_players && !m_game_started)

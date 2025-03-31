@@ -330,11 +330,11 @@ void WorldServer::CheckMarkedForRemoval()
 	}
 }
 
-void WorldServer::AddCharacter(sf::Int16 identifier)
+void WorldServer::AddCharacter(sf::Int16 identifier, sf::Int16 place)
 {
-	std::unique_ptr<Character> leader(new Character(true, identifier, m_textures, &m_event_queue, &m_projectiles));
+	std::unique_ptr<Character> leader(new Character(true, identifier, place, m_textures, &m_event_queue, &m_projectiles));
 	Character* character = leader.get();
-	character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
+	character->setPosition(Table[place].m_x, Table[place].m_y);
 	character->SetVelocity(0, 0);
 	m_characters[identifier] = character;
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
@@ -496,4 +496,3 @@ void WorldServer::MarkWinnersScore() {
 		}
 	}
 }
-
