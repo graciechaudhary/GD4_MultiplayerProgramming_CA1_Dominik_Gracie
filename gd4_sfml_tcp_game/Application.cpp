@@ -29,7 +29,11 @@ Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::Vid
 
 	//GracieChaudhary - new menu screen
 	m_textures.Load(TextureID::kMenuScreen, "MediaFiles/Textures/Menu/5.png");
-	m_textures.Load(TextureID::kScoreboardScreen, "MediaFiles/Textures/Scoreboard/ScoreboardDraft001.png");
+
+	m_textures.Load(TextureID::kScoreboardScreen, "MediaFiles/Textures/Scoreboard/ScoreboardBackground.png");
+	m_textures.Load(TextureID::kScoreboard, "MediaFiles/Textures/Scoreboard/ScoreboardFixed.png");
+	m_textures.Load(TextureID::kTopKills, "MediaFiles/Textures/Scoreboard/TopFixed.png");
+	m_textures.Load(TextureID::kTopTime, "MediaFiles/Textures/Scoreboard/TopFixed.png");
 
 	RegisterStates();
 	m_stack.PushState(StateID::kTitle);

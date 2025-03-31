@@ -10,7 +10,7 @@ MusicPlayer::MusicPlayer()
 
 	//GracieChaudhary - uploading new music
 	m_filenames[MusicThemes::kMenu] = "MediaFiles/Music/MenuMusic.ogg";
-	m_filenames[MusicThemes::kGame] = "MediaFiles/Music/GameplayMusic.ogg";
+	m_filenames[MusicThemes::kGame] = "MediaFiles/Music/GameplayMusic002.ogg";
 	m_filenames[MusicThemes::kGameOver] = "MediaFiles/Music/GameOverMusic.wav";
 }
 
