@@ -4,6 +4,7 @@
 #include <SFML/System/Sleep.hpp>
 #include "Utility.hpp"
 #include <iostream>
+#include <fstream>
 
 GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
 , m_world()
@@ -21,6 +22,55 @@ GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
 	m_peers[0].reset(new RemotePeer());
 	m_thread.launch();
 	m_places = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
+
+    {
+        //Try to open existing file
+        std::ifstream input_file("kills_highscores.txt");
+        for (int i = 0; i < m_max_connected_players; ++i)
+        {
+            std::string name;
+            int kills;
+            if (input_file >> name >> kills)
+            {
+				AddKillScore(kills, name);
+            }
+            else
+            {
+				AddKillScore(0, "Error");
+            }
+        }
+    }
+
+    {
+        //Try to open existing file
+        std::ifstream input_file("time_highscores.txt");
+        for (int i = 0; i < m_max_connected_players; ++i)
+        {
+            std::string name;
+            float time;
+            if (input_file >> name >> time)
+            {
+                AddTimeScore(time, name);
+            }
+            else
+            {
+                AddTimeScore(0, "Error");
+            }
+        }
+    }
+
+
+	std::cout << "Kills Highscores" << std::endl;
+    for (auto& score : m_high_scores_kills)
+    {
+        std::cout << score.first << " " << score.second << std::endl;
+    }
+
+	std::cout << "Time Highscores" << std::endl;
+	for (auto& score : m_high_scores_time)
+	{
+		std::cout << score.first << " " << score.second << std::endl;
+	}
 }
 
 GameServer::~GameServer()
@@ -94,6 +144,35 @@ void GameServer::ExecutionThread()
                 if (m_world.CheckAlivePlayers() == 1)
                 {
                     BroadcastMessage("Game Finished");
+
+                    m_world.MarkWinnersScore();
+
+					auto& players = m_world.GetPlayerRecords();
+					for (auto& player : players){
+						std::string name = m_world.GetCharacter(player.first)->GetName();
+						AddKillScore(player.second.m_kills, name);
+						AddTimeScore(player.second.m_survival_time.asSeconds(), name);
+                    }
+
+                    std::ofstream output_file_kills("kills_highscores.txt");
+					std::ofstream output_file_time("time_highscores.txt");
+
+					sf::Packet packet;
+					packet << static_cast<sf::Int16>(Server::PacketType::kHighScores);
+					for (int i = 0; i < 5; ++i)
+					{
+						packet << m_high_scores_kills[i].second << m_high_scores_kills[i].first;
+						packet << m_high_scores_time[i].second << m_high_scores_time[i].first;
+
+						output_file_kills << m_high_scores_kills[i].second << " " << m_high_scores_kills[i].first << " ";
+						output_file_time << m_high_scores_time[i].second << " " << m_high_scores_time[i].first << " ";
+					}
+					SendToAll(packet);
+
+					output_file_kills.close();
+					output_file_time.close();
+
+
                     m_world.PrintRecords();
 					m_waiting_thread_end = true;
                 }
@@ -322,6 +401,7 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 		std::string name;
 		packet >> name;
 		receiving_peer.m_name = name;
+		m_world.GetCharacter(receiving_peer.m_identifier)->SetName(name);
 
 		sf::Packet name_packet;
 		name_packet << static_cast<sf::Int16>(Server::PacketType::kNameSync);
@@ -490,6 +570,33 @@ sf::Int16 GameServer::GetSpawnPlace()
 	sf::Int16 place = m_places.front();
 	m_places.pop_front();
     return place;
+}
+
+void GameServer::AddKillScore(sf::Int16 kills, std::string name)
+{
+    m_high_scores_kills.emplace_back(kills, name);
+
+    std::sort(m_high_scores_kills.begin(), m_high_scores_kills.end(), [](const auto& a, const auto& b) {
+        return a.first > b.first;
+        });
+
+    if (m_high_scores_kills.size() > 5) {
+        m_high_scores_kills.pop_back();
+    }
+}
+
+void GameServer::AddTimeScore(float time, std::string name)
+{
+    m_high_scores_time.emplace_back(time, name);
+
+    std::sort(m_high_scores_time.begin(), m_high_scores_time.end(), [](const auto& a, const auto& b) {
+        return a.first > b.first;
+        });
+
+    if (m_high_scores_time.size() > 5) {
+        m_high_scores_time.pop_back();
+    }
+
 }
 
 GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false), m_game_ready(false), m_name("")

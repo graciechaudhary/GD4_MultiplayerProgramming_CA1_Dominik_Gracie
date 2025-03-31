@@ -53,6 +53,9 @@ public:
 
 	GameRecords m_game_records;
 	std::stringstream m_score_ss;
+	std::stringstream m_kills_score_ss;
+	std::stringstream m_time_score_ss;
+
 
 private:
 	void InitialiseActions();

@@ -15,10 +15,10 @@ ScoreboardState::ScoreboardState(StateStack& stack, Context context) : State(sta
     m_results = context.players_controller->m_score_ss.str();
 	context.players_controller->m_score_ss.str(std::string());
 
-  
+ 
 
 	SetupText(context);
-   
+
 }
 
 void ScoreboardState::Draw()

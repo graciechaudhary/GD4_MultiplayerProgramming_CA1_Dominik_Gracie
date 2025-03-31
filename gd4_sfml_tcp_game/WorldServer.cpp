@@ -454,15 +454,6 @@ void WorldServer::RemoveCharacter(sf::Int16 character_id)
 
 void WorldServer::PrintRecords()
 {
-
-	for (auto& character : m_characters)
-	{
-		if (!character.second->IsDestroyed()) {
-			m_players_records[character.first].m_survival_time = m_clock.getElapsedTime();
-			m_order_of_death.push_back(character.first);
-		}
-	}
-
 	std::cout << "Printing records" << std::endl;
 	for (auto& record : m_players_records)
 	{
@@ -484,5 +475,14 @@ void WorldServer::PrintRecords()
 	}
 
 	m_event_queue.push_back(std::move(packet));
+}
 
+void WorldServer::MarkWinnersScore() {
+	for (auto& character : m_characters)
+	{
+		if (!character.second->IsDestroyed()) {
+			m_players_records[character.first].m_survival_time = m_clock.getElapsedTime();
+			m_order_of_death.push_back(character.first);
+		}
+	}
 }
