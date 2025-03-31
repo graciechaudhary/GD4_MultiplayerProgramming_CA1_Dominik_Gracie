@@ -75,7 +75,7 @@ public:
 
 	static sf::Int16  GetSnowballCounter();
 
-	void SetName(std::string name) { m_name_display->SetString(name); m_name = name; };
+	void SetName(std::string name);
 	std::string GetName() const { return m_name; };
 
 private:

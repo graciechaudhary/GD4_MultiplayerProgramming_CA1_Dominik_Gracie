@@ -47,6 +47,9 @@ public:
 
 	void PrintRecords();
 
+	void MarkWinnersScore();
+
+	std::map<sf::Int16, PlayerRecords>& GetPlayerRecords() { return m_players_records; };
 
 
 private:

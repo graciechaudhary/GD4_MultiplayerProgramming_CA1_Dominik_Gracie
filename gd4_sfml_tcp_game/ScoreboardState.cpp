@@ -16,15 +16,15 @@ ScoreboardState::ScoreboardState(StateStack& stack, Context context) : State(sta
 
     m_scoreboard.setFont(font);
     m_scoreboard.setString(m_results);
-    m_scoreboard.setCharacterSize(40);
+    m_scoreboard.setCharacterSize(25);
     Utility::CentreOrigin(m_scoreboard);
-    m_scoreboard.setPosition(0.5f * view_size.x, 0.1f * view_size.y);
+    m_scoreboard.setPosition(0.5f * view_size.x, 0.5f * view_size.y);
 
     m_instruction_text.setFont(font);
     m_instruction_text.setString("Press Enter to return to main menu");
     m_instruction_text.setCharacterSize(40);
     Utility::CentreOrigin(m_instruction_text);
-    m_instruction_text.setPosition(0.48f * view_size.x, 0.9f * view_size.y);
+    m_instruction_text.setPosition(0.48f * view_size.x, 0.95f * view_size.y);
 }
 
 void ScoreboardState::Draw()

@@ -60,6 +60,9 @@ private:
 
 	sf::Int16 GetSpawnPlace();
 
+	void AddKillScore(sf::Int16 kills, std::string name);
+	void AddTimeScore(float time, std::string name);
+
 private:
 	sf::Thread m_thread;
 	sf::Clock m_clock;
@@ -81,5 +84,8 @@ private:
 	std::deque<sf::Int16> m_places;
 
 	std::deque<sf::Int16> m_scoreboard;
+
+	std::vector<std::pair<sf::Int16, std::string>> m_high_scores_kills;
+	std::vector<std::pair<float, std::string>> m_high_scores_time;
 };
 

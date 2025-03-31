@@ -526,6 +526,26 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		m_game_ended = true;
 		break;
 	}
+	case Server::PacketType::kHighScores: {
+		std::stringstream& kill_scores = m_players_controller.m_kills_score_ss;
+		std::stringstream& time_scores = m_players_controller.m_time_score_ss;
+		for (int i = 0; i < 5; ++i)
+		{
+			std::string name;
+			sf::Int16 score;
+			packet >> name >> score;
+			kill_scores << i + 1 << ".\t\t" << name << "\t\t" << score << std::endl;
+
+			float time;
+			packet >> name >> time;
+			time_scores << i + 1 << ".\t\t" << name << "\t\t" << time << std::endl;
+		}
+
+		std::cout << kill_scores.str() << std::endl;
+		std::cout << time_scores.str() << std::endl;
+
+		break;
+	}
 
 
 	default:

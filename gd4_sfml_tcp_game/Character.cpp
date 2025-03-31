@@ -789,6 +789,15 @@ sf::Int16 Character::GetSnowballCounter()
 	return snowball_counter;
 }
 
+void Character::SetName(std::string name)
+{
+	if (!m_is_on_server)
+	{
+		m_name_display->SetString(name);
+	}
+	 m_name = name;
+}
+
 //Dominik Hampejs D00250604
 void Character::WalkRight()
 {

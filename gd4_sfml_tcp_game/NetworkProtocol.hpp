@@ -27,7 +27,8 @@ namespace Server
 		kSnowballUp,
 		kWaitingNotice,
 		kColourSync,
-		kResults
+		kResults,
+		kHighScores,
 	};
 }
 
