@@ -24,6 +24,8 @@ private:
 	sf::Sprite m_top_time_sprite;
 
 	sf::Text m_scoreboard;
+	sf::Text m_top_kills_list;
+	sf::Text m_top_time_list;
 	sf::Text m_instruction_text;
 
 	sf::Text m_top_kills;
