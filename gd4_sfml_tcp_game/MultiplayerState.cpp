@@ -361,6 +361,8 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 		m_socket.send(name_packet);
 
+		m_world.PlaySoundEffect(identifier, SoundEffect::kExplosion2);
+
 		break;
 	}
 	case Server::PacketType::kNameSync: {
@@ -408,10 +410,13 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 		if (m_world.GetCharacter(m_identifier)->IsDestroyed())
 		{
-			m_player_dead = false;
+			m_player_dead = true;
+			m_world.PlaySoundEffect(identifer, SoundEffect::kExplosion1);
 		}
-
+		m_world.PlaySoundEffect(identifer, SoundEffect::kSnowballHitPlayer);
 		break;
+
+		
 	}
 	case Server::PacketType::kHealthUp: {
 		sf::Int16 character_identifer;
@@ -420,7 +425,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> pickup_identifier;
 		m_world.GetCharacter(character_identifer)->Repair(1, m_world.GetCharacter(character_identifer)->GetMaxHitpoints());
 		m_world.RemovePickup(pickup_identifier);
+		m_world.PlaySoundEffect(character_identifer, SoundEffect::kHealthPickup);
 		break;
+
+		
 	}
 	case Server::PacketType::kSnowballUp: {
 		sf::Int16 character_identifer;
@@ -429,7 +437,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> pickup_identifier;
 		m_world.GetCharacter(character_identifer)->RechargeSnowballs();
 		m_world.RemovePickup(pickup_identifier);
+		m_world.PlaySoundEffect(character_identifer, SoundEffect::kSnowballPickup);
 		break;
+
+
 	}
 	case Server::PacketType::kCreateSnowball: {
 		sf::Int16 identifer;
@@ -437,8 +448,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> identifer >> snowball_identifier;
 
 		m_world.CreateSnowball(identifer, snowball_identifier);
+		m_world.PlaySoundEffect(identifer, SoundEffect::kSnowballThrow);
 		break;
 	}
+
 	case Server::PacketType::kUpdateClientState: {
 			sf::Int16 character_count;
 			packet >> character_count;
@@ -480,6 +493,7 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> character_id;
 
 		m_world.RemoveCharacter(character_id);
+		
 		break;
 	}
 	case Server::PacketType::kSnowballRemoved: {
@@ -608,21 +622,25 @@ void MultiplayerState::SetUpColourSelectionUI(Context context)
 
 	//lables
 	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
+	red_label->SetOutlineDesign(sf::Color::White, 2);
 	red_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f - 75);
 	red_label->SetColor(sf::Color::Red);
 	red_label->SetSize(30);
 
 	auto green_label = std::make_shared<gui::Label>("Green", *context.fonts);
+	green_label->SetOutlineDesign(sf::Color::White, 2);
 	green_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f -15);
 	green_label->SetColor(sf::Color::Green);
 	green_label->SetSize(30);
 
 	auto blue_label = std::make_shared<gui::Label>("Blue", *context.fonts);
+	blue_label->SetOutlineDesign(sf::Color::White, 2);
 	blue_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f + 35);
 	blue_label->SetColor(sf::Color::Blue);
 	blue_label->SetSize(30);
 
 	auto title_label = std::make_shared<gui::Label>("Colour Selection", *context.fonts);
+	title_label->SetOutlineDesign(sf::Color::White, 2);
 	title_label->setPosition(m_window.getSize().x / 2.f-120, m_window.getSize().y / 2.f - 160);
 	title_label->SetColor(sf::Color::Red);
 	title_label->SetSize(50);

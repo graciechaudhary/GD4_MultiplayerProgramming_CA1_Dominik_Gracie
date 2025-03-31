@@ -13,9 +13,18 @@ public:
 	virtual bool HandleEvent(const sf::Event& event) override;
 
 private:
+	void SetupText(Context context);
+
+private:
 	sf::Sprite m_background_sprite;
 	sf::Text m_scoreboard;
 	sf::Text m_instruction_text;
+	sf::Text m_top_kills;
+	sf::Text m_top_time;
+	sf::Text m_player_list;
 	std::string m_results;
+
+	sf::Time m_blink_timer;
+	bool m_show_text = true;
 };
 

@@ -25,6 +25,9 @@ enum class TextureID
 	kGreenTree,
 	kDeadTree,
 	kMenuScreen,
-	kMenuButton
+	kMenuButton,
+	kScoreboardScreen,
+	kWSAD,
+	kSpace
 
 };
