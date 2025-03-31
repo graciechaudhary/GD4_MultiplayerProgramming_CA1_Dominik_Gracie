@@ -15,49 +15,10 @@ ScoreboardState::ScoreboardState(StateStack& stack, Context context) : State(sta
     m_results = context.players_controller->m_score_ss.str();
 	context.players_controller->m_score_ss.str(std::string());
 
-    sf::Font& font = context.fonts->Get(Font::kMain);
-    sf::Vector2f view_size = context.window->getView().getSize();
+  
 
-    m_scoreboard.setFont(font);
-    m_scoreboard.setString(m_results);
-    m_scoreboard.setCharacterSize(40);
-    Utility::CentreOrigin(m_scoreboard);
-    m_scoreboard.setPosition(0.5f * view_size.x, 0.1f * view_size.y);
-
-    m_instruction_text.setFont(font);
-    m_instruction_text.setString("Press Enter to return to main menu");
-	m_instruction_text.setOutlineColor(sf::Color::Red);
-    m_instruction_text.setOutlineThickness(2.f);
-    m_instruction_text.setCharacterSize(40);
-    Utility::CentreOrigin(m_instruction_text);
-    m_instruction_text.setPosition(0.5f * view_size.x, 0.95f * view_size.y);
-
-	m_player_list.setFont(font);
-	m_player_list.setString("Players this Game");
-    m_player_list.setOutlineColor(sf::Color::Red);
-    m_player_list.setOutlineThickness(3.f);
-	m_player_list.setCharacterSize(50);
-	Utility::CentreOrigin(m_player_list);
-    //setting on top middle
-	m_player_list.setPosition(0.5f * view_size.x, 0.045f * view_size.y);
-
-	m_top_kills.setFont(font);
-	m_top_kills.setString("Top Kills");
-	m_top_kills.setOutlineColor(sf::Color::Red);
-	m_top_kills.setOutlineThickness(3.f);
-	m_top_kills.setCharacterSize(50);
-	Utility::CentreOrigin(m_top_kills);
-    //setting left top
-	m_top_kills.setPosition(0.15f * view_size.x, 0.17f * view_size.y);
-
-	m_top_time.setFont(font);
-	m_top_time.setString("Top Time");
-	m_top_time.setOutlineColor(sf::Color::Red);
-	m_top_time.setOutlineThickness(3.f);
-	m_top_time.setCharacterSize(50);
-	Utility::CentreOrigin(m_top_time);
-	//setting right top
-    m_top_time.setPosition(0.85f * view_size.x, 0.17f * view_size.y);
+	SetupText(context);
+   
 }
 
 void ScoreboardState::Draw()
@@ -106,4 +67,51 @@ bool ScoreboardState::HandleEvent(const sf::Event& event)
         RequestStackPush(StateID::kMenu);
     }
 	return false;
+}
+
+void ScoreboardState::SetupText(Context context)
+{
+    sf::Font& font = context.fonts->Get(Font::kMain);
+    sf::Vector2f view_size = context.window->getView().getSize();
+
+    m_scoreboard.setFont(font);
+    m_scoreboard.setString(m_results);
+    m_scoreboard.setCharacterSize(40);
+    Utility::CentreOrigin(m_scoreboard);
+    m_scoreboard.setPosition(0.5f * view_size.x, 0.1f * view_size.y);
+
+    m_instruction_text.setFont(font);
+    m_instruction_text.setString("Press Enter to return to main menu");
+    m_instruction_text.setOutlineColor(sf::Color::Red);
+    m_instruction_text.setOutlineThickness(2.f);
+    m_instruction_text.setCharacterSize(40);
+    Utility::CentreOrigin(m_instruction_text);
+    m_instruction_text.setPosition(0.5f * view_size.x, 0.95f * view_size.y);
+
+    m_player_list.setFont(font);
+    m_player_list.setString("Scoreboard");
+    m_player_list.setOutlineColor(sf::Color::Red);
+    m_player_list.setOutlineThickness(3.f);
+    m_player_list.setCharacterSize(50);
+    Utility::CentreOrigin(m_player_list);
+    //setting on top middle
+    m_player_list.setPosition(0.5f * view_size.x, 0.045f * view_size.y);
+
+    m_top_kills.setFont(font);
+    m_top_kills.setString("Top Kills");
+    m_top_kills.setOutlineColor(sf::Color::Red);
+    m_top_kills.setOutlineThickness(3.f);
+    m_top_kills.setCharacterSize(50);
+    Utility::CentreOrigin(m_top_kills);
+    //setting left top
+    m_top_kills.setPosition(0.15f * view_size.x, 0.17f * view_size.y);
+
+    m_top_time.setFont(font);
+    m_top_time.setString("Top Time");
+    m_top_time.setOutlineColor(sf::Color::Red);
+    m_top_time.setOutlineThickness(3.f);
+    m_top_time.setCharacterSize(50);
+    Utility::CentreOrigin(m_top_time);
+    //setting right top
+    m_top_time.setPosition(0.85f * view_size.x, 0.17f * view_size.y);
 }

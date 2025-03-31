@@ -13,6 +13,9 @@ public:
 	virtual bool HandleEvent(const sf::Event& event) override;
 
 private:
+	void SetupText(Context context);
+
+private:
 	sf::Sprite m_background_sprite;
 	sf::Text m_scoreboard;
 	sf::Text m_instruction_text;

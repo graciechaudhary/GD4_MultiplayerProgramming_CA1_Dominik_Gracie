@@ -13,6 +13,36 @@ MenuState::MenuState(StateStack& stack, Context context)
     m_background_sprite.setTexture(texture);
     m_background_sprite.setScale(static_cast<float>(context.window->getSize().x) / texture.getSize().x,
         static_cast<float>(context.window->getSize().y) / texture.getSize().y);
+
+	sf::Texture& WSAD_texture = context.textures->Get(TextureID::kWSAD);
+	m_WSAD_sprite.setTexture(WSAD_texture);
+	Utility::CentreOrigin(m_WSAD_sprite);
+	m_WSAD_sprite.setPosition(0.1f * context.window->getView().getSize().x, 0.7f * context.window->getView().getSize().y);
+	m_WSAD_sprite.setScale(2.f, 2.f);
+
+	m_WSAD_text.setFont(context.fonts->Get(Font::kMain));
+	m_WSAD_text.setString("     Menu: Up and Down\nGame: 8-directional movement");
+
+
+	m_WSAD_text.setCharacterSize(30);
+	m_WSAD_text.setOutlineColor(sf::Color::Red);
+	m_WSAD_text.setOutlineThickness(2.f);
+	Utility::CentreOrigin(m_WSAD_text);
+	m_WSAD_text.setPosition(0.1f * context.window->getView().getSize().x, 0.85f * context.window->getView().getSize().y);
+
+	sf::Texture& space_texture = context.textures->Get(TextureID::kSpace);
+	m_Space_sprite.setTexture(space_texture);
+	Utility::CentreOrigin(m_Space_sprite);
+	m_Space_sprite.setPosition(0.85f * context.window->getView().getSize().x, 0.75f * context.window->getView().getSize().y);
+	m_Space_sprite.setScale(2.f, 2.f);
+
+	m_Space_text.setFont(context.fonts->Get(Font::kMain));
+	m_Space_text.setString("Menu: Select\nGame: Shoot");
+	m_Space_text.setCharacterSize(30);
+	m_Space_text.setOutlineColor(sf::Color::Red);
+	m_Space_text.setOutlineThickness(2.f);
+	Utility::CentreOrigin(m_Space_text);
+	m_Space_text.setPosition(0.85f * context.window->getView().getSize().x, 0.85f * context.window->getView().getSize().y);
    
     //GracieChaudhary - menu decoration
     m_game_name.setFont(context.fonts->Get(Font::kMain));
@@ -23,6 +53,8 @@ MenuState::MenuState(StateStack& stack, Context context)
     m_game_name.setLetterSpacing(1.5f);
     Utility::CentreOrigin(m_game_name);
     m_game_name.setPosition(context.window->getView().getSize().x / 2.f, context.window->getView().getSize().y * 0.35f);
+
+
 
     auto play_button = std::make_shared<gui::Button>(context);
     play_button->setPosition((context.window->getSize().x - 200)/2, 489);
@@ -69,6 +101,10 @@ void MenuState::Draw()
     window.draw(m_background_sprite);
     window.draw(m_gui_container);
     window.draw(m_game_name);
+	window.draw(m_WSAD_sprite);
+	window.draw(m_Space_sprite);
+	window.draw(m_WSAD_text);
+	window.draw(m_Space_text);
 }
 
 bool MenuState::Update(sf::Time dt)

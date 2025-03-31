@@ -602,21 +602,25 @@ void MultiplayerState::SetUpColourSelectionUI(Context context)
 
 	//lables
 	auto red_label = std::make_shared<gui::Label>("Red", *context.fonts);
+	red_label->SetOutlineDesign(sf::Color::White, 2);
 	red_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f - 75);
 	red_label->SetColor(sf::Color::Red);
 	red_label->SetSize(30);
 
 	auto green_label = std::make_shared<gui::Label>("Green", *context.fonts);
+	green_label->SetOutlineDesign(sf::Color::White, 2);
 	green_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f -15);
 	green_label->SetColor(sf::Color::Green);
 	green_label->SetSize(30);
 
 	auto blue_label = std::make_shared<gui::Label>("Blue", *context.fonts);
+	blue_label->SetOutlineDesign(sf::Color::White, 2);
 	blue_label->setPosition(m_window.getSize().x / 2.f - 130, m_window.getSize().y / 2.f + 35);
 	blue_label->SetColor(sf::Color::Blue);
 	blue_label->SetSize(30);
 
 	auto title_label = std::make_shared<gui::Label>("Colour Selection", *context.fonts);
+	title_label->SetOutlineDesign(sf::Color::White, 2);
 	title_label->setPosition(m_window.getSize().x / 2.f-120, m_window.getSize().y / 2.f - 160);
 	title_label->SetColor(sf::Color::Red);
 	title_label->SetSize(50);

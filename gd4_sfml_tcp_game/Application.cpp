@@ -13,7 +13,7 @@
 
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/FRAME_RATE);
 
-Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::VideoMode(WINDOW_WIDTH,WINDOW_HEIGHT), "States", sf::Style::Fullscreen)
+Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::VideoMode(WINDOW_WIDTH,WINDOW_HEIGHT), "States", sf::Style::Default)
 	, m_stack(State::Context(m_window, m_textures, m_fonts, m_players_controller, m_music, m_sound))
 {
 	m_window.setKeyRepeatEnabled(false);
@@ -24,6 +24,8 @@ Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::Vid
 	m_textures.Load(TextureID::kButtonSelected, "Media/Textures/ButtonSelected.png");
 	m_textures.Load(TextureID::kButtonActivated, "Media/Textures/ButtonPressed.png");
 	m_textures.Load(TextureID::kButtons, "Media/Textures/Buttons.png");
+	m_textures.Load(TextureID::kWSAD, "MediaFiles/Textures/Instructions/InstructionKeysFigma/WSAD.png");
+	m_textures.Load(TextureID::kSpace, "MediaFiles/Textures/Instructions/InstructionKeysFigma/Space.png");
 
 	//GracieChaudhary - new menu screen
 	m_textures.Load(TextureID::kMenuScreen, "MediaFiles/Textures/Menu/5.png");
