@@ -22,7 +22,7 @@ std::pair<sf::IpAddress, std::string> GetAddressFromFile()
 
 	//If the open/read failed, create a new file
 	std::ofstream output_file("env_info.txt");
-	std::string local_address = "192.168.0.2";
+	std::string local_address = "127.0.0.1";
 	std::string nametag = "Tag";
 	output_file << local_address << nametag;
 	return std::pair<sf::IpAddress, std::string>(local_address, nametag);
@@ -361,6 +361,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 
 		m_socket.send(name_packet);
 
+		if (identifier == m_identifier)
+		{
+			m_world.GetCharacter(identifier)->SetName(m_players_controller.GetName());
+		}
 		m_world.PlaySoundEffect(identifier, SoundEffect::kExplosion2);
 
 		break;
@@ -413,6 +417,8 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 			m_player_dead = true;
 			m_world.PlaySoundEffect(identifer, SoundEffect::kExplosion1);
 		}
+
+		if (identifer == m_identifier)
 		m_world.PlaySoundEffect(identifer, SoundEffect::kSnowballHitPlayer);
 		break;
 
@@ -425,7 +431,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> pickup_identifier;
 		m_world.GetCharacter(character_identifer)->Repair(1, m_world.GetCharacter(character_identifer)->GetMaxHitpoints());
 		m_world.RemovePickup(pickup_identifier);
+
+		if (character_identifer == m_identifier)
 		m_world.PlaySoundEffect(character_identifer, SoundEffect::kHealthPickup);
+
 		break;
 
 		
@@ -437,7 +446,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> pickup_identifier;
 		m_world.GetCharacter(character_identifer)->RechargeSnowballs();
 		m_world.RemovePickup(pickup_identifier);
+
+		if (character_identifer == m_identifier)
 		m_world.PlaySoundEffect(character_identifer, SoundEffect::kSnowballPickup);
+
 		break;
 
 
@@ -448,7 +460,10 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		packet >> identifer >> snowball_identifier;
 
 		m_world.CreateSnowball(identifer, snowball_identifier);
+
+		if (identifer == m_identifier)
 		m_world.PlaySoundEffect(identifer, SoundEffect::kSnowballThrow);
+
 		break;
 	}
 
