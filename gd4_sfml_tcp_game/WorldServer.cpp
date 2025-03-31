@@ -168,19 +168,29 @@ void WorldServer::HandleCollisions()
 			player_one.SetVelocity(0.f, 0.f);
 			playuer_two.SetVelocity(0.f, 0.f);
 
-			//If one player was stationery bounce the moving player of the stationary player
-			if (velocity_one == sf::Vector2f(0.f, 0.f))
+			//less than 0.2f is considered standing still
+			float standing_still_limit = 0.2f;
+			bool one_standing_still = (std::abs(velocity_one.x) < standing_still_limit && std::abs(velocity_one.y) < standing_still_limit);
+			bool two_standing_still = (std::abs(velocity_two.x) < standing_still_limit && std::abs(velocity_two.y) < standing_still_limit);
+
+			//If one player was stationery bounce the moving player of the stationary player (Stationary player pushed the moving away)
+			if (one_standing_still)
 			{
-				velocity_one = -velocity_two;
+				velocity_one = sf::Vector2f(0, 0);
+
+				//velocity_two = -velocity_two;
+
 			}
-			if (velocity_two == sf::Vector2f(0.f, 0.f))
+			if (two_standing_still)
 			{
-				velocity_two = -velocity_one;
+				velocity_two = sf::Vector2f(0, 0);
+
+				//velocity_two = -velocity_one;
 			}
 
 			//Exchange velocities to bounce/push each other
-			player_one.Accelerate(velocity_two);
-			playuer_two.Accelerate(velocity_one);
+			player_one.Accelerate(-velocity_one);
+			playuer_two.Accelerate(-velocity_two);
 
 			//player_one.PlayLocalSound(m_command_queue, SoundEffect::kExplosion2);
 		}
