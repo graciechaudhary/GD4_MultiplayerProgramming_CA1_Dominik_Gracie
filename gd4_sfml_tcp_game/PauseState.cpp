@@ -47,7 +47,7 @@ void PauseState::Draw()
 
 bool PauseState::Update(sf::Time dt)
 {
-    return false;
+    return true;
 }
 
 bool PauseState::HandleEvent(const sf::Event& event)

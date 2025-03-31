@@ -8,6 +8,7 @@
 #include "BloomEffect.hpp"
 #include "Character.hpp"
 #include "Pickup.hpp"
+#include "SoundNode.hpp"
 
 class WorldClient : private sf::NonCopyable
 {
@@ -40,13 +41,18 @@ public:
 	void Draw();
 	void Update(sf::Time dt);
 
-	void AddCharacter(sf::Int16 identifier);
+	void AddCharacter(sf::Int16 identifier, sf::Int16 place, std::string name);
+
 	Character* GetCharacter(sf::Int16 identifier);
 	Projectile* GetProjectile(sf::Int16 identifier);
 	Pickup* GetPickup(sf::Int16 identifier);
+	ParticleNode* GetParticleSystem(sf::Int16 identifier);
+
 	void RemoveCharacter(sf::Int16 character_id);
 	void RemoveSnowball(sf::Int16 snowball_id);
 	void RemovePickup(sf::Int16 pickup_id);
+
+	void PlaySoundEffect(sf::Int16 identifier, SoundEffect effect);
 
 	void CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier);
 
@@ -89,5 +95,7 @@ private:
 	ParticleNode* m_snow_particle;
 	Projectile* m_projectile_test;
 	//Character* m_character;
+
+	SoundNode* m_sound_player;
 
 };

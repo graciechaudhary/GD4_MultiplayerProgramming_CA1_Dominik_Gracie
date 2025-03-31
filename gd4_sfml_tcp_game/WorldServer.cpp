@@ -12,15 +12,17 @@ namespace {
 WorldServer::WorldServer() : m_scenegraph()
 , m_command_queue()
 , m_create_pickup_command()
-, m_pickup_drop_interval(sf::seconds(5.f))
+, m_full_drop_interval(sf::seconds(4.5f))
+, m_pickup_drop_interval(sf::seconds(2.f))
 , m_time_since_last_drop(sf::Time::Zero)
-, m_max_pickups(3)
+, m_max_pickups(4)
 , m_pickups_spawned(0)
 , m_pickup_counter(0)
 , m_scene_layers()
 , m_world_bounds(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
 , m_event_queue()
 , m_players_alive(0)
+, m_last_quadrant(-1)
 {
 	InitializeLayers();
 	LoadTextures();
@@ -166,19 +168,29 @@ void WorldServer::HandleCollisions()
 			player_one.SetVelocity(0.f, 0.f);
 			playuer_two.SetVelocity(0.f, 0.f);
 
-			//If one player was stationery bounce the moving player of the stationary player
-			if (velocity_one == sf::Vector2f(0.f, 0.f))
+			//less than 0.2f is considered standing still
+			float standing_still_limit = 0.2f;
+			bool one_standing_still = (std::abs(velocity_one.x) < standing_still_limit && std::abs(velocity_one.y) < standing_still_limit);
+			bool two_standing_still = (std::abs(velocity_two.x) < standing_still_limit && std::abs(velocity_two.y) < standing_still_limit);
+
+			//If one player was stationery bounce the moving player of the stationary player (Stationary player pushed the moving away)
+			if (one_standing_still)
 			{
-				velocity_one = -velocity_two;
+				velocity_one = sf::Vector2f(0, 0);
+
+				//velocity_two = -velocity_two;
+
 			}
-			if (velocity_two == sf::Vector2f(0.f, 0.f))
+			if (two_standing_still)
 			{
-				velocity_two = -velocity_one;
+				velocity_two = sf::Vector2f(0, 0);
+
+				//velocity_two = -velocity_one;
 			}
 
 			//Exchange velocities to bounce/push each other
-			player_one.Accelerate(velocity_two);
-			playuer_two.Accelerate(velocity_one);
+			player_one.Accelerate(-velocity_one);
+			playuer_two.Accelerate(-velocity_two);
 
 			//player_one.PlayLocalSound(m_command_queue, SoundEffect::kExplosion2);
 		}
@@ -228,6 +240,15 @@ void WorldServer::HandleCollisions()
 			character.Damage(projectile.GetDamage());
 			character.SetVelocity(0.f, 0.f);
 			character.Accelerate(projectile.GetVelocity() / (3.f, 3.f));
+
+			if (character.IsDestroyed())
+			{
+				m_players_records[character.GetIdentifier()].m_survival_time = m_clock.getElapsedTime();
+				m_players_records[projectile.GetCharacterIdentifier()].m_kills++;
+				m_players_alive--;
+				m_order_of_death.push_back(character.GetIdentifier());
+			}
+
 			//character.PlayLocalSound(m_command_queue, SoundEffect::kSnowballHitPlayer);
 			//character.Impacted();
 			projectile.Destroy();
@@ -250,11 +271,11 @@ void WorldServer::CheckPickupDrop(sf::Time dt)
 	{
 		m_time_since_last_drop = sf::Time::Zero;
 		m_pickups_spawned++;
-		std::cout << "Pickup Spawned" << std::endl;
 		m_command_queue.Push(m_create_pickup_command);
 	}
 
-	//When no pickup on the lake speed up spawn
+	m_pickup_drop_interval = m_full_drop_interval - sf::seconds(m_players_alive / 4.f);
+
 	if (m_pickups_spawned == 0)
 	{
 		m_time_since_last_drop += dt;
@@ -294,8 +315,6 @@ void WorldServer::CheckMarkedForRemoval()
 	{
 		if (it->second->IsMarkedForRemoval())
 		{
-			std::cout << "[DEBUG] Removing projectile with ID: " << it->first << std::endl;
-
 			Packet_Ptr packet = std::make_unique<sf::Packet>();
 			*packet << static_cast<sf::Int16>(Server::PacketType::kSnowballRemoved);
 			*packet << static_cast<sf::Int16>(it->first); 
@@ -319,6 +338,7 @@ void WorldServer::AddCharacter(sf::Int16 identifier)
 	character->SetVelocity(0, 0);
 	m_characters[identifier] = character;
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
+	m_players_alive++;
 }
 
 Character* WorldServer::GetCharacter(sf::Int16 identifier)
@@ -343,37 +363,68 @@ std::map<sf::Int16, Projectile*>& WorldServer::GetProjectiles()
 }
 
 void WorldServer::SpawnPickup(){
-	if (m_pickups_spawned >= m_max_pickups)
-		return;
-
 	float border_distance = 65.f;
 	auto type = static_cast<PickupType>(Utility::RandomInt(static_cast<int>(PickupType::kPickupCount)));
 	sf::Int16 pickup_id = m_pickup_counter++;
 
 	
 	std::unique_ptr<Pickup> pickup = std::make_unique<Pickup>(pickup_id, type, m_textures);
-	float x = Utility::RandomInt(GetBattleFieldBounds().width - border_distance * 2) + border_distance;
-	float y = Utility::RandomInt(GetBattleFieldBounds().height - border_distance * 2) + border_distance;
+	
+	int quadrant = Utility::RandomInt(4);
+	while (quadrant == m_last_quadrant) {
+		quadrant = Utility::RandomInt(4);
+	}
+	m_last_quadrant = quadrant;
 
-	pickup->setPosition(x, y);
+	sf::Vector2f position;
+
+	float mid_x = GetBattleFieldBounds().width / 2;
+	float mid_y = GetBattleFieldBounds().height / 2;
+
+	switch (quadrant) {
+	case 0: // Top-left quadrant
+		position = GetRandomPosition(border_distance, mid_x, border_distance, mid_y);
+		break;
+	case 1: // Top-right quadrant
+		position = GetRandomPosition(mid_x, GetBattleFieldBounds().width - border_distance, border_distance, mid_y);
+		break;
+	case 2: // Bottom-left quadrant
+		position = GetRandomPosition(border_distance, mid_x, mid_y, GetBattleFieldBounds().height - border_distance);
+		break;
+	case 3: // Bottom-right quadrant
+		position = GetRandomPosition(mid_x, GetBattleFieldBounds().width - border_distance, mid_y, GetBattleFieldBounds().height - border_distance);
+		break;
+	default:
+		return;
+	}
+
+	pickup->setPosition(position.x, position.y);
 
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(pickup));
+
+	std::cout << "Pickup Spawned at " << position.x  << " " << position.y << std::endl;
 
 	
 	Packet_Ptr packet = std::make_unique<sf::Packet>();
 	*packet << static_cast<sf::Int16>(Server::PacketType::kPickupSpawned);
-	*packet << pickup_id << static_cast<sf::Int16>(type) << x << y;  // FIXED
+	*packet << pickup_id << static_cast<sf::Int16>(type) << position.x << position.y;
 	m_event_queue.push_back(std::move(packet));
 }
 
+sf::Vector2f WorldServer::GetRandomPosition(float min_x, float max_x, float min_y, float max_y)
+{
+	sf::Vector2f position;
+
+	position.x =  Utility::RandomInt(max_x - min_x) + min_x;
+	position.y =  Utility::RandomInt(max_y - min_y) + min_y;
+
+	return position;
+}
+
+
 sf::Int16 WorldServer::CheckAlivePlayers()
 {
-	sf::Int16 amount_alive = 0;
-	for (auto charPair : m_characters)
-	{
-		if (!charPair.second->IsDestroyed()) amount_alive++;
-	}
-	return amount_alive;
+	return m_players_alive;
 }
 
 
@@ -393,3 +444,56 @@ void WorldServer::DestroyEntitiesOutsideView()
 
 	//we will have to inform the client that entity has been destroyed by sending respective packet
 }
+
+void WorldServer::RemoveCharacter(sf::Int16 character_id)
+{
+	m_characters[character_id]->Destroy();
+	m_characters[character_id]->setPosition(-1000, -1000);
+
+	m_players_records[character_id].m_survival_time = m_clock.getElapsedTime();
+	m_order_of_death.push_back(character_id);
+
+	m_players_alive--;
+	//m_characters.erase(character_id);
+	//auto it = m_characters.find(character_id);
+	//if (it != m_characters.end()) {
+	//	delete it->second; 
+	//	m_characters.erase(it);
+	//}
+}
+
+void WorldServer::PrintRecords()
+{
+	std::cout << "Printing records" << std::endl;
+	for (auto& record : m_players_records)
+	{
+		std::cout << "Player: " << record.first << " Time: " << record.second.m_survival_time.asSeconds() << " Kills: " << record.second.m_kills << std::endl;
+	}
+
+	Packet_Ptr packet = std::make_unique<sf::Packet>();
+	*packet << static_cast<sf::Int16>(Server::PacketType::kResults);
+
+	sf::Int16 size = m_players_records.size();
+	*packet << size;
+
+	while (!m_order_of_death.empty()) {
+		sf::Int16 player_id = m_order_of_death.back();
+		*packet << player_id;
+		*packet << m_players_records[player_id].m_survival_time.asSeconds();
+		*packet << m_players_records[player_id].m_kills;
+		m_order_of_death.pop_back();
+	}
+
+	m_event_queue.push_back(std::move(packet));
+}
+
+void WorldServer::MarkWinnersScore() {
+	for (auto& character : m_characters)
+	{
+		if (!character.second->IsDestroyed()) {
+			m_players_records[character.first].m_survival_time = m_clock.getElapsedTime();
+			m_order_of_death.push_back(character.first);
+		}
+	}
+}
+

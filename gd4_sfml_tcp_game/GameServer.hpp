@@ -29,6 +29,11 @@ private:
 		bool m_ready;
 		bool m_timed_out;
 		bool m_game_ready;
+		RGBColour m_colour;
+		std::string m_name;
+
+		sf::Time m_survival_time;
+
 	};
 
 	typedef std::unique_ptr<RemotePeer> PeerPtr;
@@ -53,6 +58,9 @@ private:
 
 	void NotifyPlayerSpawn(sf::Int16 identifier);
 
+	void AddKillScore(sf::Int16 kills, std::string name);
+	void AddTimeScore(float time, std::string name);
+
 private:
 	sf::Thread m_thread;
 	sf::Clock m_clock;
@@ -62,6 +70,7 @@ private:
 
 	sf::Int16 m_max_connected_players;
 	sf::Int16 m_connected_players;
+	sf::Int16 m_player_id_count;
 
 	std::vector<PeerPtr> m_peers;
 	bool m_waiting_thread_end;
@@ -70,5 +79,13 @@ private:
 	std::map<sf::Int16, PlayersController*> m_player_controllers;
 
 	bool m_game_started;
+
+	std::deque<sf::Int16> m_places;
+
+	std::deque<sf::Int16> m_scoreboard;
+
+	std::vector<std::pair<sf::Int16, std::string>> m_high_scores_kills;
+	std::vector<std::pair<float, std::string>> m_high_scores_time;
+
 };
 

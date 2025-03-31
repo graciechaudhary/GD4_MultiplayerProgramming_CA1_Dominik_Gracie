@@ -23,6 +23,17 @@ void gui::Label::HandleEvent(const sf::Event& event)
 {
 }
 
+//sf::Text gui::Label::GetText() const
+//{
+//    return m_text;
+//}
+
+void gui::Label::SetOutlineDesign(sf::Color color, float thickness)
+{
+	m_text.setOutlineColor(color);
+	m_text.setOutlineThickness(thickness);
+}
+
 void gui::Label::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     states.transform *= getTransform();

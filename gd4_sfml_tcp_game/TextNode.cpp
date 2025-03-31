@@ -7,6 +7,8 @@
 TextNode::TextNode(const FontHolder& fonts, std::string& text)
 	:m_text(text, fonts.Get(Font::kMain), 20)
 {
+	m_text.setFillColor(sf::Color::Black);
+	m_text.setStyle(m_text.Bold);
 }
 
 void TextNode::SetString(const std::string& text)

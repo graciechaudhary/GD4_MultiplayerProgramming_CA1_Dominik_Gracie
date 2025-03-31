@@ -73,6 +73,8 @@ public:
 
 	static sf::Int16  GetSnowballCounter();
 
+	void SetName(std::string name);
+	std::string GetName() const { return m_name; };
 
 private:
 	virtual void DrawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -100,6 +102,7 @@ private:
 
 	ResourceNode* m_health_display;
 	ResourceNode* m_snowball_display;
+	TextNode* m_name_display;
 
 
 	Command m_throw_command;
@@ -138,5 +141,7 @@ private:
 
 	std::deque<std::unique_ptr<sf::Packet>>* m_event_queue;
 	std::map<sf::Int16, Projectile*>* m_projectiles;
+	sf::Int16 m_place;
+	std::string m_name;
 };
 
