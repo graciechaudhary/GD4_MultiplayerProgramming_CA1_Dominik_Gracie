@@ -6,14 +6,15 @@
 #include "MenuState.hpp"
 #include "PauseState.hpp"
 #include "SettingsState.hpp"
+#include "GameOverState.hpp"
 #include "PreGameState.hpp"
 
 #include "MultiplayerState.hpp"
-#include "ScoreboardState.hpp"
 
 const sf::Time Application::kTimePerFrame = sf::seconds(1.f/FRAME_RATE);
 
-Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::VideoMode(WINDOW_WIDTH,WINDOW_HEIGHT), "States", sf::Style::Default)
+Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::VideoMode(WINDOW_WIDTH,WINDOW_HEIGHT), "States", sf::Style::
+Default)
 	, m_stack(State::Context(m_window, m_textures, m_fonts, m_players_controller, m_music, m_sound))
 {
 	m_window.setKeyRepeatEnabled(false);
@@ -24,16 +25,9 @@ Application::Application() : m_window(/*sf::VideoMode::getDesktopMode()*/sf::Vid
 	m_textures.Load(TextureID::kButtonSelected, "Media/Textures/ButtonSelected.png");
 	m_textures.Load(TextureID::kButtonActivated, "Media/Textures/ButtonPressed.png");
 	m_textures.Load(TextureID::kButtons, "Media/Textures/Buttons.png");
-	m_textures.Load(TextureID::kWSAD, "MediaFiles/Textures/Instructions/SizeFixed/WSAD.png");
-	m_textures.Load(TextureID::kSpace, "MediaFiles/Textures/Instructions/SizeFixed/Space.png");
 
 	//GracieChaudhary - new menu screen
 	m_textures.Load(TextureID::kMenuScreen, "MediaFiles/Textures/Menu/5.png");
-
-	m_textures.Load(TextureID::kScoreboardScreen, "MediaFiles/Textures/Scoreboard/ScoreboardBackground.png");
-	m_textures.Load(TextureID::kScoreboard, "MediaFiles/Textures/Scoreboard/ScoreboardFixed.png");
-	m_textures.Load(TextureID::kTopKills, "MediaFiles/Textures/Scoreboard/TopFixed.png");
-	m_textures.Load(TextureID::kTopTime, "MediaFiles/Textures/Scoreboard/TopFixed.png");
 
 	RegisterStates();
 	m_stack.PushState(StateID::kTitle);
@@ -97,5 +91,5 @@ void Application::RegisterStates()
 	m_stack.RegisterState<MultiplayerState>(StateID::kJoinGame, false);
 	m_stack.RegisterState<PauseState>(StateID::kPause);
 	m_stack.RegisterState<SettingsState>(StateID::kSettings);
-	m_stack.RegisterState<ScoreboardState>(StateID::kGameOver);
+	m_stack.RegisterState<GameOverState>(StateID::kGameOver);
 }

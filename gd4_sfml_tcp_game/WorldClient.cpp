@@ -24,7 +24,6 @@ WorldClient::WorldClient(sf::RenderTarget& output_target, FontHolder& font, Soun
 	, m_world_bounds(0.f, 0.f, output_target.getSize().x, output_target.getSize().y)
 	, m_centre_position(m_world_bounds.width / 2.f, m_world_bounds.height / 2.f)
 	, m_projectile_test(nullptr)
-	, m_sound_player(nullptr)
 {
 	m_scene_texture.create(m_target.getSize().x, m_target.getSize().y);
 	LoadTextures();
@@ -103,8 +102,6 @@ void WorldClient::BuildScene()
 
 	// Add sound effect node
 	std::unique_ptr<SoundNode> soundNode(new SoundNode(m_sounds));
-	m_sound_player = soundNode.get();
-	//m_scene_layers[static_cast<int>(SceneLayers::kSoundEffects)]->AttachChild(std::move(soundNode));
 	m_scenegraph.AttachChild(std::move(soundNode));
 }
 
@@ -270,15 +267,13 @@ void WorldClient::Update(sf::Time dt)
 	//m_scenegraph.RemoveWrecks();
 }
 
-
-void WorldClient::AddCharacter(sf::Int16 identifier, sf::Int16 place, std::string name)
+void WorldClient::AddCharacter(sf::Int16 identifier)
 {
 	std::unique_ptr<Character> leader(new Character(false, identifier, m_textures, m_fonts));
 	Character* character = leader.get();
 	character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
 	character->SetVelocity(0, 0);
 	character->SetColour(sf::Color::Yellow);
-	character->SetName(name);
 	m_scene_layers[static_cast<int>(SceneLayers::kIntreacations)]->AttachChild(std::move(leader));
 
 	m_characters[identifier] = character;
@@ -305,11 +300,6 @@ Pickup* WorldClient::GetPickup(sf::Int16 identifier)
 	return m_pickups[identifier];
 }
 
-ParticleNode* WorldClient::GetParticleSystem(sf::Int16 identifier)
-{
-	return m_particle_systems[identifier];
-}
-
 void WorldClient::RemoveCharacter(sf::Int16 character_id)
 {
 	//m_characters.erase(character_id);
@@ -322,29 +312,15 @@ void WorldClient::RemoveCharacter(sf::Int16 character_id)
 
 void WorldClient::RemoveSnowball(sf::Int16 snowball_id)
 {
-	Projectile* snowball = m_projectiles[snowball_id];
-	if (snowball)
-	{
-		snowball->setPosition(-100, -100);
-		snowball->Destroy();
-	}
+	m_projectiles[snowball_id]->Destroy();
 }
 
 void WorldClient::RemovePickup(sf::Int16 pickup_id)
 {
-	Pickup* pickup = m_pickups[pickup_id];
-	if (pickup)
-	{
-		pickup->setPosition(-100, -100);
-		pickup->Destroy();
-	}
-}
-
-void WorldClient::PlaySoundEffect(sf::Int16 identifier, SoundEffect effect)
-{
-
-	//using m_sound_player to play sound effect
-	m_sounds.Play(effect, m_characters[identifier]->GetWorldPosition());
+	//awkward fix - maybe changed later
+	m_pickups[pickup_id]->setPosition(-100, -100);
+	m_pickups[pickup_id]->Destroy();
+	
 }
 
 void WorldClient::CreateSnowball(sf::Int16 character_identifier, sf::Int16 snowball_identifier)

@@ -38,6 +38,9 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, sf::I
     Utility::CentreOrigin(m_impact_animation);
     m_impact_animation.setPosition(GetWorldPosition());
     m_impact_animation.scale(0.8f, 0.8f);
+    
+    
+    
 }
 
 Projectile::Projectile(ProjectileType type, const TextureHolder& textures, sf::Int16 identifier, bool is_server, ParticleNode* particle_system)
@@ -66,7 +69,6 @@ Projectile::Projectile(ProjectileType type, const TextureHolder& textures, sf::I
     Utility::CentreOrigin(m_impact_animation);
     m_impact_animation.setPosition(GetWorldPosition());
     m_impact_animation.scale(0.8f, 0.8f);
-    m_impact_animation.ForceFrameOne();
 }
 
 unsigned int Projectile::GetCategory() const

@@ -161,7 +161,6 @@
     <ClCompile Include="RGBColour.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="GameServer.cpp" />
-    <ClCompile Include="ScoreboardState.cpp" />
     <ClCompile Include="SettingsState.cpp" />
     <ClCompile Include="SoundNode.cpp" />
     <ClCompile Include="SoundPlayer.cpp" />
@@ -227,7 +226,6 @@
     <ClInclude Include="SceneLayers.hpp" />
     <ClInclude Include="SceneNode.hpp" />
     <ClInclude Include="GameServer.hpp" />
-    <ClInclude Include="ScoreboardState.hpp" />
     <ClInclude Include="SettingsState.hpp" />
     <ClInclude Include="ShaderTypes.hpp" />
     <ClInclude Include="SoundEffect.hpp" />

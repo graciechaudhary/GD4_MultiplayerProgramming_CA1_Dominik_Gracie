@@ -6,7 +6,6 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Texture.hpp>
-#include <iostream>
 
 namespace
 {

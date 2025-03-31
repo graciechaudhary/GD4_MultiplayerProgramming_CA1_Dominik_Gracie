@@ -37,8 +37,6 @@ public:
 	 
 	std::size_t GetCurrentFrame();
 
-	void ForceFrameOne();
-
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 

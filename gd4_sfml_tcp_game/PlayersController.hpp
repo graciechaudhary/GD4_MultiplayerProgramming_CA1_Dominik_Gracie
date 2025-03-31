@@ -10,8 +10,6 @@
 
 #include <SFML/Network/TcpSocket.hpp>
 
-#include <sstream>
-
 class Command;
 
 struct GameRecords
@@ -46,17 +44,7 @@ public:
 
 	void UpdateColours(CommandQueue& command_queue);
 
-	void SetName(std::string name);
-	std::string GetName() const { return m_name; };
-
-	void SetActive(bool active) { m_active = active;};
-
 	GameRecords m_game_records;
-	std::stringstream m_score_ss;
-	std::stringstream m_kills_score_ss;
-	std::stringstream m_time_score_ss;
-
-
 private:
 	void InitialiseActions();
 	static bool IsRealTimeAction(Action action);
@@ -74,8 +62,5 @@ private:
 
 	sf::TcpSocket* m_socket;
 	sf::Int16 m_identifier;
-
-	std::string m_name;
-	bool m_active;
 };
 

@@ -4,7 +4,6 @@
 #include <SFML/System/Sleep.hpp>
 #include "Utility.hpp"
 #include <iostream>
-#include <fstream>
 
 GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
 , m_world()
@@ -21,61 +20,6 @@ GameServer::GameServer() : m_thread(&GameServer::ExecutionThread, this)
 	m_listener_socket.setBlocking(false);
 	m_peers[0].reset(new RemotePeer());
 	m_thread.launch();
-
-	//Dominik
-	//A queue of available places for players to spawn that correspond to spawn points from DataTables
-	m_places = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
-
-    {
-		//---------------------------------------------Read Highscores from files
-
-        //Try to open existing file
-        std::ifstream input_file("kills_highscores.txt");
-        for (int i = 0; i < m_max_connected_players; ++i)
-        {
-            std::string name;
-            int kills;
-            if (input_file >> name >> kills)
-            {
-				AddKillScore(kills, name);
-            }
-            else
-            {
-				AddKillScore(0, "Error");
-            }
-        }
-    }
-
-    {
-        //Try to open existing file
-        std::ifstream input_file("time_highscores.txt");
-        for (int i = 0; i < m_max_connected_players; ++i)
-        {
-            std::string name;
-            float time;
-            if (input_file >> name >> time)
-            {
-                AddTimeScore(time, name);
-            }
-            else
-            {
-                AddTimeScore(0, "Error");
-            }
-        }
-    }
-
-
-	std::cout << "Kills Highscores" << std::endl;
-    for (auto& score : m_high_scores_kills)
-    {
-        std::cout << score.first << " " << score.second << std::endl;
-    }
-
-	std::cout << "Time Highscores" << std::endl;
-	for (auto& score : m_high_scores_time)
-	{
-		std::cout << score.first << " " << score.second << std::endl;
-	}
 }
 
 GameServer::~GameServer()
@@ -128,8 +72,6 @@ void GameServer::ExecutionThread()
         //Fixed time step
         while (frame_time >= frame_rate)
         {
-            //Dominik
-			//------------------Update world and handle input from clients IF game has started
             if (m_game_started)
             {
                 m_world.Update(frame_rate);
@@ -147,52 +89,14 @@ void GameServer::ExecutionThread()
             if (m_game_started)
             {
                 Tick();
-				//Dominik
-				//---------------------------------Check if game has ended
+
                 if (m_world.CheckAlivePlayers() == 1)
                 {
                     BroadcastMessage("Game Finished");
-
-					//Get winner into score board
-                    m_world.MarkWinnersScore();
-
-					//Check for highscores
-					auto& players = m_world.GetPlayerRecords();
-					for (auto& player : players){
-						std::string name = m_world.GetCharacter(player.first)->GetName();
-						AddKillScore(player.second.m_kills, name);
-						AddTimeScore(player.second.m_survival_time.asSeconds(), name);
-                    }
-
-					//Write highscores to file
-                    std::ofstream output_file_kills("kills_highscores.txt");
-					std::ofstream output_file_time("time_highscores.txt");
-
-					//Share highscores with clients
-					sf::Packet packet;
-					packet << static_cast<sf::Int16>(Server::PacketType::kHighScores);
-					for (int i = 0; i < 5; ++i)
-					{
-						packet << m_high_scores_kills[i].second << m_high_scores_kills[i].first;
-						packet << m_high_scores_time[i].second << m_high_scores_time[i].first;
-
-						output_file_kills << m_high_scores_kills[i].second << " " << m_high_scores_kills[i].first << " ";
-						output_file_time << m_high_scores_time[i].second << " " << m_high_scores_time[i].first << " ";
-					}
-					SendToAll(packet);
-
-					output_file_kills.close();
-					output_file_time.close();
-
-					//Share score board with clients
-                    m_world.PrintRecords();
-					m_waiting_thread_end = true;
                 }
             }
             else
             {
-                //Dominik
-				//---------------------------------Check if all players are ready to start the game
                 sf::Packet packet;
                 packet << static_cast<sf::Int16>(Server::PacketType::kWaitingNotice);
                 SendToAll(packet);
@@ -205,9 +109,7 @@ void GameServer::ExecutionThread()
                         amount_ready++;
                     }
                 }
-
-                if (amount_ready == m_connected_players && amount_ready != 0)
-
+                if (amount_ready == m_connected_players)
                 {
                     sf::Packet ready_packet;
                     ready_packet << static_cast<sf::Int16>(Server::PacketType::kGameReady);
@@ -215,14 +117,12 @@ void GameServer::ExecutionThread()
                     m_game_started = true;
                     SetListening(false);
                     BroadcastMessage("Game Started");
-					m_world.StartClock();
                 }
             }
 
             tick_time -= tick_rate;
         }
 
-        //Handle events called from the world
         while (!m_world.GetEventQueue().empty()) {
             WorldServer::Packet_Ptr packet;
             packet = std::move(m_world.GetEventQueue().front());
@@ -235,9 +135,28 @@ void GameServer::ExecutionThread()
     }
 }
 
-//Dominik & Gracie
 void GameServer::Tick()
 {
+    /*sf::Packet packet;
+    packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
+    packet << m_connected_players;
+	for (sf::Int16 i = 0; i < m_connected_players; ++i)
+	{
+		if (m_peers[i]->m_ready)
+		{
+			sf::Int16 identifier = m_peers[i]->m_identifier;
+			float x = m_world.GetCharacter(i)->GetWorldPosition().x;
+			float y = m_world.GetCharacter(i)->GetWorldPosition().y;
+			float vx = m_world.GetCharacter(i)->GetVelocity().x;
+			float vy = m_world.GetCharacter(i)->GetVelocity().y;
+            sf::Int16 facing_dir = static_cast<sf::Int16>(m_world.GetCharacter(i)->GetFacingDirection());
+
+			packet << identifier << x << y << vx << vy << facing_dir;
+            
+
+		}
+	}*/
+
     sf::Packet packet;
     packet << static_cast<sf::Int16>(Server::PacketType::kUpdateClientState);
 
@@ -277,8 +196,20 @@ void GameServer::Tick()
 		float x = projectile.second->GetWorldPosition().x;
 		float y = projectile.second->GetWorldPosition().y;
 		
+		//packet << identifier << x << y;
         packet << identifier << x << y;
 	}
+
+    //pickups
+	/*size = static_cast<sf::Int16>(m_world.GetPickups().size());
+	packet << size;
+	for (auto& pickup : m_world.GetPickups())
+	{
+		sf::Int16 identifier = pickup.first;
+		float x = pickup.second->GetWorldPosition().x;
+		float y = pickup.second->GetWorldPosition().y;
+		packet << identifier << x << y;
+	}*/
 
 	SendToAll(packet);
 }
@@ -328,95 +259,40 @@ void GameServer::HandleIncomingPackets(sf::Packet& packet, RemotePeer& receiving
 
     switch (static_cast<Client::PacketType> (packet_type))
     {
-    case Client::PacketType::kQuit: {
-		receiving_peer.m_timed_out = true;
-		detected_timeout = true;
-		break;
-    }
-    case Client::PacketType::kBroadcastMessage:
-    {
-        std::string message;
-        packet >> message;
-        BroadcastMessage(message);
-        break;
-    }
-	//Dominik & Gracie
-    case Client::PacketType::kPlayerRealtimeChange: {
-        sf::Int16 identifier;
-        sf::Int16 action;
-        bool action_enabled;
+	    case Client::PacketType::kBroadcastMessage:
+	    {
+		    std::string message;
+		    packet >> message;
+		    BroadcastMessage(message);
+		    break;
+	    }
+        case Client::PacketType::kPlayerRealtimeChange: {
+			sf::Int16 identifier;
+			sf::Int16 action;
+			bool action_enabled;
 
-        packet >> identifier >> action >> action_enabled;
-        m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
-        break;
-    }
-    //Dominik                                              
-    case Client::PacketType::kReadyNotice: {
-        sf::Int16 id;
-        packet >> id;
+			packet >> identifier >>action >> action_enabled;
+			m_player_controllers[identifier]->RegisterRealTimeInputChange(static_cast<Action>(action), action_enabled);
+            break;
+        }
+        case Client::PacketType::kReadyNotice : {
+            sf::Int16 id;
+            packet >> id;
 
-        for (sf::Int16 i = 0; i < m_connected_players; ++i)
-        {
-            if (m_peers[i]->m_identifier == id)
+            for (sf::Int16 i = 0; i < m_connected_players; ++i)
             {
-                m_peers[i]->m_game_ready = m_peers[i]->m_game_ready ? false : true;
+                if (m_peers[i]->m_identifier == id)
+                {
+                    m_peers[i]->m_game_ready = m_peers[i]->m_game_ready ? false : true;
+                }
             }
+
         }
-        break;
-    }
-    //Gracie
-    case Client::PacketType::kColourChange: {
-
-        sf::Int16 r;
-		packet >> r;
-
-		sf::Int16 g;
-		packet >> g;
-
-		sf::Int16 b;
-		packet >> b;
-
-		receiving_peer.m_colour = RGBColour(r, g, b);
-			
-
-        sf::Packet colour_change;
-		colour_change << static_cast<sf::Int16>(Server::PacketType::kColourSync);
-		colour_change << receiving_peer.m_identifier << r << g << b;
-		SendToAll(colour_change);
-		break;
-    }
-    //Gracie
-    case Client::PacketType::kRequestNameSync: {
-		std::string name;
-		packet >> name;
-		receiving_peer.m_name = name;
-		m_world.GetCharacter(receiving_peer.m_identifier)->SetName(name);
-
-		sf::Packet name_packet;
-		name_packet << static_cast<sf::Int16>(Server::PacketType::kNameSync);
-		name_packet << m_connected_players;
-
-        for (auto& peer : m_peers) {
-			if (peer->m_ready) {
-				name_packet << peer->m_identifier << peer->m_name;
-			}
-        }
-		receiving_peer.m_socket.send(name_packet);
-
-        sf::Packet new_name;
-		new_name << static_cast<sf::Int16>(Server::PacketType::kNameSync);
-		sf::Int16 size = 1;
-        new_name << size;
-		new_name << receiving_peer.m_identifier << receiving_peer.m_name;
-		SendToAll(new_name);
-		break;
-    }
     default:
         break;
     }
 }
 
-//Dominik & Gracie
 void GameServer::HandleIncomingConnections()
 {
     if (!m_listening_state)
@@ -429,27 +305,21 @@ void GameServer::HandleIncomingConnections()
 
 		sf::Packet packet;
 		packet << static_cast<sf::Int16>(Server::PacketType::kSpawnSelf);
-		packet << m_player_id_count;
-    packet << place;
-
+		packet << m_connected_players;
 		m_peers[m_connected_players]->m_socket.send(packet);
 
-        m_peers[m_connected_players]->m_identifier = m_player_id_count;
+        m_peers[m_connected_players]->m_identifier = m_connected_players;
         m_peers[m_connected_players]->m_ready = true;
         m_peers[m_connected_players]->m_last_packet_time = Now();
 
-		m_player_controllers[m_player_id_count] = new PlayersController(&m_peers[m_connected_players]->m_socket, m_player_id_count);
-
-		m_world.AddCharacter(m_player_id_count, place);
+		m_player_controllers[m_connected_players] = new PlayersController(&m_peers[m_connected_players]->m_socket, m_connected_players);
+		m_world.AddCharacter(m_connected_players);
 
         InformWorldState(m_peers[m_connected_players]->m_socket);
-        NotifyPlayerSpawn(m_player_id_count, place);
-
-		std::cout << "Player " << m_player_id_count << " connected at place: " <<  place << std::endl;
+        NotifyPlayerSpawn(m_connected_players);
         
 
         m_connected_players++;
-		m_player_id_count++;
         if (m_connected_players >= m_max_connected_players)
         {
             SetListening(false);
@@ -463,25 +333,12 @@ void GameServer::HandleIncomingConnections()
     }
 }
 
-//Dominik & Gracie
 void GameServer::HandleDisconnections()
 {
     for (auto itr = m_peers.begin(); itr != m_peers.end();)
     {
         if ((*itr)->m_timed_out)
         {
-			//Inform all clients of the disconnection
-			sf::Packet packet;
-			packet << static_cast<sf::Int16>(Server::PacketType::kCharacterRemoved);
-			packet << (*itr)->m_identifier;
-
-			//Add place back to the list
-            m_places.push_front(m_world.GetCharacter((*itr)->m_identifier)->GetPlace());
-
-			//Remove character from world
-			m_world.RemoveCharacter((*itr)->m_identifier);
-			m_player_controllers[(*itr)->m_identifier]->SetActive(false);
-
             m_connected_players--;
             itr = m_peers.erase(itr);
 
@@ -518,7 +375,6 @@ void GameServer::BroadcastMessage(const std::string& message)
 	SendToAll(packet);
 }
 
-//Dominik & Gracie
 void GameServer::InformWorldState(sf::TcpSocket& socket)
 {
     sf::Packet packet;
@@ -530,79 +386,25 @@ void GameServer::InformWorldState(sf::TcpSocket& socket)
         if (m_peers[i]->m_ready)
         {
             sf::Int16 identifier = m_peers[i]->m_identifier;
-			sf::Int16 place = m_world.GetCharacter(identifier)->GetPlace();
-            sf::Int16 r,g,b;
-			r = m_peers[i]->m_colour.GetRed();
-			g = m_peers[i]->m_colour.GetGreen();
-			b = m_peers[i]->m_colour.GetBlue();
-			packet << identifier << place << r << g << b;
-		}
-	}
-	socket.send(packet);
+            packet << identifier;
+        }
+    }
+
+    socket.send(packet);
 }
 
-//Dominik & Gracie
-void GameServer::NotifyPlayerSpawn(sf::Int16 identifier, sf::Int16 place)
+void GameServer::NotifyPlayerSpawn(sf::Int16 identifier)
 {
     sf::Packet packet;
     sf::Int16 size = 1;
     packet << static_cast<sf::Int16>(Server::PacketType::kInitialState);
     packet << size;
     packet << identifier;
-	packet << place;
-    sf::Int16 r, g, b;
-    r = m_peers[identifier]->m_colour.GetRed();
-    g = m_peers[identifier]->m_colour.GetGreen();
-    b = m_peers[identifier]->m_colour.GetBlue();
-	packet << r << g << b;
 
     SendToAll(packet);
 }
 
-//Dominik
-sf::Int16 GameServer::GetSpawnPlace()
-{
-	sf::Int16 place = m_places.front();
-	m_places.pop_front();
-    return place;
-}
-
-//Dominink
-void GameServer::AddKillScore(sf::Int16 kills, std::string name)
-{
-    //Add
-    //Sort
-    //Pop over 5
-    m_high_scores_kills.emplace_back(kills, name);
-
-    std::sort(m_high_scores_kills.begin(), m_high_scores_kills.end(), [](const auto& a, const auto& b) {
-        return a.first > b.first;
-        });
-
-    if (m_high_scores_kills.size() > 5) {
-        m_high_scores_kills.pop_back();
-    }
-}
-
-//Dominik
-void GameServer::AddTimeScore(float time, std::string name)
-{
-    //Add
-	//Sort
-	//Pop over 5
-    m_high_scores_time.emplace_back(time, name);
-
-    std::sort(m_high_scores_time.begin(), m_high_scores_time.end(), [](const auto& a, const auto& b) {
-        return a.first > b.first;
-        });
-
-    if (m_high_scores_time.size() > 5) {
-        m_high_scores_time.pop_back();
-    }
-
-}
-
-GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false), m_game_ready(false), m_name("")
+GameServer::RemotePeer::RemotePeer() : m_ready(false), m_timed_out(false), m_game_ready(false)
 {
     m_socket.setBlocking(false);
 }

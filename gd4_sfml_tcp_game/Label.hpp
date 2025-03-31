@@ -16,8 +16,6 @@ namespace gui
 		virtual bool IsSelectable() const override;
 		void SetText(const std::string& text);
 		void HandleEvent(const sf::Event& event) override;
-		//sf::Text GetText() const;
-		void SetOutlineDesign(sf::Color color, float thickness);
 
 		void SetColor(sf::Color color) { m_text.setFillColor(color); }
 

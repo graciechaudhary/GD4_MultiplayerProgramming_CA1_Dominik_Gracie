@@ -33,25 +33,6 @@ public:
 
 	sf::Int16 CheckAlivePlayers();
 
-	void RemoveCharacter(sf::Int16 character_id);
-
-	void StartClock() { m_clock.restart(); };
-
-	struct PlayerRecords {
-		PlayerRecords() :m_survival_time(sf::Time::Zero), m_kills(0)
-		{
-		}
-		sf::Time m_survival_time = sf::Time::Zero;
-		sf::Int16 m_kills = 0;
-	};
-
-	void PrintRecords();
-
-	void MarkWinnersScore();
-
-	std::map<sf::Int16, PlayerRecords>& GetPlayerRecords() { return m_players_records; };
-
-
 private:
 	struct SpawnPoint
 	{
@@ -98,8 +79,6 @@ private:
 	void CheckMarkedForRemoval();
 	void SpawnPickup();
 
-	sf::Vector2f GetRandomPosition(float min_x, float max_x, float min_y, float max_y);
-
 
 
 
@@ -116,22 +95,15 @@ private:
 	TextureHolder m_textures;
 
 	sf::Time m_pickup_drop_interval;
-	sf::Time m_full_drop_interval;
 	sf::Time m_time_since_last_drop;
 	int m_pickups_spawned;
 	int m_max_pickups;
 	sf::Int16 m_pickup_counter;
 
-
-	sf::Clock m_clock;
-	std::map<sf::Int16, PlayerRecords> m_players_records;
-	std::deque<sf::Int16> m_order_of_death;
-	
 	std::map<sf::Int16, Character*> m_characters;
 	std::map<sf::Int16, Projectile*> m_projectiles;
 	std::deque<Packet_Ptr> m_event_queue;
 
 	sf::Int16 m_players_alive;
-	int m_last_quadrant;
 };
 

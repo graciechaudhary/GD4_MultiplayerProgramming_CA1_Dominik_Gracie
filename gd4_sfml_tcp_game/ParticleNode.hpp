@@ -18,7 +18,6 @@ public:
 
 	int GetIdentifier() const;
 
-
 	void UpdateVisuals(sf::Time dt);
 
 private:

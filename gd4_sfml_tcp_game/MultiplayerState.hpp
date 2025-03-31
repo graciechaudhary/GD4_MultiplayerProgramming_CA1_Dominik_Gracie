@@ -5,13 +5,6 @@
 #include "WorldClient.hpp"
 #include "PlayersController.hpp"
 
-#include "Container.hpp"
-#include "Button.hpp"
-#include <SFML/Graphics/Sprite.hpp>
-#include "RGBColour.hpp"
-#include "Label.hpp"
-#include "ResourceIdentifiers.hpp"
-
 class MultiplayerState : public State
 {
 public:
@@ -25,7 +18,6 @@ public:
 private:
 	void UpdateBroadcastMessage(sf::Time elapsed_time);
 	void HandlePacket(sf::Int16 packet_type, sf::Packet& packet);
-	void SetUpColourSelectionUI(Context context);
 
 private:
 	sf::RenderWindow& m_window;
@@ -54,16 +46,5 @@ private:
 
 	bool m_game_started;
 	bool m_player_dead;
-	
-	bool m_game_ended;
-	sf::Time m_game_end_time;
-
-	gui::Container m_gui_container;
-	std::vector<gui::Button::Ptr> m_buttons;
-	std::unique_ptr<RGBColour> m_colour;
-	bool m_is_player_ready;
-	sf::Sprite m_sprite;
-	int m_selected_button;
-
 };
 

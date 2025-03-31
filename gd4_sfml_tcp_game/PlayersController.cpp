@@ -118,7 +118,7 @@ struct CharacterMover
 	Direction direction;
 	sf::Int16 identifier;
 };
-//Dominik & Gracie
+
 struct CharacterThrower
 {
 	CharacterThrower(sf::Int16 identifier) : identifier(identifier)
@@ -134,12 +134,12 @@ struct CharacterThrower
     sf::Int16 identifier;
 };
 
-PlayersController::PlayersController() : m_current_game_status(GameStatus::kGameRunning), m_should_update_colours(false), m_socket(nullptr), m_identifier(1), m_active(true), m_score_ss()
+PlayersController::PlayersController() : m_current_game_status(GameStatus::kGameRunning), m_should_update_colours(false), m_socket(nullptr), m_identifier(1)
 {
     InitialiseActions();
 }
 
-PlayersController::PlayersController(sf::TcpSocket* socket, sf::Int16 identifier) : m_should_update_colours(false), m_socket(socket), m_identifier(identifier), m_active(true), m_score_ss()
+PlayersController::PlayersController(sf::TcpSocket* socket, sf::Int16 identifier) : m_should_update_colours(false), m_socket(socket), m_identifier(identifier)
 {
     InitialiseActions();
 }
@@ -150,7 +150,6 @@ void PlayersController::SetConnection(sf::TcpSocket* socket, sf::Int16 identifie
 	m_identifier = identifier;
 }
 
-//Dominik & Gracie
 void PlayersController::HandleEvent(const sf::Event& event)
 {
     //if (event.type == sf::Event::KeyPressed)
@@ -166,7 +165,7 @@ void PlayersController::HandleEvent(const sf::Event& event)
     {
         Action action = m_key_binding[event.key.code];
         bool isPressed = (event.type == sf::Event::KeyPressed);
-		if (IsRealTimeAction(action) && m_action_proxy[action] != isPressed) //Only call if the state has changed -> reduce network traffic
+        if (IsRealTimeAction(action) && m_action_proxy[action] != isPressed)
         {
             m_action_proxy[action] = isPressed;
             // Send realtime change over network
@@ -181,7 +180,6 @@ void PlayersController::HandleEvent(const sf::Event& event)
 
 	//HandleControllerInput(event);
 }
-
 
 void PlayersController::HandleRealTimeInput(CommandQueue& command_queue)
 {
@@ -234,11 +232,9 @@ void PlayersController::HandleControllerInput(const sf::Event& event) {
 }
 
  
-//Dominik & Gracie
+
 void PlayersController::NetworkedRealTimeInputServer(CommandQueue& command_queue)
 {
-    if (!m_active) return;
-
 	for (auto pair : m_action_proxy)
 	{
 		if (pair.second)
@@ -249,7 +245,6 @@ void PlayersController::NetworkedRealTimeInputServer(CommandQueue& command_queue
 	}
 }
 
-//Dominik & Gracie
 void PlayersController::RegisterRealTimeInputChange(Action action, bool state)
 {
 	m_action_proxy[action] = state;
@@ -374,9 +369,4 @@ void PlayersController::UpdateColours(CommandQueue& command_queue)
     command_queue.Push(set_colour_one);
 	command_queue.Push(set_particle_colour_one);
 	m_should_update_colours = false;
-}
-
-void PlayersController::SetName(std::string name)
-{
-	m_name = name.substr(0, 4);
 }
