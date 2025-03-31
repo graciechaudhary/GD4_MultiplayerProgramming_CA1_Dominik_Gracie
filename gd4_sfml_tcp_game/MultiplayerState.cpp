@@ -29,6 +29,7 @@ std::pair<sf::IpAddress, std::string> GetIpAndNametagFromFile()
 	output_file << local_address << " " << nametag;
 	return std::pair<sf::IpAddress, std::string>(local_address, nametag);
 
+
 }
 //Dominik & Gracie
 MultiplayerState::MultiplayerState(StateStack& stack, Context context, bool is_host)
@@ -349,8 +350,8 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 	}
 	//Server has sent the client their identifier and spawn place
 	case Server::PacketType::kSpawnSelf:{
-		sf::Int16 identifier, place;
-		packet >> identifier >> place;
+		sf::Int16 identifier;
+		packet >> identifier;
 		m_identifier = identifier;
 		m_world.AddCharacter(identifier, place, m_players_controller.GetName());
 		m_players_controller.SetConnection(&m_socket, identifier);
@@ -396,8 +397,8 @@ void MultiplayerState::HandlePacket(sf::Int16 packet_type, sf::Packet& packet)
 		for (sf::Int16 i = 0; i < amount; i++)
 		{
 
-			sf::Int16 id, place;
-			packet >> id >> place;
+			sf::Int16 id;
+			packet >> id;
 
 			sf::Int16 r, g, b;
 			packet >> r >> g >> b;

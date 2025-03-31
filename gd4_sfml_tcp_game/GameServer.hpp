@@ -56,9 +56,7 @@ private:
 
 	void InformWorldState(sf::TcpSocket& socket);
 
-	void NotifyPlayerSpawn(sf::Int16 identifier, sf::Int16 place);
-
-	sf::Int16 GetSpawnPlace();
+	void NotifyPlayerSpawn(sf::Int16 identifier);
 
 	void AddKillScore(sf::Int16 kills, std::string name);
 	void AddTimeScore(float time, std::string name);
@@ -81,11 +79,13 @@ private:
 	std::map<sf::Int16, PlayersController*> m_player_controllers;
 
 	bool m_game_started;
+
 	std::deque<sf::Int16> m_places;
 
 	std::deque<sf::Int16> m_scoreboard;
 
 	std::vector<std::pair<sf::Int16, std::string>> m_high_scores_kills;
 	std::vector<std::pair<float, std::string>> m_high_scores_time;
+
 };
 

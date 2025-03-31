@@ -270,11 +270,12 @@ void WorldClient::Update(sf::Time dt)
 	//m_scenegraph.RemoveWrecks();
 }
 
+
 void WorldClient::AddCharacter(sf::Int16 identifier, sf::Int16 place, std::string name)
 {
-	std::unique_ptr<Character> leader(new Character(false, identifier, place ,m_textures, m_fonts));
+	std::unique_ptr<Character> leader(new Character(false, identifier, m_textures, m_fonts));
 	Character* character = leader.get();
-	character->setPosition(Table[place].m_x, Table[place].m_y);
+	character->setPosition(Table[identifier].m_x, Table[identifier].m_y);
 	character->SetVelocity(0, 0);
 	character->SetColour(sf::Color::Yellow);
 	character->SetName(name);
@@ -311,7 +312,6 @@ ParticleNode* WorldClient::GetParticleSystem(sf::Int16 identifier)
 
 void WorldClient::RemoveCharacter(sf::Int16 character_id)
 {
-	m_characters[character_id]->setPosition(-1000,-1000);
 	//m_characters.erase(character_id);
 	//auto it = m_characters.find(character_id);
 	//if (it != m_characters.end()) {
