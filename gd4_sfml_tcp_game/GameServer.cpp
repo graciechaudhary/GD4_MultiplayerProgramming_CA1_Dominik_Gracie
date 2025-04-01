@@ -477,7 +477,7 @@ void GameServer::HandleDisconnections()
             m_places.push_front(m_world.GetCharacter((*itr)->m_identifier)->GetPlace());
 
 			//Remove character from world
-			m_world.RemoveCharacter((*itr)->m_identifier);
+			m_world.RemoveCharacter((*itr)->m_identifier, m_game_started);
 			m_player_controllers[(*itr)->m_identifier]->SetActive(false);
 
             m_connected_players--;
