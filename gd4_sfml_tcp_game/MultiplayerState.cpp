@@ -116,6 +116,8 @@ void MultiplayerState::Draw()
 			m_window.draw(m_broadcast_text);
 		}
 
+
+		//Gracie
 		if (!m_game_started)
 		{
 			m_window.draw(m_gui_container);
