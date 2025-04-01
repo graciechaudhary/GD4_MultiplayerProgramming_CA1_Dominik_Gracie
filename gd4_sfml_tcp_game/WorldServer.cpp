@@ -445,13 +445,16 @@ void WorldServer::DestroyEntitiesOutsideView()
 	//we will have to inform the client that entity has been destroyed by sending respective packet
 }
 
-void WorldServer::RemoveCharacter(sf::Int16 character_id)
+void WorldServer::RemoveCharacter(sf::Int16 character_id, bool game_running)
 {
 	m_characters[character_id]->Destroy();
 	m_characters[character_id]->setPosition(-1000, -1000);
 
-	m_players_records[character_id].m_survival_time = m_clock.getElapsedTime();
-	m_order_of_death.push_back(character_id);
+	if (game_running)
+	{
+		m_players_records[character_id].m_survival_time = m_clock.getElapsedTime();
+		m_order_of_death.push_back(character_id);
+	}
 
 	m_players_alive--;
 	//m_characters.erase(character_id);

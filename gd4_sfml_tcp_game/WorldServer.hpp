@@ -33,7 +33,7 @@ public:
 
 	sf::Int16 CheckAlivePlayers();
 
-	void RemoveCharacter(sf::Int16 character_id);
+	void RemoveCharacter(sf::Int16 character_id, bool game_running);
 
 	void StartClock() { m_clock.restart(); };
 
